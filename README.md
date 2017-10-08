@@ -12,6 +12,7 @@ them and share data blocks for a specific file.
 | -- | -- |
 | Ice 3.7 | https://doc.zeroc.com/display/Ice37/Home |
 | Maven 3.5.0 | http://maven.apache.org |
+| Bittorrent java implementation | https://bitbucket.org/frazboyz/bencoder |
 
 
 # Project team
