@@ -35,6 +35,10 @@ https://yurisubach.com/2016/07/14/jersey-dockerize/ - How to Dockerize Java REST
 * hash
 * pointer to next chunk (hash of next chunk)
 
+## Client Handling
+Idea: for each request, a new thread gets created
+Once maximum number of optimal threads (ex. 6 threads on a 4 core machine),
+the other requests get queued
 
 # Project team
 Freddy
