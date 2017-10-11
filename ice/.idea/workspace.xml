@@ -26,9 +26,11 @@
       <file leaf-file-name="PostgresTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/PostgresTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="18" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="18" />
-              <folding />
+            <state relative-caret-position="494">
+              <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -207,14 +209,6 @@
               <item name="classes" type="462c0819:PsiDirectoryNode" />
               <item name="pt" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="IceTest" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ice" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-              <item name="classes" type="462c0819:PsiDirectoryNode" />
-              <item name="pt" type="462c0819:PsiDirectoryNode" />
-              <item name="fcup" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -346,12 +340,12 @@
       <option name="presentableId" value="Default" />
       <updated>1507674555895</updated>
       <workItem from="1507674561480" duration="11775000" />
-      <workItem from="1507719075110" duration="83000" />
+      <workItem from="1507719075110" duration="363000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11858000" />
+    <option name="totallyTimeSpent" value="12138000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="38" y="22" width="1242" height="778" extended-state="0" />
@@ -424,7 +418,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="3" column="18" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="18" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -459,9 +455,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/PostgresTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="18" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="18" />
-          <folding />
+        <state relative-caret-position="494">
+          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -33,11 +33,15 @@ public class PostgresTest {
 
     private static Connection getConnection(String host, Properties props) {
         try {
+            Class.forName("org.postgresql.Driver");
             Connection conn = DriverManager.getConnection(host, props);
             System.out.println("Connected to prod db");
             return conn;
         } catch(SQLException e) {
             e.printStackTrace();
+            return null;
+        } catch(ClassNotFoundException ex) {
+            ex.printStackTrace();
             return null;
         }
     }
@@ -46,13 +50,10 @@ public class PostgresTest {
         Properties props = new Properties();
 
         try {
-            Class.forName("org.postgresql.Driver");
             FileInputStream input = new FileInputStream(filename);
             props.load(input);
         } catch(IOException e) {
             e.printStackTrace();
-        } catch(ClassNotFoundException ex) {
-            ex.printStackTrace();
         }
 
         return props;
