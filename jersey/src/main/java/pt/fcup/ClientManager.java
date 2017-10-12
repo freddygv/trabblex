@@ -7,7 +7,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import java.io.IOException;
 import java.net.URI;
 
-class ClientManager implements IClient{
+class ClientManager{
 
 
     // Base URI the Grizzly HTTP server will listen on
@@ -42,16 +42,6 @@ class ClientManager implements IClient{
             // Do something !
         }
         server.stop();
-
-    }
-
-    public void list_seeders()
-    {
-
-    }
-
-    public void create_seed()
-    {
 
     }
 }
