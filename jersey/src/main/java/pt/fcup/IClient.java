@@ -1,3 +1,5 @@
+package pt.fcup;
+
 /**
 * Interface used by
 - the main portal and client
@@ -5,7 +7,7 @@
 to communicate
 */
 
-public Interface IClient
+public interface IClient
 {
   public void list_seeders();
   public void create_seed();

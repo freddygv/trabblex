@@ -7,7 +7,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import java.io.IOException;
 import java.net.URI;
 
-class ClientManager extends Parent implements IClient {
+class ClientManager implements IClient{
 
 
     // Base URI the Grizzly HTTP server will listen on
@@ -30,12 +30,17 @@ class ClientManager extends Parent implements IClient {
     /**
     * Create server and everything else necessary
     */
-    public ClientManager
+    public ClientManager ()
     {
         final HttpServer server = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "
                + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
-        System.in.read();
+        try{
+            System.in.read();
+        }
+        catch(IOException e){
+            // Do something !
+        }
         server.stop();
 
     }
