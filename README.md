@@ -41,12 +41,13 @@ Once maximum number of optimal threads (ex. 6 threads on a 4 core machine),
 the other requests get queued
 
 # Project team
-Freddy
+Freddy - code the **Seeder manager**
 
-Quentin
+Quentin - code the **Client manager**
 
 # TODO
-* Create a simple jetty server
+* Create a simple server that manages the client and seeder apps
+* Create a simple client manager (Jetty)
 * Create a simple ICE RPC client
-* Create the seeder
+* Create the seeder (ICE)
 * Create test cases using Junit based on the spec - one for each method of the elements
