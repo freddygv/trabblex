@@ -27,6 +27,8 @@ them and share data blocks for a specific file.
 * Implements *client* interface
 * Enables the client to get back the list of seeders , and create a seed
 
+## Simple Client
+Connects to the client manager using the JAX-RS Client API
 
 ## Database
 Using CLOUD SQL --> integrated into google cloud

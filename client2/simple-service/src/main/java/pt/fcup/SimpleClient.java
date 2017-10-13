@@ -13,35 +13,36 @@ public class SimpleClient {
 
     private ClientConfig clientConfig;
     private Client client;
-    private WebTarget webTarget;
-    private WebTarget resourceWebTarget;
 
     public SimpleClient()
     {
         clientConfig = new ClientConfig();
-        //clientConfig.register(MyClientResponseFilter.class);
-        //clientConfig.register(new AnotherClientFilter());
-
         client = ClientBuilder.newClient(clientConfig);
-        //client.register(ThirdClientFilter.class);
-
-        webTarget = client.target("http://localhost:8080/myapp/");
-        //webTarget.register(FilterForExampleCom.class);
-        resourceWebTarget = webTarget.path("clientmanager");
 
 
-        //invocationBuilder.header("some-header", "true");
+    }
+
+    public void getSeeders()
+    {
 
     }
 
     public void getResource()
     {
-        Invocation.Builder invocationBuilder =
-                resourceWebTarget.request(MediaType.TEXT_PLAIN_TYPE);
+        String keywords = "test, test2, test3";
+        String webTarget = client.target("http://localhost:8080/trabblex/clientmanager/getfromkeywords")
+                             .path("{keywords}")
+                             .resolveTemplate("keywords", keywords)
+                             .request(MediaType.TEXT_PLAIN_TYPE)
+                             .get(String.class);
+
+        /*Invocation.Builder invocationBuilder =
+                WebTarget.request(MediaType.TEXT_PLAIN);
 
         Response response = invocationBuilder.get();
         System.out.println(response.getStatus());
-        System.out.println(response.readEntity(String.class));
+        System.out.println(response.readEntity(String.class));*/
+        System.out.println(webTarget);
     }
 
     public static void main(String[] args)
