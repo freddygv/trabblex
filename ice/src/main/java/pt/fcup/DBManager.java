@@ -10,30 +10,40 @@ public class DBManager {
     private String HOST = "127.0.0.1:5432";
     private String DB_NAME = "prod";
     private String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-    private Properties DB_PROPS = getDBProperties("db.properties");
+    private Properties DB_PROPS;
 
     private Connection conn;
     private Statement st;
     private ResultSet rs;
 
 
-    public DBManager() {
+    public DBManager() throws IOException, ClassNotFoundException{
         try {
             Class.forName("org.postgresql.Driver");
 
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Postgres Driver not found.");
+            throw e;
+
+        }
+
+        try {
+            DB_PROPS = getDBProperties("db.properties");
+
+        } catch (IOException e) {
+            System.err.println("Error loading properties file.");
+            throw e;
 
         }
     }
 
-    public void printQuery(String query) {
+    public void printQuery(String query) throws SQLException {
         try {
             conn = getConnection();
 
         } catch (SQLException e) {
             System.err.println("Connection to DB Failed.");
-            e.printStackTrace();
+            throw e;
         }
 
         try {
@@ -51,7 +61,7 @@ public class DBManager {
 
         } catch (SQLException e) {
             System.err.println("Query execution failed.");
-            e.printStackTrace();
+            throw e;
 
         }
 
@@ -63,20 +73,12 @@ public class DBManager {
 
     }
 
-    private Properties getDBProperties(String filename) {
+    private Properties getDBProperties(String filename) throws IOException {
         Properties props = new Properties();
 
-        try {
-            FileInputStream input = new FileInputStream(filename);
-            props.load(input);
-            return props;
-
-        } catch (IOException e) {
-            System.err.println("Error loading properties file.");
-            e.printStackTrace();
-            return null;
-
-        }
+        FileInputStream input = new FileInputStream(filename);
+        props.load(input);
+        return props;
 
     }
 
