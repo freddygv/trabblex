@@ -16,6 +16,18 @@ them and share data blocks for a specific file.
 | Bittorrent specification | https://wiki.theory.org/index.php/BitTorrentSpecification |
 | Docker | |
 
+## Components
+
+### Client Manager
+* Creates a Grizzly HTTP Server (at first view, provides the best performance)
+* Creates resources used by the client
+* Offers REST interface (maybe ICE later)
+
+#### Resource: Client Manager Resource
+* Implements *client* interface
+* Enables the client to get back the list of seeders , and create a seed
+
+
 ## Database
 Using CLOUD SQL --> integrated into google cloud
 

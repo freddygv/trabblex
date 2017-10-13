@@ -10,20 +10,18 @@ import java.net.URI;
 class ClientManager{
 
 
-    // Base URI the Grizzly HTTP server will listen on
+    // Base URI the Grizzly server will listen on
     public static final String BASE_URI = "http://localhost:8080/myapp/";
 
-
     /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
-     * @return Grizzly HTTP server.
+     * Start Grizzly HTTP server exposing JAX-RS resources
      */
     public static HttpServer startServer() {
         // create a resource config that scans for JAX-RS resources and providers
         final ResourceConfig rc = new ResourceConfig().packages("pt.fcup");
 
         // create and start a new instance of grizzly http server
-        // exposing the Jersey application at BASE_URI
+        // expose the Jersey application at BASE_URI
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
