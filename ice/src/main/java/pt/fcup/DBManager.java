@@ -49,7 +49,7 @@ public class DBManager {
      * @return JSONArray as string, [{row1-col1: value}, {row2-col1: value}]
      * @throws SQLException
      */
-    public String queryTable(String query) throws SQLException {
+    public JSONArray queryTable(String query) throws SQLException {
         try {
             conn = getConnection();
 
@@ -75,7 +75,7 @@ public class DBManager {
             statement.close();
             conn.close();
 
-            return table.toString();
+            return table;
 
         } catch (SQLException e) {
             System.err.println("Query execution failed.");

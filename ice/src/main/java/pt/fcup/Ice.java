@@ -20,7 +20,7 @@ public class Ice {
         try {
             DBManager db = new DBManager();
             String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-            System.out.println(db.queryTable(sampleQuery));
+            System.out.println(db.queryTable(sampleQuery).toString());
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             ec.printStackTrace();

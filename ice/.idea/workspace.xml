@@ -13,14 +13,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DBManager.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java">
+      <file leaf-file-name="DBManagerTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="66" column="38" lean-forward="false" selection-start-line="66" selection-start-column="38" selection-end-line="66" selection-end-column="38" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="285">
+              <caret line="26" column="64" lean-forward="false" selection-start-line="26" selection-start-column="64" selection-end-line="26" selection-end-column="64" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -64,9 +62,9 @@
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/PostgresTest.java" />
         <option value="$PROJECT_DIR$/target/classes/META-INF/MANIFEST.MF" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Ice.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Ice.java" />
+        <option value="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
       </list>
     </option>
   </component>
@@ -367,16 +365,15 @@
       <workItem from="1507674561480" duration="11775000" />
       <workItem from="1507719075110" duration="774000" />
       <workItem from="1507738281002" duration="2935000" />
-      <workItem from="1507893220224" duration="12224000" />
+      <workItem from="1507893220224" duration="12475000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27708000" />
+    <option name="totallyTimeSpent" value="27959000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="38" y="22" width="1242" height="778" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -387,7 +384,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2375" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287879" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3287879" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3287879" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19333333" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -453,7 +450,12 @@
         <state relative-caret-position="270">
           <caret line="21" column="49" lean-forward="true" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <marker date="1507913989144" expanded="true" signature="25:180" ph="..." />
+            <marker date="1507913989144" expanded="true" signature="721:1139" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="1145:1281" ph="/**...*/" />
+            <marker date="1507913989144" expanded="true" signature="1348:2235" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="2296:2366" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="2443:2609" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -463,11 +465,11 @@
         <state relative-caret-position="120">
           <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding>
-            <marker date="1507913441826" expanded="true" signature="25:75" ph="..." />
-            <marker date="1507913441826" expanded="true" signature="139:201" ph="{...}" />
-            <marker date="1507913441826" expanded="true" signature="225:236" ph=" { " />
-            <marker date="1507913441826" expanded="true" signature="246:252" ph=" }" />
-            <marker date="1507913441826" expanded="true" signature="281:699" ph="{...}" />
+            <marker date="1507914029103" expanded="true" signature="25:75" ph="..." />
+            <marker date="1507914029103" expanded="true" signature="139:201" ph="{...}" />
+            <marker date="1507914029103" expanded="false" signature="225:236" ph=" { " />
+            <marker date="1507914029103" expanded="false" signature="246:252" ph=" }" />
+            <marker date="1507914029103" expanded="true" signature="281:710" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -518,11 +520,11 @@
         <state relative-caret-position="810">
           <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
           <folding>
-            <marker date="1507913441826" expanded="true" signature="25:75" ph="..." />
-            <marker date="1507913441826" expanded="true" signature="139:201" ph="{...}" />
-            <marker date="1507913441826" expanded="true" signature="225:236" ph=" { " />
-            <marker date="1507913441826" expanded="true" signature="246:252" ph=" }" />
-            <marker date="1507913441826" expanded="true" signature="281:699" ph="{...}" />
+            <marker date="1507914029103" expanded="true" signature="25:75" ph="..." />
+            <marker date="1507914029103" expanded="true" signature="139:201" ph="{...}" />
+            <marker date="1507914029103" expanded="false" signature="225:236" ph=" { " />
+            <marker date="1507914029103" expanded="false" signature="246:252" ph=" }" />
+            <marker date="1507914029103" expanded="true" signature="281:710" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -573,11 +575,11 @@
         <state relative-caret-position="45">
           <caret line="3" column="18" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="18" />
           <folding>
-            <marker date="1507913441826" expanded="true" signature="25:75" ph="..." />
-            <marker date="1507913441826" expanded="true" signature="139:201" ph="{...}" />
-            <marker date="1507913441826" expanded="true" signature="225:236" ph=" { " />
-            <marker date="1507913441826" expanded="true" signature="246:252" ph=" }" />
-            <marker date="1507913441826" expanded="true" signature="281:699" ph="{...}" />
+            <marker date="1507914029103" expanded="true" signature="25:75" ph="..." />
+            <marker date="1507914029103" expanded="true" signature="139:201" ph="{...}" />
+            <marker date="1507914029103" expanded="false" signature="225:236" ph=" { " />
+            <marker date="1507914029103" expanded="false" signature="246:252" ph=" }" />
+            <marker date="1507914029103" expanded="true" signature="281:710" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1179,54 +1181,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="21" column="9" lean-forward="true" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
-          <folding>
-            <marker date="1507913254660" expanded="false" signature="25:236" ph="..." />
-            <marker date="1507913254660" expanded="true" signature="409:450" ph="{...}" />
-            <marker date="1507913254660" expanded="true" signature="501:788" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/target/classes/pt/fcup/DBManager.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1507913446852" expanded="true" signature="0:104" ph="/.../" />
-            <marker date="1507913446852" expanded="false" signature="131:445" ph="..." />
-            <marker date="1507913446852" expanded="true" signature="900:1489" ph="{...}" />
-            <marker date="1507913446852" expanded="true" signature="1554:2628" ph="{...}" />
-            <marker date="1507913446852" expanded="true" signature="2689:2768" ph="{...}" />
-            <marker date="1507913446852" expanded="true" signature="2845:3009" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Ice.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="3" column="29" lean-forward="true" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
-          <folding>
-            <marker date="1507913441826" expanded="true" signature="25:75" ph="..." />
-            <marker date="1507913441826" expanded="true" signature="139:201" ph="{...}" />
-            <marker date="1507913441826" expanded="true" signature="225:236" ph=" { " />
-            <marker date="1507913441826" expanded="true" signature="246:252" ph=" }" />
-            <marker date="1507913441826" expanded="true" signature="281:699" ph="{...}" />
+            <marker date="1507914044804" expanded="true" signature="0:104" ph="/.../" />
+            <marker date="1507914044804" expanded="false" signature="131:445" ph="..." />
+            <marker date="1507914044804" expanded="true" signature="900:1489" ph="{...}" />
+            <marker date="1507914044804" expanded="true" signature="2416:2554" ph="{...}" />
+            <marker date="1507914044804" expanded="true" signature="2615:2694" ph="{...}" />
+            <marker date="1507914044804" expanded="true" signature="2771:2935" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="66" column="38" lean-forward="false" selection-start-line="66" selection-start-column="38" selection-end-line="66" selection-end-column="38" />
+        <state relative-caret-position="303">
+          <caret line="77" column="24" lean-forward="false" selection-start-line="77" selection-start-column="24" selection-end-line="77" selection-end-column="24" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <marker date="1507913989144" expanded="true" signature="25:180" ph="..." />
+            <marker date="1507913989144" expanded="true" signature="721:1139" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="1145:1281" ph="/**...*/" />
+            <marker date="1507913989144" expanded="true" signature="1348:2235" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="2296:2366" ph="{...}" />
+            <marker date="1507913989144" expanded="true" signature="2443:2609" ph="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Ice.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="22" column="68" lean-forward="false" selection-start-line="22" selection-start-column="68" selection-end-line="22" selection-end-column="68" />
+          <folding>
+            <marker date="1507914029103" expanded="true" signature="25:75" ph="..." />
+            <marker date="1507914029103" expanded="true" signature="139:201" ph="{...}" />
+            <marker date="1507914029103" expanded="false" signature="225:236" ph=" { " />
+            <marker date="1507914029103" expanded="false" signature="246:252" ph=" }" />
+            <marker date="1507914029103" expanded="true" signature="281:710" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="26" column="64" lean-forward="false" selection-start-line="26" selection-start-column="64" selection-end-line="26" selection-end-column="64" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -24,7 +24,7 @@ class DBManagerTest {
         String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
 
         expectedString = "[{\"tablename\":\"seeders\"}]";
-        resultString = testDB.queryTable(sampleQuery);
+        resultString = testDB.queryTable(sampleQuery).toString();
 
         assertEquals(expectedString, resultString);
     }
