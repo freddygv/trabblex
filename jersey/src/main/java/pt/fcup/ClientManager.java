@@ -34,8 +34,10 @@ class ClientManager{
     public ClientManager ()
     {
         final HttpServer server = startServer();
-        System.out.println(String.format("Jersey app started with WADL available at "
-               + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
+
+        String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
+        DBManager.getInstance().printQuery(sampleQuery);
+
         try{
             System.in.read();
         }

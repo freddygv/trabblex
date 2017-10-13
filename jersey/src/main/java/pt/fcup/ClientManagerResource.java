@@ -22,10 +22,10 @@ public class ClientManagerResource  implements IClient{
         return keywords;
     }
 
-    public String[] getSeedersfromdB()
+    /*public String[] getSeedersfromdB()
     {
 
-    }
+    }*/
 
     public void list_seeders()
     {

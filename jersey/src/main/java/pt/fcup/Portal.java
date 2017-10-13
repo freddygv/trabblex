@@ -13,7 +13,15 @@ public class Portal
   // storage manager
   // seeders list
 
-  public static void main(String[] args) {
-      ClientManager cm = new ClientManager();
-  }
+  private ClientManager cm;
+
+   public void Portal()
+   {
+       cm = new ClientManager();
+   }
+
+
+    public static void main(String[] args) {
+        Portal pt = new Portal();
+    }
 }
