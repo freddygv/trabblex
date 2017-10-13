@@ -7,9 +7,10 @@ public class Ice {
 
     }
 
+
     private void run() {
         DBManager db = new DBManager();
-        String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
+        String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
         db.printQuery(sampleQuery);
 
     }

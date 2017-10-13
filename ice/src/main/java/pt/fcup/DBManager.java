@@ -10,7 +10,7 @@ public class DBManager {
     private String HOST = "127.0.0.1:5432";
     private String DB_NAME = "prod";
     private String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-    private Properties DB_PROPS = getProperties("db.properties");
+    private Properties DB_PROPS = getDBProperties("db.properties");
 
     private Connection conn;
     private Statement st;
@@ -21,7 +21,7 @@ public class DBManager {
         try {
             Class.forName("org.postgresql.Driver");
 
-        } catch(ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
 
         }
@@ -29,7 +29,15 @@ public class DBManager {
 
     public void printQuery(String query) {
         try {
-            st = getConnection().createStatement();
+            conn = getConnection();
+
+        } catch (SQLException e) {
+            System.err.println("Connection to DB Failed.");
+            e.printStackTrace();
+        }
+
+        try {
+            st = conn.createStatement();
             rs = st.executeQuery(query);
 
             while (rs.next()) {
@@ -42,37 +50,34 @@ public class DBManager {
             st.close();
 
         } catch (SQLException e) {
+            System.err.println("Query execution failed.");
             e.printStackTrace();
 
         }
+
+
     }
 
-    private Connection getConnection() {
-        try {
-            conn = DriverManager.getConnection(DB_URL, DB_PROPS);
-            System.out.println("Connected to prod db");
-            return conn;
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, DB_PROPS);
 
-        } catch(SQLException e) {
-            e.printStackTrace();
-            return null;
-
-        }
     }
 
-    private Properties getProperties(String filename) {
+    private Properties getDBProperties(String filename) {
         Properties props = new Properties();
 
         try {
             FileInputStream input = new FileInputStream(filename);
             props.load(input);
+            return props;
 
-        } catch(IOException e) {
+        } catch (IOException e) {
+            System.err.println("Error loading properties file.");
             e.printStackTrace();
+            return null;
 
         }
 
-        return props;
     }
 
 }
