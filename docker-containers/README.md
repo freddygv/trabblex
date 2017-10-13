@@ -1,7 +1,7 @@
 # Docker builds
 Requires: Docker installation. The commands below were tested on UNIX.
 
-In each container directory run: `docker build .`
+In each container directory run: `sudo docker build .`
 
 After the container finishes building, it will output an image_id that looks something like this: 135093e9f918
 
