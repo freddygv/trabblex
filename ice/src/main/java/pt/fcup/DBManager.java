@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.IOException;
 import java.sql.*;
 import java.io.FileInputStream;
@@ -13,8 +15,13 @@ public class DBManager {
     private Properties DB_PROPS;
 
     private Connection conn;
-    private Statement st;
-    private ResultSet rs;
+    private Statement statement;
+    private ResultSet resultSet;
+    private ResultSetMetaData metaData;
+    private int numColumns;
+
+    private JSONObject row = new JSONObject();
+    private JSONArray table = new JSONArray();
 
 
     public DBManager() throws IOException, ClassNotFoundException{
@@ -37,7 +44,12 @@ public class DBManager {
         }
     }
 
-    public void printQuery(String query) throws SQLException {
+    /**
+     * @param query
+     * @return JSONArray as string, [{row1-col1: value}, {row2-col1: value}]
+     * @throws SQLException
+     */
+    public String queryTable(String query) throws SQLException {
         try {
             conn = getConnection();
 
@@ -47,17 +59,25 @@ public class DBManager {
         }
 
         try {
-            st = conn.createStatement();
-            rs = st.executeQuery(query);
+            statement = conn.createStatement();
+            resultSet = statement.executeQuery(query);
+            metaData = resultSet.getMetaData();
+            numColumns = metaData.getColumnCount();
 
-            while (rs.next()) {
-                // Just printing the first column of the returned set right now
-                System.out.println(rs.getString(1));
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(1));
 
+                for (int i = 1; i <= numColumns; i++) {
+                    row.put(metaData.getColumnName(i), resultSet.getString(i));
+                }
+                table.put(row);
             }
 
-            rs.close();
-            st.close();
+            resultSet.close();
+            statement.close();
+            conn.close();
+
+            return table.toString();
 
         } catch (SQLException e) {
             System.err.println("Query execution failed.");

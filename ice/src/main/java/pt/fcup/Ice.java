@@ -11,17 +11,16 @@ public class Ice {
     }
 
     private void run() {
-        testDB();
-
+        queryDB();
     }
 
-    private void testDB() {
-        System.out.println("Testing DB connection and basic query...");
+    private void queryDB() {
+        System.out.println("Sending query to DB...");
 
         try {
             DBManager db = new DBManager();
             String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-            db.printQuery(sampleQuery);
+            System.out.println(db.queryTable(sampleQuery));
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             ec.printStackTrace();
