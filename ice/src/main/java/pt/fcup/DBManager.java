@@ -65,8 +65,6 @@ public class DBManager {
             numColumns = metaData.getColumnCount();
 
             while (resultSet.next()) {
-                System.out.println(resultSet.getString(1));
-
                 for (int i = 1; i <= numColumns; i++) {
                     row.put(metaData.getColumnName(i), resultSet.getString(i));
                 }
