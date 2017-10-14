@@ -15,13 +15,15 @@ public class Portal
 
   private ClientManager cm;
 
-   public void Portal()
-   {
-       cm = new ClientManager();
-   }
+  public void Portal()
+  {
+      cm = new ClientManager();
+      System.out.println("Created client manager");
+  }
 
 
     public static void main(String[] args) {
+            System.out.println("Creating portal …");
         Portal pt = new Portal();
     }
 }

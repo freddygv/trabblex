@@ -16,8 +16,9 @@ public class DBManager {
     private Statement st;
     private ResultSet rs;
 
+    private static DBManager instance;
 
-    public DBManager() {
+    private DBManager() {
         try {
             Class.forName("org.postgresql.Driver");
 
@@ -26,6 +27,16 @@ public class DBManager {
 
         }
     }
+
+    /** Single entry point for the database singleton */
+	public static DBManager getInstance()
+	{
+        if (null == instance) { // Premier appel
+            instance = new DBManager();
+        }
+        return instance;
+	}
+
 
     public void printQuery(String query) {
         try {

@@ -18,6 +18,10 @@ them and share data blocks for a specific file.
 
 ## Components
 
+### Database manager
+Is implemented as singleton -
+to have only one entry point to the database for all the other components
+
 ### Client Manager
 * Creates a Grizzly HTTP Server (at first view, provides the best performance)
 * Creates resources used by the client

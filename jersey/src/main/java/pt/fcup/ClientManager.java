@@ -38,13 +38,16 @@ class ClientManager{
         String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
         DBManager.getInstance().printQuery(sampleQuery);
 
-        try{
+
+        System.out.println("Executed query");
+
+    /*    try{
             System.in.read();
         }
         catch(IOException e){
             // Do something !
-        }
-        server.stop();
+        }*/
+        //server.stop();
 
     }
 }
