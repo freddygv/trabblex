@@ -17,13 +17,11 @@ public class Portal
 
   public Portal()
   {
-      System.out.println("Creating client manager");
       cm = new ClientManager();
   }
 
 
     public static void main(String[] args) {
-        System.out.println("Creating portal …");
         Portal pt = new Portal();
     }
 }

@@ -9,20 +9,20 @@ import java.util.Properties;
 
 public class DBManager {
 
-    private final String HOST = "127.0.0.1:5432";
-    private final String DB_NAME = "prod";
-    private final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-    private final String DB_PROPS_LOCATION = "db.properties";
-    private Properties DB_PROPS;
+    protected final String HOST = "127.0.0.1:5432";
+    protected final String DB_NAME = "prod";
+    protected final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+    protected final String DB_PROPS_LOCATION = "db.properties";
+    protected Properties DB_PROPS;
 
-    private Connection conn;
-    private Statement statement;
-    private ResultSet resultSet;
-    private ResultSetMetaData metaData;
-    private int numColumns;
+    protected Connection conn;
+    protected Statement statement;
+    protected ResultSet resultSet;
+    protected ResultSetMetaData metaData;
+    protected int numColumns;
 
-    private JSONObject row;
-    private JSONArray table;
+    protected JSONObject row;
+    protected JSONArray table;
 
 
     public DBManager() throws IOException, ClassNotFoundException{
@@ -74,7 +74,7 @@ public class DBManager {
                 for (int i = 1; i <= numColumns; i++) {
                     row.put(metaData.getColumnName(i), resultSet.getString(i));
                 }
-                
+
                 table.put(row);
             }
 
@@ -93,12 +93,12 @@ public class DBManager {
 
     }
 
-    private Connection getConnection() throws SQLException {
+    protected Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_PROPS);
 
     }
 
-    private void loadDBProperties(String filename) throws IOException {
+    protected void loadDBProperties(String filename) throws IOException {
         FileInputStream input = new FileInputStream(filename);
         DB_PROPS = new Properties();
         DB_PROPS.load(input);

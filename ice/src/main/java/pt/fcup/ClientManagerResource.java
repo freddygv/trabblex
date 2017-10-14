@@ -9,7 +9,12 @@ import javax.ws.rs.PathParam;
 * Gives the client a bunch of functionalities
 **/
 @Path("clientmanager")
-public class ClientManagerResource  implements IClient{
+public class ClientManagerResource implements IClient{
+
+    public ClientManager()
+    {
+
+    }
 
     /**
     * Upon getting a list of keywords from the client,
