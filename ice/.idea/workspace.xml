@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="85efa27e-31c3-471a-8999-9009962887f0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/IceTest-1.0.jar" afterPath="$PROJECT_DIR$/target/IceTest-1.0.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/pt/fcup/DBManager.class" afterPath="$PROJECT_DIR$/target/classes/pt/fcup/DBManager.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/test-classes/pt/fcup/DBManagerTest.class" afterPath="$PROJECT_DIR$/target/test-classes/pt/fcup/DBManagerTest.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" afterPath="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" afterPath="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-pt.fcup.DBManagerTest.xml" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-pt.fcup.DBManagerTest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/surefire-reports/pt.fcup.DBManagerTest.txt" afterPath="$PROJECT_DIR$/target/surefire-reports/pt.fcup.DBManagerTest.txt" />
@@ -28,8 +25,8 @@
       <file leaf-file-name="DBManagerTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+            <state relative-caret-position="150">
+              <caret line="17" column="35" lean-forward="true" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -52,6 +49,7 @@
       <find>p</find>
       <find>f</find>
       <find>printStackTrace</find>
+      <find>pg.</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -369,12 +367,12 @@
       <workItem from="1507738281002" duration="2935000" />
       <workItem from="1507893220224" duration="12572000" />
       <workItem from="1507936156989" duration="7000" />
-      <workItem from="1507971798824" duration="4111000" />
+      <workItem from="1507971798824" duration="4457000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32174000" />
+    <option name="totallyTimeSpent" value="32520000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -927,7 +925,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="370">
+        <state relative-caret-position="72">
           <caret line="41" column="46" lean-forward="false" selection-start-line="41" selection-start-column="46" selection-end-line="41" selection-end-column="46" />
           <folding>
             <marker date="1507995266789" expanded="true" signature="25:180" ph="..." />
@@ -942,8 +940,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        <state relative-caret-position="150">
+          <caret line="17" column="35" lean-forward="true" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
           <folding />
         </state>
       </provider>

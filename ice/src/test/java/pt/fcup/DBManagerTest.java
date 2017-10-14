@@ -21,10 +21,11 @@ class DBManagerTest {
 
     @Test
     void queryTable() throws Exception {
-        String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg " +
-                "WHERE pg.tablename IN ('chunk_owners','seeders') ORDER BY pg.tablename;";
+        String sampleQuery = "SELECT schemaname, tablename FROM pg_catalog.pg_tables pg " +
+                "WHERE tablename IN ('chunk_owners','seeders') ORDER BY tablename;";
 
-        expectedString = "[{\"tablename\":\"chunk_owners\"},{\"tablename\":\"seeders\"}]";
+        expectedString = "[{\"schemaname\":\"public\",\"tablename\":\"chunk_owners\"}," +
+                "{\"schemaname\":\"public\",\"tablename\":\"seeders\"}]";
         resultString = testDB.queryTable(sampleQuery).toString();
 
         assertEquals(expectedString, resultString);
