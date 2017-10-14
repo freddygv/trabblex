@@ -39,7 +39,8 @@ public class DBManager {
 
     /**
      * @param query
-     * @return JSONArray as string, [{row1-col1: value}, {row2-col1: value}]
+     * @return JSONArray: [{row1-col1: value, row1-col2: value},
+     *                     {row2-col1: value, row2-col2: value}]
      * @throws SQLException
      */
     public JSONArray queryTable(String query) throws SQLException {
@@ -53,6 +54,7 @@ public class DBManager {
 
         try {
             Statement statement = conn.createStatement();
+
             ResultSet resultSet = statement.executeQuery(query);
 
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -74,7 +76,6 @@ public class DBManager {
             resultSet.close();
             statement.close();
             conn.close();
-
             return table;
 
         } catch (SQLException e) {
@@ -82,7 +83,6 @@ public class DBManager {
             throw e;
 
         }
-
 
     }
 
