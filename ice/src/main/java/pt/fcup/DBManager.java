@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.IOException;
 import java.sql.*;
 import java.io.FileInputStream;
@@ -10,80 +12,92 @@ public class DBManager {
     private String HOST = "127.0.0.1:5432";
     private String DB_NAME = "prod";
     private String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-    private Properties DB_PROPS = getProperties("db.properties");
+    private Properties DB_PROPS;
 
     private Connection conn;
-    private Statement st;
-    private ResultSet rs;
+    private Statement statement;
+    private ResultSet resultSet;
+    private ResultSetMetaData metaData;
+    private int numColumns;
 
-    private static DBManager instance;
+    private JSONObject row = new JSONObject();
+    private JSONArray table = new JSONArray();
 
-    private DBManager() {
+
+    public DBManager() throws IOException, ClassNotFoundException{
         try {
             Class.forName("org.postgresql.Driver");
 
-        } catch(ClassNotFoundException ex) {
-            ex.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Postgres Driver not found.");
+            throw e;
+
+        }
+
+        try {
+            DB_PROPS = getDBProperties("db.properties");
+
+        } catch (IOException e) {
+            System.err.println("Error loading properties file.");
+            throw e;
 
         }
     }
 
-    /** Single entry point for the database singleton */
-	public static DBManager getInstance()
-	{
-        if (null == instance) { // Premier appel
-            instance = new DBManager();
-        }
-        return instance;
-	}
-
-
-    public void printQuery(String query) {
+    /**
+     * @param query
+     * @return JSONArray as string, [{row1-col1: value}, {row2-col1: value}]
+     * @throws SQLException
+     */
+    public JSONArray queryTable(String query) throws SQLException {
         try {
-            st = getConnection().createStatement();
-            rs = st.executeQuery(query);
-
-            while (rs.next()) {
-                // Just printing the first column of the returned set right now
-                System.out.println(rs.getString(1));
-
-            }
-
-            rs.close();
-            st.close();
+            conn = getConnection();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-
+            System.err.println("Connection to DB Failed.");
+            throw e;
         }
-    }
 
-    private Connection getConnection() {
         try {
-            conn = DriverManager.getConnection(DB_URL, DB_PROPS);
-            System.out.println("Connected to prod db");
-            return conn;
+            statement = conn.createStatement();
+            resultSet = statement.executeQuery(query);
+            metaData = resultSet.getMetaData();
+            numColumns = metaData.getColumnCount();
 
-        } catch(SQLException e) {
-            e.printStackTrace();
-            return null;
+            while (resultSet.next()) {
+                for (int i = 1; i <= numColumns; i++) {
+                    row.put(metaData.getColumnName(i), resultSet.getString(i));
+                }
+                table.put(row);
+            }
+
+            resultSet.close();
+            statement.close();
+            conn.close();
+
+            return table;
+
+        } catch (SQLException e) {
+            System.err.println("Query execution failed.");
+            throw e;
 
         }
+
+
     }
 
-    private Properties getProperties(String filename) {
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, DB_PROPS);
+
+    }
+
+    private Properties getDBProperties(String filename) throws IOException {
         Properties props = new Properties();
 
-        try {
-            FileInputStream input = new FileInputStream(filename);
-            props.load(input);
-
-        } catch(IOException e) {
-            e.printStackTrace();
-
-        }
-
+        FileInputStream input = new FileInputStream(filename);
+        props.load(input);
         return props;
+
     }
 
 }
