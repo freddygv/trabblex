@@ -33,14 +33,12 @@ class ClientManager{
     */
     public ClientManager ()
     {
-
-
         try{
             final HttpServer server = startServer();
             DBManager dbm = new DBManager();
 
             String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-            
+
             String res = dbm.queryTable(sampleQuery).toString();
             System.out.println("Executed query, result = " + res);
         }
@@ -48,14 +46,5 @@ class ClientManager{
         {
 
         }
-
-    /*    try{
-            System.in.read();
-        }
-        catch(IOException e){
-            // Do something !
-        }*/
-        //server.stop();
-
     }
 }
