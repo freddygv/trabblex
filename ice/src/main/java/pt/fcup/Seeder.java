@@ -56,22 +56,48 @@ public class Seeder {
         return video_size_y;
     }
 
-    public void registerInPortal() {
+    public boolean registerInPortal() {
         System.out.println("Registering seeder with file: " + filename);
 
+//        String insertionQuery = "";
+//
 //        try {
-//            DBManager db = new DBManager();
-//            String sampleQuery = "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-//            System.out.println(db.queryTable(sampleQuery).toString());
+//            dbUpdate(insertionQuery);
+//            return true;
 //
 //        } catch (ClassNotFoundException | IOException | SQLException ec) {
-//            ec.printStackTrace();
+//            System.err.println("Seeder registration: DB insert failed.");
+//            return false;
 //
 //        }
+
+        // TODO: Remove when ready
+        return true;
     }
 
-    public void deregisterInPortal() {
+    public boolean deregisterInPortal() {
         System.out.println("De-registering seeder with file: " + filename);
+
+//        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
+//
+//        try {
+//            dbUpdate(deletionQuery);
+//            return true;
+//
+//        } catch (ClassNotFoundException | IOException | SQLException ec) {
+//            System.err.println("Seeder de-registration: DB delete failed.");
+//            return false;
+//
+//        }
+
+        // TODO: Remove when ready
+        return true;
+    }
+
+    private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
+        DBManager db = new DBManager();
+        db.singleUpdate(query);
+
     }
 
     public void setHost() {

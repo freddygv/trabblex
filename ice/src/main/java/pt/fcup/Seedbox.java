@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Seedbox {
+    // TODO: Put in real URL
     private final String BUCKET_URL = "fake.google.com/cloud/storage/url/bucket";
 
     public static void main(String[] args) {
@@ -44,7 +45,8 @@ public class Seedbox {
             fileMetadata = getMetadata(i, urls.get(i));
 
             current = new Seeder(fileMetadata);
-            current.registerInPortal();
+
+            boolean regSuccess = current.registerInPortal();
 
             seeders.put(current.getFileHash(), current);
 

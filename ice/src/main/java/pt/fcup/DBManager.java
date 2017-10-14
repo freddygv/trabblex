@@ -86,6 +86,35 @@ public class DBManager {
 
     }
 
+    public void singleUpdate(String updateQuery) throws SQLException {
+        try {
+            conn = getConnection();
+
+        } catch (SQLException e) {
+            System.err.println("Connection to DB Failed.");
+            throw e;
+        }
+
+        try {
+            PreparedStatement statement = conn.prepareStatement(updateQuery);
+
+//            int foovalue = 500;
+//            statement.setInt(1, foovalue);
+
+            int rowsUpdated = statement.executeUpdate();
+            System.out.println(rowsUpdated + " rows successfully updated.");
+
+            statement.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            System.err.println("Query execution failed.");
+            throw e;
+
+        }
+
+    }
+
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_PROPS);
 
