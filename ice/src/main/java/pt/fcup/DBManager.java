@@ -98,9 +98,6 @@ public class DBManager {
         try {
             PreparedStatement statement = conn.prepareStatement(updateQuery);
 
-//            int foovalue = 500;
-//            statement.setInt(1, foovalue);
-
             int rowsUpdated = statement.executeUpdate();
             System.out.println(rowsUpdated + " rows successfully updated.");
 

@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class Seedbox {
      * @param urls String list of URLs with video files
      */
     private HashMap<String, Seeder> createSeeders(List<String> urls) {
-        HashMap<String, Seeder> seeders = new HashMap<String, Seeder>();
+        HashMap<String, Seeder> seeders = new HashMap<>();
         HashMap<String, String> fileMetadata;
 
         Seeder current;
@@ -46,9 +48,17 @@ public class Seedbox {
 
             current = new Seeder(fileMetadata);
 
-            boolean regSuccess = current.registerInPortal();
+            // TODO: Do I need to give each seeder a unique port to listen on?
+            current.setHost();
 
-            seeders.put(current.getFileHash(), current);
+            boolean regSuccess = current.registerSeeder();
+
+            if (regSuccess) {
+                seeders.put(current.getFileHash(), current);
+            } else {
+                System.out.println("Seeder registration failed for: " + current.getFileHash());
+
+            }
 
         }
 
@@ -56,17 +66,36 @@ public class Seedbox {
     }
 
     /**
-     * TODO: Remove index param once metadata fetcher is implemented
+     * For debugging only, queries the DB to check if all files were added.
+     * Call before 'return seeders;'
+     */
+    private void queryAndTruncateSeeders() {
+        try {
+            DBManager testDB = new DBManager();
+            System.out.println("Querying seeders table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, file_name FROM seeders;").toString());
+
+            System.out.println("Truncating seeders table:");
+            testDB.singleUpdate("DELETE FROM seeders WHERE file_hash IS NOT NULL;");
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * TODO: Remove dummy data and index param once metadata fetcher is implemented
      * Getting relevant file metadata to instantiate Seeders
      *
      * @param videoUrl URL for the file
      */
     private HashMap<String, String> getMetadata(int index, String videoUrl) {
-        HashMap<String, String> metadata = new HashMap<String, String>();
+        HashMap<String, String> metadata = new HashMap<>();
         metadata.put("fileHash", "abcd" + Integer.toString(index));
-        metadata.put("filename", "video-" + Integer.toString(index));
+        metadata.put("fileName", "video-" + Integer.toString(index));
+        metadata.put("fileSize", "74");
         metadata.put("video_size_x", "20");
         metadata.put("video_size_y", "24");
+        metadata.put("bitrate", "256");
 
         return metadata;
     }

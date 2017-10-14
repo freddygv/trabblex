@@ -6,12 +6,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/pt/fcup/DBManager.class" afterPath="$PROJECT_DIR$/target/classes/pt/fcup/DBManager.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/pt/fcup/Seedbox.class" afterPath="$PROJECT_DIR$/target/classes/pt/fcup/Seedbox.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/pt/fcup/Seeder.class" afterPath="$PROJECT_DIR$/target/classes/pt/fcup/Seeder.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/test-classes/pt/fcup/DBManagerTest.class" afterPath="$PROJECT_DIR$/target/test-classes/pt/fcup/DBManagerTest.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" afterPath="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java" afterPath="$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pt/fcup/Seeder.java" afterPath="$PROJECT_DIR$/src/main/java/pt/fcup/Seeder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" afterPath="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-pt.fcup.DBManagerTest.xml" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-pt.fcup.DBManagerTest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/surefire-reports/pt.fcup.DBManagerTest.txt" afterPath="$PROJECT_DIR$/target/surefire-reports/pt.fcup.DBManagerTest.txt" />
     </list>
@@ -29,12 +27,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DBManagerTest.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
+      <file leaf-file-name="Seedbox.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="40" lean-forward="false" selection-start-line="4" selection-start-column="40" selection-end-line="4" selection-end-column="40" />
-              <folding />
+            <state relative-caret-position="862">
+              <caret line="86" column="60" lean-forward="true" selection-start-line="86" selection-start-column="60" selection-end-line="86" selection-end-column="60" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -85,10 +85,10 @@
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Ice.java" />
         <option value="$PROJECT_DIR$/target/classes/META-INF/MANIFEST.MF" />
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox2.java" />
-        <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java" />
+        <option value="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java" />
         <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Seeder.java" />
-        <option value="$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java" />
       </list>
     </option>
   </component>
@@ -401,12 +401,12 @@
       <workItem from="1507738281002" duration="2935000" />
       <workItem from="1507893220224" duration="12572000" />
       <workItem from="1507936156989" duration="7000" />
-      <workItem from="1507971798824" duration="16637000" />
+      <workItem from="1507971798824" duration="20259000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44700000" />
+    <option name="totallyTimeSpent" value="48322000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -437,7 +437,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19333333" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287879" sideWeight="0.49333334" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287879" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -469,7 +469,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
           <caret line="21" column="9" lean-forward="true" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
-          <folding />
+          <folding>
+            <marker date="1508014840259" expanded="true" signature="25:199" ph="..." />
+            <marker date="1508014840259" expanded="true" signature="372:413" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="464:932" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="991:2165" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="2226:2612" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -505,14 +511,13 @@
         <state relative-caret-position="270">
           <caret line="21" column="49" lean-forward="true" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
           <folding>
-            <marker date="1508013453490" expanded="true" signature="25:180" ph="..." />
-            <marker date="1508013453490" expanded="true" signature="571:981" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="987:1176" ph="/**...*/" />
-            <marker date="1508013453490" expanded="true" signature="1243:2290" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="2361:3039" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="2634:2712" ph="//..." />
-            <marker date="1508013453490" expanded="true" signature="3100:3170" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="3242:3403" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="25:180" ph="..." />
+            <marker date="1508014935145" expanded="true" signature="571:981" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="987:1176" ph="/**...*/" />
+            <marker date="1508014935145" expanded="true" signature="1243:2290" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="2361:2959" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="3020:3090" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="3162:3323" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -522,17 +527,7 @@
         <state relative-caret-position="120">
           <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding>
-            <marker date="1508011806548" expanded="true" signature="25:119" ph="..." />
-            <marker date="1508011806548" expanded="true" signature="299:360" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="385:525" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="531:700" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="754:883" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="889:1032" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1102:1563" ph="{...}" />
-            <marker date="1508011806548" expanded="false" signature="1157:1173" ph="&lt;~&gt;" />
-            <marker date="1508011806548" expanded="true" signature="1569:1757" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1834:2167" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="1890:1906" ph="&lt;~&gt;" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -583,17 +578,7 @@
         <state relative-caret-position="810">
           <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
           <folding>
-            <marker date="1508011806548" expanded="true" signature="25:119" ph="..." />
-            <marker date="1508011806548" expanded="true" signature="299:360" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="385:525" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="531:700" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="754:883" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="889:1032" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1102:1563" ph="{...}" />
-            <marker date="1508011806548" expanded="false" signature="1157:1173" ph="&lt;~&gt;" />
-            <marker date="1508011806548" expanded="true" signature="1569:1757" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1834:2167" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="1890:1906" ph="&lt;~&gt;" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -644,17 +629,7 @@
         <state relative-caret-position="45">
           <caret line="3" column="18" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="18" />
           <folding>
-            <marker date="1508011806548" expanded="true" signature="25:119" ph="..." />
-            <marker date="1508011806548" expanded="true" signature="299:360" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="385:525" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="531:700" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="754:883" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="889:1032" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1102:1563" ph="{...}" />
-            <marker date="1508011806548" expanded="false" signature="1157:1173" ph="&lt;~&gt;" />
-            <marker date="1508011806548" expanded="true" signature="1569:1757" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1834:2167" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="1890:1906" ph="&lt;~&gt;" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -944,76 +919,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-88">
-          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-          <folding>
-            <marker date="1508011806548" expanded="true" signature="25:119" ph="..." />
-            <marker date="1508011806548" expanded="true" signature="299:360" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="385:525" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="531:700" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="754:883" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="889:1032" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1102:1563" ph="{...}" />
-            <marker date="1508011806548" expanded="false" signature="1157:1173" ph="&lt;~&gt;" />
-            <marker date="1508011806548" expanded="true" signature="1569:1757" ph="/**...*/" />
-            <marker date="1508011806548" expanded="true" signature="1834:2167" ph="{...}" />
-            <marker date="1508011806548" expanded="true" signature="1890:1906" ph="&lt;~&gt;" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
-          <caret line="68" column="55" lean-forward="false" selection-start-line="68" selection-start-column="55" selection-end-line="68" selection-end-column="55" />
-          <folding>
-            <marker date="1508013453490" expanded="true" signature="25:180" ph="..." />
-            <marker date="1508013453490" expanded="true" signature="571:981" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="987:1176" ph="/**...*/" />
-            <marker date="1508013453490" expanded="true" signature="1243:2290" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="2361:3039" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="2634:2712" ph="//..." />
-            <marker date="1508013453490" expanded="true" signature="3100:3170" ph="{...}" />
-            <marker date="1508013453490" expanded="true" signature="3242:3403" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Seeder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="80" column="90" lean-forward="false" selection-start-line="80" selection-start-column="90" selection-end-line="80" selection-end-column="90" />
-          <folding>
-            <marker date="1508014457680" expanded="true" signature="25:101" ph="..." />
-            <marker date="1508014457680" expanded="true" signature="457:726" ph="{...}" />
-            <marker date="1508014457680" expanded="false" signature="759:770" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="786:792" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="819:830" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="840:846" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="875:886" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="898:904" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="937:948" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="964:970" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="1003:1014" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="1030:1036" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="1069:1080" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="1096:1102" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="1139:1150" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="1170:1176" ph=" }" />
-            <marker date="1508014457680" expanded="false" signature="1213:1224" ph=" { " />
-            <marker date="1508014457680" expanded="false" signature="1244:1250" ph=" }" />
-            <marker date="1508014457680" expanded="true" signature="1290:1751" ph="{...}" />
-            <marker date="1508014457680" expanded="true" signature="1366:1724" ph="//..." />
-            <marker date="1508014457680" expanded="true" signature="1793:2315" ph="{...}" />
-            <marker date="1508014457680" expanded="true" signature="1872:2288" ph="//..." />
-            <marker date="1508014457680" expanded="true" signature="2414:2494" ph="{...}" />
-            <marker date="1508014457680" expanded="true" signature="2522:2579" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-555">
@@ -1043,9 +948,78 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/pt/fcup/DBManagerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="40" lean-forward="false" selection-start-line="4" selection-start-column="40" selection-end-line="4" selection-end-column="40" />
-          <folding />
+        <state relative-caret-position="273">
+          <caret line="26" column="64" lean-forward="false" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="64" />
+          <folding>
+            <marker date="1508014840259" expanded="true" signature="25:199" ph="..." />
+            <marker date="1508014840259" expanded="true" signature="372:413" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="464:932" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="991:2165" ph="{...}" />
+            <marker date="1508014840259" expanded="true" signature="2226:2612" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/DBManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="248">
+          <caret line="98" column="77" lean-forward="false" selection-start-line="98" selection-start-column="77" selection-end-line="98" selection-end-column="77" />
+          <folding>
+            <marker date="1508014935145" expanded="true" signature="25:180" ph="..." />
+            <marker date="1508014935145" expanded="true" signature="571:981" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="987:1176" ph="/**...*/" />
+            <marker date="1508014935145" expanded="true" signature="1243:2290" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="2361:2959" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="3020:3090" ph="{...}" />
+            <marker date="1508014935145" expanded="true" signature="3162:3323" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Seeder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-95">
+          <caret line="88" column="0" lean-forward="true" selection-start-line="88" selection-start-column="0" selection-end-line="88" selection-end-column="0" />
+          <folding>
+            <marker date="1508016898842" expanded="true" signature="25:101" ph="..." />
+            <marker date="1508016898842" expanded="true" signature="526:891" ph="{...}" />
+            <marker date="1508016898842" expanded="false" signature="924:935" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="951:957" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="984:995" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1005:1011" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1040:1051" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1063:1069" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1102:1113" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1129:1135" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1168:1179" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1195:1201" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1234:1245" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1261:1267" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1300:1311" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1327:1333" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1370:1381" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1401:1407" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1444:1455" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1475:1481" ph=" }" />
+            <marker date="1508016898842" expanded="false" signature="1513:1524" ph=" { " />
+            <marker date="1508016898842" expanded="false" signature="1539:1545" ph=" }" />
+            <marker date="1508016898842" expanded="true" signature="1583:2608" ph="{...}" />
+            <marker date="1508016898842" expanded="true" signature="1667:1816" ph="//..." />
+            <marker date="1508016898842" expanded="true" signature="2648:3250" ph="{...}" />
+            <marker date="1508016898842" expanded="true" signature="2735:2884" ph="//..." />
+            <marker date="1508016898842" expanded="true" signature="3349:3429" ph="{...}" />
+            <marker date="1508016898842" expanded="true" signature="3457:3514" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pt/fcup/Seedbox.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="862">
+          <caret line="86" column="60" lean-forward="true" selection-start-line="86" selection-start-column="60" selection-end-line="86" selection-end-column="60" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
