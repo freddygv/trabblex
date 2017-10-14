@@ -33,13 +33,21 @@ class ClientManager{
     */
     public ClientManager ()
     {
-        final HttpServer server = startServer();
-
-        String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-        //rDBManager.getInstance().printQuery(sampleQuery);
 
 
-        System.out.println("Executed query");
+        try{
+            final HttpServer server = startServer();
+            DBManager dbm = new DBManager();
+
+            String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
+            
+            String res = dbm.queryTable(sampleQuery).toString();
+            System.out.println("Executed query, result = " + res);
+        }
+        catch(Exception e)
+        {
+
+        }
 
     /*    try{
             System.in.read();

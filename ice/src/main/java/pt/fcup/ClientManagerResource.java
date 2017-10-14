@@ -14,6 +14,7 @@ public class ClientManagerResource  implements IClient{
     /**
     * Upon getting a list of keywords from the client,
     * returns all the seeders that match that list
+    * @return the seeders that match the list, in json format
     **/
     @GET
     @Path("getfromkeywords/{kwds}")

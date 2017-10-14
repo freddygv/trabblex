@@ -15,7 +15,7 @@ public class Portal
 
   private ClientManager cm;
 
-  public void Portal()
+  public Portal()
   {
       System.out.println("Creating client manager");
       cm = new ClientManager();
