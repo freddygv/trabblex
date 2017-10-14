@@ -9,9 +9,10 @@ import java.util.Properties;
 
 public class DBManager {
 
-    private String HOST = "127.0.0.1:5432";
-    private String DB_NAME = "prod";
-    private String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+    private final String HOST = "127.0.0.1:5432";
+    private final String DB_NAME = "prod";
+    private final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+    private final String DB_PROPS_LOCATION = "db.properties";
     private Properties DB_PROPS;
 
     private Connection conn;
@@ -20,8 +21,8 @@ public class DBManager {
     private ResultSetMetaData metaData;
     private int numColumns;
 
-    private JSONObject row = new JSONObject();
-    private JSONArray table = new JSONArray();
+    private JSONObject row;
+    private JSONArray table;
 
 
     public DBManager() throws IOException, ClassNotFoundException{
@@ -35,7 +36,7 @@ public class DBManager {
         }
 
         try {
-            DB_PROPS = getDBProperties("db.properties");
+            loadDBProperties(DB_PROPS_LOCATION);
 
         } catch (IOException e) {
             System.err.println("Error loading properties file.");
@@ -61,13 +62,19 @@ public class DBManager {
         try {
             statement = conn.createStatement();
             resultSet = statement.executeQuery(query);
+
             metaData = resultSet.getMetaData();
             numColumns = metaData.getColumnCount();
 
+            table = new JSONArray();
+
             while (resultSet.next()) {
+                row = new JSONObject();
+
                 for (int i = 1; i <= numColumns; i++) {
                     row.put(metaData.getColumnName(i), resultSet.getString(i));
                 }
+                
                 table.put(row);
             }
 
@@ -91,12 +98,11 @@ public class DBManager {
 
     }
 
-    private Properties getDBProperties(String filename) throws IOException {
-        Properties props = new Properties();
-
+    private void loadDBProperties(String filename) throws IOException {
         FileInputStream input = new FileInputStream(filename);
-        props.load(input);
-        return props;
+        DB_PROPS = new Properties();
+        DB_PROPS.load(input);
+        input.close();
 
     }
 
