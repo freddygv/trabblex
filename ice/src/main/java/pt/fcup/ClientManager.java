@@ -36,7 +36,7 @@ class ClientManager{
         final HttpServer server = startServer();
 
         String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-        DBManager.getInstance().printQuery(sampleQuery);
+        //rDBManager.getInstance().printQuery(sampleQuery);
 
 
         System.out.println("Executed query");
