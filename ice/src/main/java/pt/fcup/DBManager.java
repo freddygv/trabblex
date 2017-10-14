@@ -13,17 +13,9 @@ public class DBManager {
     private final String DB_NAME = "prod";
     private final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
     private final String DB_PROPS_LOCATION = "db.properties";
+
     private Properties DB_PROPS;
-
     private Connection conn;
-    private Statement statement;
-    private ResultSet resultSet;
-    private ResultSetMetaData metaData;
-    private int numColumns;
-
-    private JSONObject row;
-    private JSONArray table;
-
 
     public DBManager() throws IOException, ClassNotFoundException{
         try {
@@ -60,13 +52,14 @@ public class DBManager {
         }
 
         try {
-            statement = conn.createStatement();
-            resultSet = statement.executeQuery(query);
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
 
-            metaData = resultSet.getMetaData();
-            numColumns = metaData.getColumnCount();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int numColumns = metaData.getColumnCount();
 
-            table = new JSONArray();
+            JSONArray table = new JSONArray();
+            JSONObject row;
 
             while (resultSet.next()) {
                 row = new JSONObject();
@@ -74,7 +67,7 @@ public class DBManager {
                 for (int i = 1; i <= numColumns; i++) {
                     row.put(metaData.getColumnName(i), resultSet.getString(i));
                 }
-                
+
                 table.put(row);
             }
 
