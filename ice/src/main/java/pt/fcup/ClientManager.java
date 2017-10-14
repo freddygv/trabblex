@@ -35,16 +35,15 @@ class ClientManager{
     {
         try{
             final HttpServer server = startServer();
-            DBManager dbm = new DBManager();
+            System.out.println("Created server");
+            System.in.read();
+            server.stop();
 
-            String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
-
-            String res = dbm.queryTable(sampleQuery).toString();
-            System.out.println("Executed query, result = " + res);
         }
         catch(Exception e)
         {
-
+            System.out.println("Error: " + e);
         }
+
     }
 }

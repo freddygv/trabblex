@@ -7,34 +7,24 @@ import java.sql.*;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+/**
+*   Database manager implemented as singleton
+*   Ensures only one database manager is present in the system
+**/
 public class DBManager_singleton extends DBManager{
 
-    private static DBManager instance = null;
+    private static DBManager_singleton instance = null;
 
-    private DBManager() throws IOException, ClassNotFoundException{
-        try {
-            Class.forName("org.postgresql.Driver");
-
-        } catch (ClassNotFoundException e) {
-            System.err.println("Postgres Driver not found.");
-            throw e;
-        }
-
-        try {
-            loadDBProperties(DB_PROPS_LOCATION);
-
-        } catch (IOException e) {
-            System.err.println("Error loading properties file.");
-            throw e;
-
-        }
+    private DBManager_singleton() throws IOException, ClassNotFoundException{
+        super();
     }
 
     /** Singleton access point */
-	public static Singleton getInstance()
+	public static DBManager_singleton getInstance() throws IOException, ClassNotFoundException
 	{
 		if (instance == null)
-		{ 	instance = new DBManager();
+		{
+            instance = new DBManager_singleton();
 		}
 		return instance;
 	}

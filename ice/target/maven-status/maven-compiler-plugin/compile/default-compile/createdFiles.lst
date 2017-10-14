@@ -1,4 +1,5 @@
 pt/fcup/Ice.class
+pt/fcup/DBManager_singleton.class
 pt/fcup/ISeeder.class
 pt/fcup/Portal.class
 pt/fcup/ClientManager.class

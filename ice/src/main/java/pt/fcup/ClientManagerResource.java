@@ -11,7 +11,7 @@ import javax.ws.rs.PathParam;
 @Path("clientmanager")
 public class ClientManagerResource implements IClient{
 
-    public ClientManager()
+    public ClientManagerResource()
     {
 
     }
@@ -25,7 +25,19 @@ public class ClientManagerResource implements IClient{
     @Path("getfromkeywords/{kwds}")
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt(@PathParam("kwds") String keywords) {
-        return keywords;
+        String res = null;
+        try{
+            String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
+
+            res = DBManager_singleton.getInstance()
+                            .queryTable(sampleQuery).toString();
+            System.out.println("Executed query, result = " + res);
+        }
+        catch(Exception e)
+        {
+
+        }
+        return res;
     }
 
     /*public String[] getSeedersfromdB()
@@ -35,7 +47,8 @@ public class ClientManagerResource implements IClient{
 
     public void list_seeders()
     {
-
+        // get seeders from db
+        // return seeders to client
     }
 
     public void create_seed()

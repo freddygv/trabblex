@@ -72,3 +72,4 @@ Quentin - code the **Client manager**
 * Create a simple ICE RPC client
 * Create the seeder (ICE)
 * Create test cases using Junit based on the spec - one for each method of the elements
+* Manage exceptions in client manager resources
