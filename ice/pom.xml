@@ -108,8 +108,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!--<mainClass>pt.fcup.Portal</mainClass> -->
-                    <mainClass>pt.fcup.Seedbox</mainClass>
+                    <mainClass>pt.fcup.Portal</mainClass>
+                    <!--<mainClass>pt.fcup.Seedbox</mainClass>-->
                 </configuration>
             </plugin>
         </plugins>

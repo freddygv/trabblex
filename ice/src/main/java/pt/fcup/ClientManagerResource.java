@@ -19,6 +19,7 @@ public class ClientManagerResource implements IClient{
     }
 
     /**
+    * TODO: replace query by call to seeder manager
     * Upon getting a list of keywords from the client,
     * returns all the seeders that match that list
     * @return the seeders that match the list, in json format
@@ -33,6 +34,7 @@ public class ClientManagerResource implements IClient{
         try{
             // get unique database manager
             DBManager_singleton db = DBManager_singleton.getInstance();
+            // execute dummy query
             String sampleQuery =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
                     "WHERE file_hash = 'file-hash-1'";
 
@@ -50,21 +52,21 @@ public class ClientManagerResource implements IClient{
 
 
     // see IClient interface for spec
-    public ArrayList<Seeder> listSeeders()
+    public ArrayList<HashMap<String, String>> listSeeders()
     {
         return null;
 
     }
 
     // see IClient interface for spec
-    public Seeder createSeed(String fileName)
+    public HashMap<String, String> createSeed(String fileName)
     {
             return null;
 
     }
 
     // see IClient interface for spec
-    public Seeder getSeeder(String fileHash)
+    public HashMap<String, String> getSeeder(String fileHash)
     {
             return null;
 

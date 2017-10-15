@@ -16,17 +16,17 @@ public interface IClient
     * Get a list of all the seeders
     * @return all the seeders
     **/
-    public ArrayList<Seeder> listSeeders();
+    public ArrayList<HashMap<String, String>> listSeeders();
 
     /**
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    public Seeder createSeed(String fileName);
+    public HashMap<String, String> createSeed(String fileName);
 
     /**
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    public Seeder getSeeder(String fileHash);
+    public HashMap<String, String> getSeeder(String fileHash);
 }
