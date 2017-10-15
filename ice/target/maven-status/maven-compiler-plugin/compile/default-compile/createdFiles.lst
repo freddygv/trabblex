@@ -1,11 +1,15 @@
-<<<<<<< HEAD
-pt/fcup/Ice.class
-pt/fcup/DBManager_singleton.class
+pt/fcup/generated/_RegistrableIPrxI.class
+pt/fcup/RegistrableI.class
+pt/fcup/Seedbox.class
 pt/fcup/ISeeder.class
-pt/fcup/Portal.class
-pt/fcup/ClientManager.class
+pt/fcup/generated/RegistrableIPrx.class
+pt/fcup/generated/RegistrableI.class
 pt/fcup/ClientManagerResource.class
+pt/fcup/generated/RegistrableI$1.class
+pt/fcup/DBManager_singleton.class
+pt/fcup/Portal.class
+pt/fcup/PortalServer.class
+pt/fcup/ClientManager.class
 pt/fcup/IClient.class
 pt/fcup/DBManager.class
-=======
->>>>>>> master
+pt/fcup/Seeder.class

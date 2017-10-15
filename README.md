@@ -31,9 +31,6 @@ to have only one entry point to the database for all the other components
 * Implements *client* interface
 * Enables the client to get back the list of seeders , and create a seed
 
-### Seeder manager
-Use multitons ?
-
 ## Simple Client
 Connects to the client manager using the JAX-RS Client API
 

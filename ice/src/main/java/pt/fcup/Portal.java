@@ -13,14 +13,13 @@ public class Portal
   // storage manager
   // seeders list
 
-  private ClientManager cm = null;
+    private ClientManager cm = null;
 
-  public Portal()
-  {
-      System.out.println("Creating client manager");
-      cm = new ClientManager();
+    public Portal()
+    {
+        cm = new ClientManager();
 
-  }
+    }
 
 
     public static void main(String[] args)
@@ -28,4 +27,5 @@ public class Portal
         Portal pt = new Portal();
 
     }
+
 }

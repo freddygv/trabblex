@@ -4,6 +4,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
+import java.util.ArrayList;
 
 /**
 * Gives the client a bunch of functionalities
@@ -25,35 +26,47 @@ public class ClientManagerResource implements IClient{
     @GET
     @Path("getfromkeywords/{kwds}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getIt(@PathParam("kwds") String keywords) {
+    public String getSeedersfromKeyword(@PathParam("kwds") String keywords)
+    {
         String res = null;
-        try{
-            String sampleQuery =  "SELECT pg.tablename FROM pg_catalog.pg_tables pg WHERE pg.tablename = 'seeders';";
 
-            res = DBManager_singleton.getInstance()
-                            .queryTable(sampleQuery).toString();
+        try{
+            // get unique database manager
+            DBManager_singleton db = DBManager_singleton.getInstance();
+            String sampleQuery =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
+                    "WHERE file_hash = 'file-hash-1'";
+
+            res = db.queryTable(sampleQuery).toString();
             System.out.println("Executed query, result = " + res);
+
         }
         catch(Exception e)
         {
-
+            System.err.println("Connection to DB Failed.");
         }
         return res;
+
     }
 
-    /*public String[] getSeedersfromdB()
-    {
 
-    }*/
-
-    public void list_seeders()
+    // see IClient interface for spec
+    public ArrayList<Seeder> listSeeders()
     {
-        // get seeders from db
-        // return seeders to client
+        return null;
+
     }
 
-    public void create_seed()
+    // see IClient interface for spec
+    public Seeder createSeed(String fileName)
     {
+            return null;
+
+    }
+
+    // see IClient interface for spec
+    public Seeder getSeeder(String fileHash)
+    {
+            return null;
 
     }
 }

@@ -6,12 +6,15 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
 import java.net.URI;
+import javax.ws.rs.core.Application;
 
 /**
 *   Creates a Grizzly HTTP server and exposes a
 *   bunch of resources for the client to use
 **/
-class ClientManager{
+class ClientManager extends ResourceConfig{
+
+    private DBManager db;
 
     // Base URI the Grizzly server will listen on
     public static final String BASE_URI = "http://localhost:8080/trabblex/";
@@ -34,6 +37,8 @@ class ClientManager{
     */
     public ClientManager ()
     {
+
+        // start server
         try
         {
             final HttpServer server = startServer();
