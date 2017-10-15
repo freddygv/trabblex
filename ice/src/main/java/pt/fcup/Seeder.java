@@ -3,6 +3,7 @@ package pt.fcup;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import pt.fcup.generated.*;
 
 public class Seeder {
     private final String PROTOCOL = "TCP";
@@ -69,43 +70,57 @@ public class Seeder {
     }
 
     public boolean registerSeeder() {
-        System.out.println("Registering seeder with file: " + fileName);
+        String regString = "Registering seeder with file: " + fileName;
+
+        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+            RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+            register.registerSeeder(regString);
+            return true;
+
+        }
 
         // TODO: Pull query out into Portal class, Seeder won't have DB so this method should call an ICE message
         // TODO: Edit neighbor list as well
-        String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
-                                                     "port, video_size_x, video_size_y, bitrate) " +
-                                 "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSize + "'" +
-                                        ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
-                                        ",'" + bitrate + "');";
-
-        try {
-            dbUpdate(insertionQuery);
-            return true;
-
-        } catch (ClassNotFoundException | IOException | SQLException ec) {
-            System.err.println("Seeder registration: DB insert failed.");
-            return false;
-
-        }
+//        String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
+//                                                     "port, video_size_x, video_size_y, bitrate) " +
+//                                 "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSize + "'" +
+//                                        ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
+//                                        ",'" + bitrate + "');";
+//
+//        try {
+//            dbUpdate(insertionQuery);
+//            return true;
+//
+//        } catch (ClassNotFoundException | IOException | SQLException ec) {
+//            System.err.println("Seeder registration: DB insert failed.");
+//            return false;
+//
+//        }
     }
 
     public boolean deregisterSeeder() {
-        System.out.println("De-registering seeder with file: " + fileName);
+        String deregString = "De-registering seeder with file: " + fileName;
+
+        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+            RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+            register.deregisterSeeder(deregString);
+            return true;
+
+        }
 
         // TODO: Pull query out into Portal class, Seeder won't have DB so this method should call an ICE message
         // TODO: Edit neighbor list as well
-        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
-
-        try {
-            dbUpdate(deletionQuery);
-            return true;
-
-        } catch (ClassNotFoundException | IOException | SQLException ec) {
-            System.err.println("Seeder de-registration: DB delete failed.");
-            return false;
-
-        }
+//        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
+//
+//        try {
+//            dbUpdate(deletionQuery);
+//            return true;
+//
+//        } catch (ClassNotFoundException | IOException | SQLException ec) {
+//            System.err.println("Seeder de-registration: DB delete failed.");
+//            return false;
+//
+//        }
 
     }
 
