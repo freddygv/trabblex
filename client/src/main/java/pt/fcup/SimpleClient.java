@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import java.util.Properties;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,18 +13,20 @@ import javax.ws.rs.client.*;
 
 public class SimpleClient {
 
+    protected final String HOST = "http://127.0.0.1:8080";
+    protected final String URL = HOST + "/trabblex/clientmanager/getfromkeywords";
+
     private ClientConfig clientConfig;
     private Client client;
 
     public SimpleClient()
     {
-        clientConfig = new ClientConfig();
-        client = ClientBuilder.newClient(clientConfig);
-
+        //clientConfig = new ClientConfig();
+        client = ClientBuilder.newClient();
 
     }
 
-    public void getSeeders()
+    public void listSeeders()
     {
 
     }
@@ -30,19 +34,27 @@ public class SimpleClient {
     public void getResource()
     {
         String keywords = "test, test2, test3";
-        String webTarget = client.target("http://localhost:8080/trabblex/clientmanager/getfromkeywords")
-                             .path("{keywords}")
-                             .resolveTemplate("keywords", keywords)
-                             .request(MediaType.TEXT_PLAIN_TYPE)
-                             .get(String.class);
+        try
+        {
+            String result = client.target(URL)
+                                 .path("{keywords}")
+                                 .resolveTemplate("keywords", keywords)
+                                 .request(MediaType.TEXT_PLAIN_TYPE)
+                                 .get(String.class);
+            System.out.println(result);
 
-        /*Invocation.Builder invocationBuilder =
-                WebTarget.request(MediaType.TEXT_PLAIN);
+        }
+        catch(java.net.ConnectException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
 
-        Response response = invocationBuilder.get();
-        System.out.println(response.getStatus());
-        System.out.println(response.readEntity(String.class));*/
-        System.out.println(webTarget);
+        }
+        catch(Exception e )
+        {
+            System.err.println("Unhandled error: " + e);
+
+        }
+
     }
 
     public static void main(String[] args)
@@ -51,4 +63,5 @@ public class SimpleClient {
         sc.getResource();
 
     }
+
 }
