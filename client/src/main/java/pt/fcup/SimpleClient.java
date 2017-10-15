@@ -44,7 +44,7 @@ public class SimpleClient {
             System.out.println(result);
 
         }
-        catch(java.net.ConnectException e)
+        catch(javax.ws.rs.ProcessingException e)
         {
             System.err.println("Cannot connect to server " + HOST);
 
