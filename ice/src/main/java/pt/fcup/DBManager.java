@@ -9,21 +9,13 @@ import java.util.Properties;
 
 public class DBManager {
 
-    protected final String HOST = "127.0.0.1:5432";
-    protected final String DB_NAME = "prod";
-    protected final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-    protected final String DB_PROPS_LOCATION = "db.properties";
-    protected Properties DB_PROPS;
+    private final String HOST = "127.0.0.1:5432";
+    private final String DB_NAME = "prod";
+    private final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+    private final String DB_PROPS_LOCATION = "db.properties";
 
-    protected Connection conn;
-    protected Statement statement;
-    protected ResultSet resultSet;
-    protected ResultSetMetaData metaData;
-    protected int numColumns;
-
-    protected JSONObject row;
-    protected JSONArray table;
-
+    private Properties DB_PROPS;
+    private Connection conn;
 
     public DBManager() throws IOException, ClassNotFoundException{
         try {
@@ -47,7 +39,8 @@ public class DBManager {
 
     /**
      * @param query
-     * @return JSONArray as string, [{row1-col1: value}, {row2-col1: value}]
+     * @return JSONArray: [{row1-col1: value, row1-col2: value},
+     *                     {row2-col1: value, row2-col2: value}]
      * @throws SQLException
      */
     public JSONArray queryTable(String query) throws SQLException {
@@ -60,13 +53,15 @@ public class DBManager {
         }
 
         try {
-            statement = conn.createStatement();
-            resultSet = statement.executeQuery(query);
+            Statement statement = conn.createStatement();
 
-            metaData = resultSet.getMetaData();
-            numColumns = metaData.getColumnCount();
+            ResultSet resultSet = statement.executeQuery(query);
 
-            table = new JSONArray();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int numColumns = metaData.getColumnCount();
+
+            JSONArray table = new JSONArray();
+            JSONObject row;
 
             while (resultSet.next()) {
                 row = new JSONObject();
@@ -81,7 +76,6 @@ public class DBManager {
             resultSet.close();
             statement.close();
             conn.close();
-
             return table;
 
         } catch (SQLException e) {
@@ -90,6 +84,31 @@ public class DBManager {
 
         }
 
+    }
+
+    public void singleUpdate(String updateQuery) throws SQLException {
+        try {
+            conn = getConnection();
+
+        } catch (SQLException e) {
+            System.err.println("Connection to DB Failed.");
+            throw e;
+        }
+
+        try {
+            PreparedStatement statement = conn.prepareStatement(updateQuery);
+
+            int rowsUpdated = statement.executeUpdate();
+            System.out.println(rowsUpdated + " rows successfully updated.");
+
+            statement.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            System.err.println("Query execution failed.");
+            throw e;
+
+        }
 
     }
 

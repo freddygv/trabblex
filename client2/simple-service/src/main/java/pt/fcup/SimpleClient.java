@@ -21,6 +21,7 @@ public class SimpleClient {
     {
         clientConfig = new ClientConfig();
         client = ClientBuilder.newClient(clientConfig);
+        
     }
 
     public void getSeeders()
@@ -31,13 +32,14 @@ public class SimpleClient {
     public void getResource()
     {
         String keywords = "test, test2, test3";
-        String webTarget = client.target(URL)
+        String result = client.target(URL)
                              .path("{keywords}")
                              .resolveTemplate("keywords", keywords)
                              .request(MediaType.TEXT_PLAIN_TYPE)
                              .get(String.class);
 
-        System.out.println(webTarget);
+        System.out.println(result);
+
     }
 
     public static void main(String[] args)

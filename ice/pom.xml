@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>pt.fcup</groupId>
+    <groupId>fcup</groupId>
     <artifactId>IceTest</artifactId>
     <version>1.0</version>
     <properties>
@@ -108,7 +108,11 @@
                     </execution>
                 </executions>
                 <configuration>
+<<<<<<< HEAD
                     <mainClass>pt.fcup.Portal</mainClass>
+=======
+                    <mainClass>pt.fcup.Seedbox</mainClass>
+>>>>>>> master
                 </configuration>
             </plugin>
         </plugins>

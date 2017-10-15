@@ -19,10 +19,13 @@ public class Portal
   {
       System.out.println("Creating client manager");
       cm = new ClientManager();
+
   }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         Portal pt = new Portal();
+
     }
 }

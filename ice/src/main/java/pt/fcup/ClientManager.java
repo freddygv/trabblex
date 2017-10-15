@@ -26,6 +26,7 @@ class ClientManager{
         // create and start a new instance of grizzly http server
         // expose the Jersey application at BASE_URI
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+
     }
 
     /**
@@ -33,7 +34,8 @@ class ClientManager{
     */
     public ClientManager ()
     {
-        try{
+        try
+        {
             final HttpServer server = startServer();
             System.out.println("Created server");
             System.in.read();
@@ -43,7 +45,9 @@ class ClientManager{
         catch(Exception e)
         {
             System.out.println("Error: " + e);
+
         }
 
     }
+
 }

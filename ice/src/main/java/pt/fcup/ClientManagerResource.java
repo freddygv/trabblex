@@ -7,6 +7,7 @@ import javax.ws.rs.PathParam;
 
 /**
 * Gives the client a bunch of functionalities
+* Used as a resource by the client manager
 **/
 @Path("clientmanager")
 public class ClientManagerResource implements IClient{
