@@ -1,6 +1,6 @@
 package pt.fcup;
 
-public class PortalServer {
+public class IceServer {
     public static void main(String[] args) {
         PortalServer p = new PortalServer();
         p.run();
