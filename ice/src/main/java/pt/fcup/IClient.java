@@ -13,20 +13,34 @@ to communicate
 public interface IClient
 {
     /**
-    * Get a list of all the seeders
+    * Get a list of all the seeders:
+    * file_name, file_size, video_size_x, video_size_y, bitrate
+    * does NOT include ip adress and port for security purposes
+    * (the chunk_owners database contains info about the seeders AND peers)
     * @return all the seeders
     **/
-    public ArrayList<HashMap<String, String>> listSeeders();
+    public JSONArray listSeeders();
+
+    /**
+    * Searches all the seeders for the keywords
+    * @return a json of the specific seeders
+    **/
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords);
+
 
     /**
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    public HashMap<String, String> createSeed(String fileName);
+    public JSONArray createSeed(String fileName);
 
     /**
-    * Creates a seeder for the designated file
-    * @return all the seeders
+    * Calls the IceServer to inform that the client disconnected
+    * @return success
     **/
-    public HashMap<String, String> getSeeder(String fileHash);
+    public boolean disconnectClient(String ip, int port)
+    {
+
+    }
+
 }

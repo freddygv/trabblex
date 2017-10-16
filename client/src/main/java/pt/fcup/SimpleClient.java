@@ -57,6 +57,49 @@ public class SimpleClient {
 
     }
 
+
+    /**
+    * Get file info
+    * if completely downloaded, full path, size; if
+    * being downloaded: file size and neighbor list
+    * @return file info in a json array
+    **/
+    public JSONArray fileInfo(String fileName);
+
+    /**
+    * Starts the download of a file
+    * Via a TCP connection
+    * @return a json of the specific seeders
+    **/
+    public boolean downloadFile(String name)
+    {
+        // Call client manager
+        // CM answers info from chunk_owners
+        // Connect via TCP to the seeder
+
+    }
+
+    /**
+    * Get info from all local files
+    * @return file info in a json array
+    **/
+    public JSONArray listFiles(String hash);
+
+    /**
+    * Creates a seeder for the designated file
+    * @return all the seeders
+    **/
+    public JSONArray createSeed(String fileName)
+    {
+        // call client Manager
+    }
+
+    public boolean informClientUnjoinable(String ip, int port)
+    {
+        // Inform client manager that a client is not joinable
+        // eg disconnected from the network
+    }
+
     public static void main(String[] args)
     {
         SimpleClient sc = new SimpleClient();

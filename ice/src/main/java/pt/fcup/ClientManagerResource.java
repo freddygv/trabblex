@@ -44,7 +44,8 @@ public class ClientManagerResource implements IClient{
         }
         catch(Exception e)
         {
-            System.err.println("Connection to DB Failed.");
+            System.err.println("Connection to DB Failed (" + e + ")");
+
         }
         return res;
 
@@ -52,23 +53,47 @@ public class ClientManagerResource implements IClient{
 
 
     // see IClient interface for spec
-    public ArrayList<HashMap<String, String>> listSeeders()
+    public JSONArray listSeeders()
     {
-        return null;
+        JSONArray res = null;
+
+        try
+        {
+            // get unique database manager
+            DBManager_singleton db = DBManager_singleton.getInstance();
+            // execute dummy query
+            String sampleQuery =  "SELECT * FROM seeders ";
+
+            res = db.queryTable(sampleQuery);
+            System.out.println("Executed query, result = " + res.toString());
+
+        }
+        catch(Exception e)
+        {
+            System.err.println("Connection to DB Failed (" + e + ")");
+
+        }
+
+        return res;
 
     }
 
-    // see IClient interface for spec
-    public HashMap<String, String> createSeed(String fileName)
-    {
-            return null;
+    /**
+    * Searches all the seeders for the keywords
+    * @return a json of the specific seeders
+    **/
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords);
 
+
+    public JSONArray createSeed(String fileName)
+    {
+        // Call Ice Server via RPC
     }
 
-    // see IClient interface for spec
-    public HashMap<String, String> getSeeder(String fileHash)
+    public boolean informClientUnjoinable(String ip, int port)
     {
-            return null;
-
+        // call Ice server via RPC
     }
+
+
 }
