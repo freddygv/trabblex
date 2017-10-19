@@ -7,14 +7,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
 
-// client imports
 import org.glassfish.jersey.client.*;
 import javax.ws.rs.client.*;
+
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 public class SimpleClient {
 
     protected final String HOST = "http://127.0.0.1:8080";
-    protected final String URL = HOST + "/trabblex/clientmanager/getfromkeywords";
+    protected final String URL = HOST + "/trabblex/clientmanager/";
 
     private ClientConfig clientConfig;
     private Client client;
@@ -37,7 +39,7 @@ public class SimpleClient {
         try
         {
             String result = client.target(URL)
-                                 .path("{keywords}")
+                                 .path("getfromkeywords/{keywords}")
                                  .resolveTemplate("keywords", keywords)
                                  .request(MediaType.TEXT_PLAIN_TYPE)
                                  .get(String.class);
@@ -64,7 +66,10 @@ public class SimpleClient {
     * being downloaded: file size and neighbor list
     * @return file info in a json array
     **/
-    public JSONArray fileInfo(String fileName);
+    public JSONArray fileInfo(String fileName)
+    {
+        return null;
+    }
 
     /**
     * Starts the download of a file
@@ -83,19 +88,43 @@ public class SimpleClient {
                 Note: can be either another client or the portal's Seeder
             ATM, use dummy info
         */
-        String owner_ip = "localhost";
+
+        String file = "test.mp4";
+        try
+        {
+            String result = client.target(URL)
+                                 .path("getfile/{file}")
+                                 .resolveTemplate("file", file)
+                                 .request(MediaType.TEXT_PLAIN_TYPE)
+                                 .get(String.class);
+            System.out.println(result);
+
+        }
+        catch(javax.ws.rs.ProcessingException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(Exception e )
+        {
+            System.err.println("Unhandled error: " + e);
+
+        }
 
 
 
         // Connect via TCP to the seeder
-
+        return false;
     }
 
     /**
     * Get info from all local files
     * @return file info in a json array
     **/
-    public JSONArray listFiles(String hash);
+    public JSONArray listFiles(String hash)
+    {
+        return null;
+    }
 
     /**
     * Creates a seeder for the designated file
@@ -104,12 +133,14 @@ public class SimpleClient {
     public JSONArray createSeed(String fileName)
     {
         // call client Manager
+        return null;
     }
 
     public boolean informClientUnjoinable(String ip, int port)
     {
         // Inform client manager that a client is not joinable
         // eg disconnected from the network
+        return false;
     }
 
     public static void main(String[] args)
