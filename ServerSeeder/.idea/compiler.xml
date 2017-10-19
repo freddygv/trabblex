@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ice" />
+        <module name="SeederServer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ice" target="1.8" />
+      <module name="SeederServer" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
