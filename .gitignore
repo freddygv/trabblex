@@ -1,4 +1,5 @@
 ice/target/
+!ice/target/classes/META-INF/
 
 # Idea
 **/.idea/workspace.xml 
