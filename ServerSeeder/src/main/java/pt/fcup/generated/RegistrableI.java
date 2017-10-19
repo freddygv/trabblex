@@ -22,9 +22,9 @@ package pt.fcup.generated;
 
 public interface RegistrableI extends com.zeroc.Ice.Object
 {
-    void registerSeeder(String regMessage, com.zeroc.Ice.Current current);
+    boolean registerSeeder(String regMessage, com.zeroc.Ice.Current current);
 
-    void deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
+    boolean deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
 
     static final String[] _iceIds =
     {
@@ -56,8 +56,11 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         String iceP_regMessage;
         iceP_regMessage = istr.readString();
         inS.endReadParams();
-        obj.registerSeeder(iceP_regMessage, current);
-        return inS.setResult(inS.writeEmptyParams());
+        boolean ret = obj.registerSeeder(iceP_regMessage, current);
+        com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
+        ostr.writeBool(ret);
+        inS.endWriteParams(ostr);
+        return inS.setResult(ostr);
     }
 
     static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_deregisterSeeder(RegistrableI obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
@@ -67,8 +70,11 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         String iceP_deregMessage;
         iceP_deregMessage = istr.readString();
         inS.endReadParams();
-        obj.deregisterSeeder(iceP_deregMessage, current);
-        return inS.setResult(inS.writeEmptyParams());
+        boolean ret = obj.deregisterSeeder(iceP_deregMessage, current);
+        com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
+        ostr.writeBool(ret);
+        inS.endWriteParams(ostr);
+        return inS.setResult(ostr);
     }
 
     final static String[] _iceOps =

@@ -29,10 +29,10 @@ public class Seedbox {
      * Instantiates a seeder to provide file requested
      * @param filename name of the file requested
      */
-    private Seeder createSingleSeeder(String filename) {
+    private boolean createSingleSeeder(String filename) {
         // TODO: Remove block when there's real data
         Random rand = new Random();
-        int i = rand.nextInt(10);
+        int i = rand.nextInt(100);
         HashMap<String, String> fileMetadata =  getDummyMetadata(i, filename);
         //
 
@@ -45,12 +45,14 @@ public class Seedbox {
 
         if (regSuccess) {
             System.out.println("Seeder registration success for: " + newSeeder.getFileName());
+
         } else {
             System.out.println("Seeder registration failed for: " + newSeeder.getFileName());
 
+
         }
 
-        return newSeeder;
+        return regSuccess;
     }
 
     private int generatePort() {
@@ -76,7 +78,7 @@ public class Seedbox {
         try {
             DBManager testDB = new DBManager();
             System.out.println("Querying seeders table:");
-            System.out.println(testDB.queryTable("SELECT file_hash, file_name FROM seeders;").toString());
+            System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM seeders;").toString());
 
             System.out.println("Truncating seeders table:");
             testDB.singleUpdate("DELETE FROM seeders WHERE file_hash IS NOT NULL;");

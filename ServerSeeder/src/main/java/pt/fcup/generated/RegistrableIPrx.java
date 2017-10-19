@@ -22,61 +22,69 @@ package pt.fcup.generated;
 
 public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
 {
-    default void registerSeeder(String regMessage)
+    default boolean registerSeeder(String regMessage)
     {
-        registerSeeder(regMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return registerSeeder(regMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default void registerSeeder(String regMessage, java.util.Map<String, String> context)
+    default boolean registerSeeder(String regMessage, java.util.Map<String, String> context)
     {
-        _iceI_registerSeederAsync(regMessage, context, true).waitForResponse();
+        return _iceI_registerSeederAsync(regMessage, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Void> registerSeederAsync(String regMessage)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String regMessage)
     {
         return _iceI_registerSeederAsync(regMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Void> registerSeederAsync(String regMessage, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String regMessage, java.util.Map<String, String> context)
     {
         return _iceI_registerSeederAsync(regMessage, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_registerSeederAsync(String iceP_regMessage, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_registerSeederAsync(String iceP_regMessage, java.util.Map<String, String> context, boolean sync)
     {
-        com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "registerSeeder", null, sync, null);
-        f.invoke(false, context, null, ostr -> {
+        com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "registerSeeder", null, sync, null);
+        f.invoke(true, context, null, ostr -> {
                      ostr.writeString(iceP_regMessage);
-                 }, null);
+                 }, istr -> {
+                     boolean ret;
+                     ret = istr.readBool();
+                     return ret;
+                 });
         return f;
     }
 
-    default void deregisterSeeder(String deregMessage)
+    default boolean deregisterSeeder(String deregMessage)
     {
-        deregisterSeeder(deregMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return deregisterSeeder(deregMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default void deregisterSeeder(String deregMessage, java.util.Map<String, String> context)
+    default boolean deregisterSeeder(String deregMessage, java.util.Map<String, String> context)
     {
-        _iceI_deregisterSeederAsync(deregMessage, context, true).waitForResponse();
+        return _iceI_deregisterSeederAsync(deregMessage, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Void> deregisterSeederAsync(String deregMessage)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String deregMessage)
     {
         return _iceI_deregisterSeederAsync(deregMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Void> deregisterSeederAsync(String deregMessage, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String deregMessage, java.util.Map<String, String> context)
     {
         return _iceI_deregisterSeederAsync(deregMessage, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_deregisterSeederAsync(String iceP_deregMessage, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_deregisterSeederAsync(String iceP_deregMessage, java.util.Map<String, String> context, boolean sync)
     {
-        com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "deregisterSeeder", null, sync, null);
-        f.invoke(false, context, null, ostr -> {
+        com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "deregisterSeeder", null, sync, null);
+        f.invoke(true, context, null, ostr -> {
                      ostr.writeString(iceP_deregMessage);
-                 }, null);
+                 }, istr -> {
+                     boolean ret;
+                     ret = istr.readBool();
+                     return ret;
+                 });
         return f;
     }
 

@@ -80,24 +80,41 @@ public class Seeder {
                 ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
                 ",'" + bitrate + "');";
 
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-            RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-            register.registerSeeder(insertionQuery);
-            return true;
+        boolean regResult = false;
 
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+                regResult = register.registerSeeder(insertionQuery);
+            }
+
+            if (regResult) {
+                break;
+            }
         }
+
+        return regResult;
+
     }
 
     // TODO: Should this also close the socket if the seeder has no client connections?
     public boolean deregisterSeeder() {
         String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
 
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-            RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-            deregister.deregisterSeeder(deletionQuery);
-            return true;
+        boolean regResult = false;
 
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+                regResult = deregister.deregisterSeeder(deletionQuery);
+            }
+
+            if (regResult) {
+                break;
+            }
         }
+
+        return regResult;
     }
 
     public void setHost(int port) {
