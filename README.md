@@ -18,6 +18,10 @@ them and share data blocks for a specific file.
 
 ## Components
 
+### Database manager
+Maybe later will be implemented as singleton -
+to have only one entry point to the database for all the other components
+
 ### Client Manager
 * Creates a Grizzly HTTP Server (at first view, provides the best performance)
 * Creates resources used by the client
@@ -27,6 +31,8 @@ them and share data blocks for a specific file.
 * Implements *client* interface
 * Enables the client to get back the list of seeders , and create a seed
 
+## Simple Client
+Connects to the client manager using the JAX-RS Client API
 
 ## Database
 Using CLOUD SQL --> integrated into google cloud
@@ -63,3 +69,4 @@ Quentin - code the **Client manager**
 * Create a simple ICE RPC client
 * Create the seeder (ICE)
 * Create test cases using Junit based on the spec - one for each method of the elements
+* Manage exceptions in client manager resources

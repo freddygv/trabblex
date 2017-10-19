@@ -112,12 +112,12 @@ public class DBManager {
 
     }
 
-    private Connection getConnection() throws SQLException {
+    protected Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_PROPS);
 
     }
 
-    private void loadDBProperties(String filename) throws IOException {
+    protected void loadDBProperties(String filename) throws IOException {
         FileInputStream input = new FileInputStream(filename);
         DB_PROPS = new Properties();
         DB_PROPS.load(input);
