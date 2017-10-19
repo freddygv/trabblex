@@ -1,4 +1,9 @@
 ice/target/
+!ice/target/classes/META-INF/
+
+# Idea
+**/.idea/workspace.xml 
+**/.idea/tasks.xml
 
 # Compiled class file
 *.class

@@ -1,4 +1,6 @@
 package pt.fcup;
+import org.json.JSONArray;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -132,10 +134,10 @@ public class ClientManagerResource{
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
-    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords)
-    {
-        return null;
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) {
+        return new JSONArray();
     }
+
 
     /**
     * Creates a seeder for the designated file
@@ -150,7 +152,7 @@ public class ClientManagerResource{
     public boolean informClientUnjoinable(String ip, int port)
     {
         // call Ice server via RPC
-            return false;
+        return false;
     }
 
 
