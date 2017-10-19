@@ -74,7 +74,19 @@ public class SimpleClient {
     public boolean downloadFile(String name)
     {
         // Call client manager
-        // CM answers info from chunk_owners
+
+        /*
+            CM answers info from chunk_owners: (first chunk of the file)
+                owner_ip
+                chunk_hash - todo later
+                file_hash - todo later
+                Note: can be either another client or the portal's Seeder
+            ATM, use dummy info
+        */
+        String owner_ip = "localhost";
+
+
+
         // Connect via TCP to the seeder
 
     }
