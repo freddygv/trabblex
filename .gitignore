@@ -4,8 +4,11 @@ ServerSeeder/target
 !ServerSeever/target/classes/META-INF/
 
 # Idea
-**/.idea/workspace.xml 
+**/.idea/workspace.xml
 **/.idea/tasks.xml
+.idea
+.idea/*
+*/.idea
 
 # Compiled class file
 *.class
