@@ -39,8 +39,8 @@ public class SimpleClient {
         try
         {
             String result = client.target(URL)
-                                 .path("getfromkeywords/{keywords}")
-                                 .resolveTemplate("keywords", keywords)
+                                 .path("getfile/{file}")
+                                 .resolveTemplate("file", keywords)
                                  .request(MediaType.TEXT_PLAIN_TYPE)
                                  .get(String.class);
             System.out.println(result);
