@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class Seedbox {
     // TODO: Put in real URL
@@ -17,52 +18,38 @@ public class Seedbox {
     }
 
     private void run() {
-        List<String> videoURLS = getVideoListFromBucketURL();
-        HashMap<String, Seeder> seederMap = createSeeders(videoURLS);
-
-    }
-
-    /**
-     * TODO: Upload videos to google cloud storage and implement function to get the list of files
-     * @return list of video URLs in Google Storage Bucket
-     */
-    private List<String> getVideoListFromBucketURL() {
         List<String> videos = new ArrayList<>(Arrays.asList("video1-url.mp4", "video2-url.mp4"));
+        createSingleSeeder(videos.get(0));
+        createSingleSeeder(videos.get(1));
 
-        return videos;
+        // TODO: Remove at the end, just used to flush the system
+        queryAndTruncateSeeders();
     }
 
     /**
-     * Creating and returning a dictionary of file-hashes to Seeders
-     *
-     * @param urls String list of URLs with video files
+     * TODO: Return seeder, not void
+     * @param filename
      */
-    private HashMap<String, Seeder> createSeeders(List<String> urls) {
-        HashMap<String, Seeder> seeders = new HashMap<>();
-        HashMap<String, String> fileMetadata;
+    private void createSingleSeeder(String filename) {
+        Random rand = new Random();
+        int i = rand.nextInt(10);
 
-        Seeder current;
+        HashMap<String, String> fileMetadata =  getDummyMetadata(i, filename);
+        Seeder newSeeder = new Seeder(fileMetadata);
 
-        for (int i = 0; i < urls.size(); i++) {
-            fileMetadata = getMetadata(i, urls.get(i));
+        // TODO: Do I need to give each seeder a unique port to listen on?
+        newSeeder.setHost();
 
-            current = new Seeder(fileMetadata);
+        boolean regSuccess = newSeeder.registerSeeder();
 
-            // TODO: Do I need to give each seeder a unique port to listen on?
-            current.setHost();
-
-            boolean regSuccess = current.registerSeeder();
-
-            if (regSuccess) {
-                seeders.put(current.getFileHash(), current);
-            } else {
-                System.out.println("Seeder registration failed for: " + current.getFileHash());
-
-            }
+        if (regSuccess) {
+            System.out.println("Seeder registration success for: " + newSeeder.getFileName());
+        } else {
+            System.out.println("Seeder registration failed for: " + newSeeder.getFileName());
 
         }
 
-        return seeders;
+//        return newSeeder;
     }
 
     /**
@@ -83,12 +70,11 @@ public class Seedbox {
     }
 
     /**
-     * TODO: Remove dummy data and index param once metadata fetcher is implemented
-     * Getting relevant file metadata to instantiate Seeders
-     *
-     * @param videoUrl URL for the file
+     * TODO: Remove, need to implement a separate method that creates metadata
+     * @param index index to distinguish hash and filename
+     * @param filename Name of the file
      */
-    private HashMap<String, String> getMetadata(int index, String videoUrl) {
+    private HashMap<String, String> getDummyMetadata(int index, String filename) {
         HashMap<String, String> metadata = new HashMap<>();
         metadata.put("fileHash", "abcd" + Integer.toString(index));
         metadata.put("fileName", "video-" + Integer.toString(index));
