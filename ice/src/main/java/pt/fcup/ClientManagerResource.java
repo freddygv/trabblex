@@ -1,10 +1,13 @@
 package pt.fcup;
+import org.json.JSONArray;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
 import java.util.ArrayList;
+
 
 /**
 * Gives the client a bunch of functionalities
@@ -82,17 +85,26 @@ public class ClientManagerResource implements IClient{
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
-    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords);
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) {
+        return new JSONArray();
+    }
 
 
     public JSONArray createSeed(String fileName)
     {
         // Call Ice Server via RPC
+        return new JSONArray();
+    }
+
+    @Override
+    public boolean disconnectClient(String ip, int port) {
+        return false;
     }
 
     public boolean informClientUnjoinable(String ip, int port)
     {
         // call Ice server via RPC
+        return false;
     }
 
 

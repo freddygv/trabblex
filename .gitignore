@@ -1,5 +1,9 @@
 ice/target/
 
+# Idea
+**/.idea/workspace.xml 
+**/.idea/tasks.xml
+
 # Compiled class file
 *.class
 

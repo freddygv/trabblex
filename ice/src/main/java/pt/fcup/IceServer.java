@@ -2,7 +2,7 @@ package pt.fcup;
 
 public class IceServer {
     public static void main(String[] args) {
-        PortalServer p = new PortalServer();
+        IceServer p = new IceServer();
         p.run();
     }
 

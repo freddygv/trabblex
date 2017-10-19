@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 
 /**
@@ -38,9 +40,6 @@ public interface IClient
     * Calls the IceServer to inform that the client disconnected
     * @return success
     **/
-    public boolean disconnectClient(String ip, int port)
-    {
-
-    }
+    public boolean disconnectClient(String ip, int port);
 
 }
