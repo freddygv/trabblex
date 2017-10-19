@@ -102,8 +102,8 @@ public class Seeder {
         String deregString = "De-registering seeder with file: " + fileName;
 
         try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-            RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-            register.deregisterSeeder(deregString);
+            RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+            deregister.deregisterSeeder(deregString);
             return true;
 
         }
@@ -130,6 +130,10 @@ public class Seeder {
 
     }
 
+    /**
+     * This is currently hard-coded, but will need to be adjusted once the server is on the cloud
+     * This IP will be used for the neighbor list and bittorrent transfers
+     */
     public void setHost() {
         ip = "localhost";
         port = "8080";
