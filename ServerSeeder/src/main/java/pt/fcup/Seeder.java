@@ -1,11 +1,11 @@
 package pt.fcup;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import pt.fcup.generated.*;
 
 public class Seeder {
+    private final int MAX_RETRIES = 4;
+
     private final String PROTOCOL = "TCP";
     private String ip;
     private String port;
@@ -41,6 +41,10 @@ public class Seeder {
         return port;
     }
 
+    public void setPort(String port) {
+        this.port = port;
+    }
+
     public String getFilepath() {
         return filepath;
     }
@@ -70,73 +74,39 @@ public class Seeder {
     }
 
     public boolean registerSeeder() {
-        String regString = "Registering seeder with file: " + fileName;
+        String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
+                "port, video_size_x, video_size_y, bitrate) " +
+                "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSize + "'" +
+                ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
+                ",'" + bitrate + "');";
 
-        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
             RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-            register.registerSeeder(regString);
+            register.registerSeeder(insertionQuery);
             return true;
 
         }
-
-        // TODO: Pull query out into Portal class, Seeder won't have DB so this method should call an ICE message
-        // TODO: Edit neighbor list as well
-//        String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
-//                                                     "port, video_size_x, video_size_y, bitrate) " +
-//                                 "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSize + "'" +
-//                                        ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
-//                                        ",'" + bitrate + "');";
-//
-//        try {
-//            dbUpdate(insertionQuery);
-//            return true;
-//
-//        } catch (ClassNotFoundException | IOException | SQLException ec) {
-//            System.err.println("Seeder registration: DB insert failed.");
-//            return false;
-//
-//        }
     }
 
+    // TODO: Should this also close the socket if the seeder has no client connections?
     public boolean deregisterSeeder() {
-        String deregString = "De-registering seeder with file: " + fileName;
+        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
 
-        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
             RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-            deregister.deregisterSeeder(deregString);
+            deregister.deregisterSeeder(deletionQuery);
             return true;
 
         }
-
-        // TODO: Pull query out into Portal class, Seeder won't have DB so this method should call an ICE message
-        // TODO: Edit neighbor list as well
-//        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
-//
-//        try {
-//            dbUpdate(deletionQuery);
-//            return true;
-//
-//        } catch (ClassNotFoundException | IOException | SQLException ec) {
-//            System.err.println("Seeder de-registration: DB delete failed.");
-//            return false;
-//
-//        }
-
     }
 
-    private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
-        DBManager db = new DBManager();
-        db.singleUpdate(query);
-
-    }
-
-    /**
-     * This is currently hard-coded, but will need to be adjusted once the server is on the cloud
-     * This IP will be used for the neighbor list and bittorrent transfers
-     */
-    public void setHost() {
+    public void setHost(int port) {
+        // TODO: Get IP from environment variable, will be the same for all seeders
         ip = "localhost";
-        port = "8080";
+
+        this.port = Integer.toString(port);
+
+        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
 
     }
 }

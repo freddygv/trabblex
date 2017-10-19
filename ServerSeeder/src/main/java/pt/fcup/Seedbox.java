@@ -2,15 +2,14 @@ package pt.fcup;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.security.SecureRandom;
 
 public class Seedbox {
-    // TODO: Put in real URL
-    private final String BUCKET_URL = "fake.google.com/cloud/storage/url/bucket";
+
+    private final int BASE_PORT = 29200;
+    private final int MAX_OFFSET = 100;
+    private Set<Integer> portsTaken = new HashSet<>();
 
     public static void main(String[] args) {
         Seedbox sb = new Seedbox();
@@ -27,18 +26,20 @@ public class Seedbox {
     }
 
     /**
-     * TODO: Return seeder, not void
-     * @param filename
+     * Instantiates a seeder to provide file requested
+     * @param filename name of the file requested
      */
-    private void createSingleSeeder(String filename) {
+    private Seeder createSingleSeeder(String filename) {
+        // TODO: Remove block when there's real data
         Random rand = new Random();
         int i = rand.nextInt(10);
-
         HashMap<String, String> fileMetadata =  getDummyMetadata(i, filename);
+        //
+
         Seeder newSeeder = new Seeder(fileMetadata);
 
-        // TODO: Do I need to give each seeder a unique port to listen on?
-        newSeeder.setHost();
+        int seederPort = generatePort();
+        newSeeder.setHost(seederPort);
 
         boolean regSuccess = newSeeder.registerSeeder();
 
@@ -49,7 +50,22 @@ public class Seedbox {
 
         }
 
-//        return newSeeder;
+        return newSeeder;
+    }
+
+    private int generatePort() {
+        Random rand = new SecureRandom();
+
+        int randomOffset;
+        while (true) {
+            randomOffset = rand.nextInt(MAX_OFFSET);
+
+            // If portsTaken already has the number, false is returned
+            if (portsTaken.add(randomOffset)) {
+                return BASE_PORT + randomOffset;
+
+            }
+        }
     }
 
     /**

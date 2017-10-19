@@ -99,7 +99,7 @@ public class DBManager {
             PreparedStatement statement = conn.prepareStatement(updateQuery);
 
             int rowsUpdated = statement.executeUpdate();
-            System.out.println(rowsUpdated + " rows successfully updated.");
+            System.out.println(rowsUpdated + " row(s) successfully updated.");
 
             statement.close();
             conn.close();
