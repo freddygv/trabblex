@@ -13,6 +13,8 @@ import javax.ws.rs.client.*;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+
+
 public class SimpleClient {
 
     protected final String HOST = "http://127.0.0.1:8080";
@@ -21,11 +23,20 @@ public class SimpleClient {
     private ClientConfig clientConfig;
     private Client client;
 
-    public SimpleClient()
+    private boolean verbose = false;
+
+
+    public SimpleClient(String[] args)
     {
-        //clientConfig = new ClientConfig();
         client = ClientBuilder.newClient();
 
+        /*
+            Get arguments
+        */
+        for(int i=0;i<args.length;++i)
+        {
+         System.out.println(args[i]);
+        }
     }
 
     public void listSeeders()
@@ -145,27 +156,11 @@ public class SimpleClient {
 
     public static void main(String[] args)
     {
-        SimpleClient sc = new SimpleClient();
+        SimpleClient sc = new SimpleClient(args);
         sc.getResource();
 
     }
 
-    /**
-    * Define the command-line parsing with Apache Commons CLI.
-    * @return Definition of command-line options.
-    */
-    private static Options generateOptions()
-    {
-    final Option listOption = Option.builder("list")
-        .required(false)
-        .hasArg(false)
-        .longOpt(LIST_OPTION)
-        .desc("List all seeders available.")
-        .build();
-
-    final Options options = new Options();
-        options.addOption(listOption);
-        return options;
-    }
+    
 
 }
