@@ -2,10 +2,7 @@ package pt.fcup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import pt.fcup.exception.FileHashException;
-import pt.fcup.exception.JSONParsingException;
-import pt.fcup.exception.SeederGenerationException;
-
+import pt.fcup.exception.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

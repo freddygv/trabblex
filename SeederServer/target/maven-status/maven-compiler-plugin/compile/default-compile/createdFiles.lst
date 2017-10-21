@@ -8,5 +8,4 @@ pt/fcup/generated/RegistrableI$1.class
 pt/fcup/IceServer.class
 pt/fcup/exception/JSONParsingException.class
 pt/fcup/exception/SeederGenerationException.class
-pt/fcup/DBManager.class
 pt/fcup/Seeder.class

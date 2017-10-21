@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.lang.ClassNotFoundException;
 
-
 public class RegistrableI implements pt.fcup.generated.RegistrableI {
     public boolean registerSeeder(String regMessage, com.zeroc.Ice.Current current) {
         try {
