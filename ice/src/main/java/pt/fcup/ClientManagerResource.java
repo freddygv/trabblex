@@ -75,7 +75,7 @@ public class ClientManagerResource{
             String sampleQuery =  "SELECT * FROM seeders ";
 
             res = db.queryTable(sampleQuery);
-            System.out.println("Executed query, result = " + res.toString());
+            //System.out.println("Executed query, result = " + res.toString());
 
         }
         catch(Exception e)

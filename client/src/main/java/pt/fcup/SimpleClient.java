@@ -150,4 +150,22 @@ public class SimpleClient {
 
     }
 
+    /**
+    * Define the command-line parsing with Apache Commons CLI.
+    * @return Definition of command-line options.
+    */
+    private static Options generateOptions()
+    {
+    final Option listOption = Option.builder("list")
+        .required(false)
+        .hasArg(false)
+        .longOpt(LIST_OPTION)
+        .desc("List all seeders available.")
+        .build();
+
+    final Options options = new Options();
+        options.addOption(listOption);
+        return options;
+    }
+
 }

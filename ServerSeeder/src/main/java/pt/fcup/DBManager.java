@@ -24,7 +24,7 @@ public class DBManager {
         } catch (ClassNotFoundException e) {
             System.err.println("Postgres Driver not found.");
             throw e;
-
+            
         }
 
         try {
