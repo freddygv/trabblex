@@ -7,8 +7,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
 
-import org.glassfish.jersey.client.*;
+/*import org.glassfish.jersey.client.*;*/
 import javax.ws.rs.client.*;
+import javax.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -20,7 +21,6 @@ public class SimpleClient {
     protected final String HOST = "http://127.0.0.1:8080";
     protected final String URL = HOST + "/trabblex/clientmanager/";
 
-    private ClientConfig clientConfig;
     private Client client;
 
     private boolean verbose = false;
@@ -46,7 +46,7 @@ public class SimpleClient {
 
     public void getResource()
     {
-        String keywords = "test, test2, test3";
+        /*String keywords = "test, test2, test3";
         try
         {
             String result = client.target(URL)
@@ -66,7 +66,7 @@ public class SimpleClient {
         {
             System.err.println("Unhandled error: " + e);
 
-        }
+        }*/
 
     }
 
@@ -103,19 +103,28 @@ public class SimpleClient {
         String file = "test.mp4";
         try
         {
-            String result = client.target(URL)
+            /*String result = client.target(URL)
                                  .path("getfile/{file}")
                                  .resolveTemplate("file", file)
                                  .request(MediaType.TEXT_PLAIN_TYPE)
                                  .get(String.class);
-            System.out.println(result);
+            System.out.println(result);*/
+            WebTarget webTarget 
+                = client.target(URL);
+            WebTarget employeeWebTarget 
+                = webTarget.path("resources/employees");
+            Invocation.Builder invocationBuilder 
+                = employeeWebTarget.request(MediaType.APPLICATION_JSON);
+
+            String response 
+                = invocationBuilder.get(String.class);
 
         }
-        catch(javax.ws.rs.ProcessingException e)
+/*        catch(javax.ws.rs.ProcessingException e)
         {
             System.err.println("Cannot connect to server " + HOST);
 
-        }
+        }*/
         catch(Exception e )
         {
             System.err.println("Unhandled error: " + e);
@@ -157,8 +166,7 @@ public class SimpleClient {
     public static void main(String[] args)
     {
         SimpleClient sc = new SimpleClient(args);
-        sc.getResource();
-
+        sc.downloadFile("blablabla");
     }
 
     
