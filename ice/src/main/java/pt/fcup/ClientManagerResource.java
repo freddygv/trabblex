@@ -35,7 +35,7 @@ public class ClientManagerResource{
             Dummy for tests
 
         */
-       try{
+     /*  try{
             String sampleQuery =  "INSERT INTO chunk_owners"
             + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
             + "VALUES"
@@ -80,7 +80,7 @@ public class ClientManagerResource{
         {
             System.err.println("Connection to DB Failed (" + e + ")");
 
-        }
+        }*/
 
     }
 
@@ -153,7 +153,9 @@ public class ClientManagerResource{
     public String getChunkOwners(@PathParam("hash") String filehash)
     {
 
-        String query =  "SELECT * FROM chunk_owners;";
+        String query =  "SELECT * FROM chunk_owners WHERE file_hash='"
+        + filehash
+        + "';";
 
         return runQuery(query).toString();
 
@@ -163,7 +165,8 @@ public class ClientManagerResource{
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
-    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) {
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) 
+    {
         return new JSONArray();
     }
 

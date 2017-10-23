@@ -29,6 +29,9 @@ public class SimpleClient {
 
     JSONArray localSeederInfo;
 
+    // max number of concurrent downloads
+    private int max_downloads = 3;
+
     // could be used later for multi-server management
     //private final String seeder_identifier = "file_hash";
 
@@ -39,7 +42,7 @@ public class SimpleClient {
         localSeederInfo = new JSONArray();
     }
 
-    public void run()
+    private void run()
     {
         String input;
         Scanner sc = new Scanner(System.in);
@@ -105,13 +108,25 @@ public class SimpleClient {
                     displayHelp();
                     break;
 
+                case "setmaxdownloads":
+                    if(parts.length < 2)
+                    {
+                        displayHelp();
+                    
+                    }
+                    else
+                    {
+                        max_downloads = Integer.parseInt(parts[1]);
+                    }
+                    break;
+
             }
 
         } 
         while(input != "quit");
     }
 
-    public void displayHelp()
+    private void displayHelp()
     {
         System.out.println("===========================");
         System.out.println("Simple client coded by Freddy and Quentin");
@@ -122,12 +137,13 @@ public class SimpleClient {
         System.out.println("list files");
         System.out.println("info file");
         System.out.println("play name");
+        System.out.println("setmaxdownloads x");
         System.out.println("===========================");
     }
 
 
     // TODO nicely print everything
-    public JSONArray listSeeders()
+    private JSONArray listSeeders()
     {
 
         try
@@ -245,19 +261,16 @@ public class SimpleClient {
         return null;
     }
 
-    /**
-    * Starts the download of a file
-    * Via a TCP connection
-    * @return a json of the specific seeders
-    **/
-    public boolean downloadFile(String name)
+
+    /*
+        Get file hash from local stored data
+        This could be done server-side, but by doing it client-side
+        we reduce the number of server queries
+        Also, ensures consistency if file name on server changes meanwhile
+    */
+    private String getHashFromName( String name )
     {
-        /*
-            Get file hash from local storage
-            This could be done server-side, but by doing it client-side
-            we reduce the number of server queries
-            Also, ensures consistency if file name on server changes meanwhile
-        */
+      
         String hash_to_get = null;
 
         if(verbose)
@@ -275,14 +288,24 @@ public class SimpleClient {
         if(hash_to_get == null)
         {
             System.out.println("File not found !");
-            return false;
 
         }
+        else
+        {
+            if(verbose)
+                System.out.println("Found, hash= " + hash_to_get);
+        }
 
-        if(verbose)
-            System.out.println("Found, hash= " + hash_to_get);
+        return hash_to_get;
+    }
 
-
+    /*
+        Calls client manager to get chunk owners with 
+        corresponding file hash
+    */
+    private String getChunksFromHash(String hash)
+    {
+        String result = null;
         try
         {
            
@@ -290,8 +313,8 @@ public class SimpleClient {
                 System.out.println("Querying server...");
 
             // Query database
-            String result = client.target(URL)
-                                 .path("getowners/" + hash_to_get)
+            result = client.target(URL)
+                                 .path("getowners/" + hash)
                                  .request(MediaType.TEXT_PLAIN)
                                  .get(String.class);
         }
@@ -306,12 +329,31 @@ public class SimpleClient {
 
         }  
 
+        return result;
+    }
+
+    /**
+    * Starts the download of a file
+    * Via a TCP connection
+    * @return a json of the specific seeders
+    **/
+    private boolean downloadFile(String name)
+    {
+        
+        String hash_to_get = getHashFromName(name);
+
+        if(hash_to_get == null)
+            return false;
+
+        String chunk_owners = getChunksFromHash(hash_to_get); 
+
+        if(chunk_owners == null)
+            return false;
+
+        
         /*
-            Call client manager to get chunk owners with 
-            corresponding file hash
+            Sort the owners by rarity 
         */
-
-
 
         /*
             CM answers info from chunk_owners: (first chunk of the file)
@@ -342,7 +384,7 @@ public class SimpleClient {
                 = invocationBuilder.get(String.class);
 
         }
-/*        catch(javax.ws.rs.ProcessingException e)
+        /*        catch(javax.ws.rs.ProcessingException e)
         {
             System.err.println("Cannot connect to server " + HOST);
 
@@ -352,7 +394,7 @@ public class SimpleClient {
             System.err.println("Unhandled error: " + e);
 
         }
-*/
+    */
 
 
         // Connect via TCP to the seeder
@@ -363,7 +405,7 @@ public class SimpleClient {
     * Get info from all local files
     * @return file info in a json array
     **/
-    public JSONArray listFiles(String hash)
+    private JSONArray listFiles(String hash)
     {
         return null;
     }
@@ -372,13 +414,13 @@ public class SimpleClient {
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    public JSONArray createSeed(String fileName)
+    private JSONArray createSeed(String fileName)
     {
         // call client Manager
         return null;
     }
 
-    public boolean informClientUnjoinable(String ip, int port)
+    private boolean informClientUnjoinable(String ip, int port)
     {
         // Inform client manager that a client is not joinable
         // eg disconnected from the network
