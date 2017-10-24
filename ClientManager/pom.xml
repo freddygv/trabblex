@@ -35,6 +35,11 @@
     </dependencyManagement>
 
     <dependencies>
+         <dependency>
+            <groupId>fcup</groupId>
+            <artifactId>DBManager</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.zeroc</groupId>
             <artifactId>ice</artifactId>
@@ -116,7 +121,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>pt.fcup.Portal</mainClass>
+                    <mainClass>pt.fcup.ClientManager</mainClass>
                     <!--<mainClass>pt.fcup.Seedbox</mainClass>-->
                 </configuration>
             </plugin>
