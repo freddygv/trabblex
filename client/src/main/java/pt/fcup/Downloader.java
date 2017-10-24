@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.io.*;
 
 
 class Downloader extends Thread
@@ -12,6 +13,7 @@ class Downloader extends Thread
 	String ip, hash, protocol, file;
 	int port, chunkSize;
 	byte[] contents;
+
 
 	public Downloader(String file, String ip, int port, String protocol, byte[] buf)
 	{
@@ -35,11 +37,23 @@ class Downloader extends Thread
 
 		try
 		{
+			System.out.println(System.getProperty("user.dir"));
 			//Initialize socket
 			Socket socket = new Socket(InetAddress.getByName(ip), port);
+			FileOutputStream fos = null;
 
-			//Initialize the FileOutputStream to the output file's full path.
-			FileOutputStream fos = new FileOutputStream("files/" + file);
+			try
+			{
+				fos = new FileOutputStream("downloads/" + file);
+			}
+			catch(IOException e)
+	        	{
+	        		System.out.println("Couldn't create local file");
+	        		System.out.println("Please check if directory downloads exists");
+	        		System.out.println("    in same folder as jar");
+	           	e.printStackTrace();
+				Thread.currentThread().interrupt();
+	        	}
 			BufferedOutputStream bos = new BufferedOutputStream(fos);
 			InputStream is = socket.getInputStream();
 

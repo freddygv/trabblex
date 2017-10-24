@@ -27,6 +27,8 @@ them and share data blocks for a specific file.
 * The SeederServer manually creates and starts a seeder
     * Implement via RPC call
 
+* TODO in downloader - give him the download folder
+
 # Documentation
 
 | Software | Link |

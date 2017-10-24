@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+
 import java.util.Scanner;
 
 
@@ -372,7 +373,7 @@ public class SimpleClient {
             chunkTest
         );*/
         Downloader dwl = new Downloader(
-            "test popeye",
+            "test-popeye.mp4",
             "localhost", 26000,
             "TCP",
             chunkTest
