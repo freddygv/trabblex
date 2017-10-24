@@ -6,6 +6,7 @@ This streaming service is a mesh between Bittorrent and Netflix. The idea is to 
 streaming service, so instead of only using the cloud servers, the clients must communicate between
 them and share data blocks for a specific file.
 
+
 # Documentation
 
 | Software | Link |

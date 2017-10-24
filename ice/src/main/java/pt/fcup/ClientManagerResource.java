@@ -18,9 +18,89 @@ import org.json.JSONArray;
 @Path("clientmanager")
 public class ClientManagerResource{
 
+    DBManager_singleton db = null;
+
     public ClientManagerResource()
     {
+        try
+        {
+            db = DBManager_singleton.getInstance();   
+        }
+        catch(Exception e)
+        {
+            System.out.println("Couldn't get database singleton: " + e.toString());
+        }
 
+        /*
+            Dummy for tests
+
+        */
+     /*  try{
+            String sampleQuery =  "INSERT INTO chunk_owners"
+            + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
+            + "VALUES"
+            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','1','1'),"
+            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','1','1');";
+
+            db.singleUpdate(sampleQuery);
+
+            sampleQuery =  "INSERT INTO chunk_owners "
+            + "VALUES"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','1','1'),"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
+            + "('Dummy_hash_1','chunk_hash_3','127.0.0.1','26','1','1');";
+
+            db.singleUpdate(sampleQuery);
+
+
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error (" + e + ")");
+
+        }
+
+         try{
+            // execute dummy query
+            String sampleQuery =  "INSERT INTO seeders "
+            + "VALUES"
+            + "('http://127.0.0.1','Dummy_hash_1','Dummy_name_1','13','TCP','26000','1920','1080','600'),"
+            + "('http://127.0.0.1','Dummy_hash_3','Dummy_name_3','12','TCP','26000','1920','1080','600');"
+            ;
+
+            db.singleUpdate(sampleQuery);
+
+        }
+        catch(Exception e)
+        {
+            System.err.println("Connection to DB Failed (" + e + ")");
+
+        }*/
+
+    }
+
+    private JSONArray runQuery( String query )
+    {
+        JSONArray res = null;
+
+        try{
+            System.out.println("Executing query " + query); 
+            res = db.queryTable(query);
+            System.out.println("Result = " + res.toString());
+
+        }
+        catch(Exception e)
+        {
+            System.err.println("Connection to DB Failed (" + e + ")");
+
+        }
+
+        return res;
     }
 
     /**
@@ -34,25 +114,11 @@ public class ClientManagerResource{
     @Produces(MediaType.TEXT_PLAIN)
     public String getSeedersfromKeyword(@PathParam("kwds") String keywords)
     {
-        String res = null;
+        
+        String query =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
+                    "WHERE file_hash = 'file-hash-1';";
 
-        try{
-            // get unique database manager
-            DBManager_singleton db = DBManager_singleton.getInstance();
-            // execute dummy query
-            String sampleQuery =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
-                    "WHERE file_hash = 'file-hash-1'";
-
-            res = db.queryTable(sampleQuery).toString();
-            System.out.println("Executed query, result = " + res);
-
-        }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-
-        }
-        return res;
+        return runQuery(query).toString();
 
     }
 
@@ -63,70 +129,35 @@ public class ClientManagerResource{
     * (the chunk_owners database contains info about the seeders AND peers)
     * @return all the seeders
     **/
-    public JSONArray listSeeders()
+    @GET
+    @Path("list")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String listSeeders()
     {
-        JSONArray res = null;
+        JSONArray result = null;
 
-        try
-        {
-            // get unique database manager
-            DBManager_singleton db = DBManager_singleton.getInstance();
-            // execute dummy query
-            String sampleQuery =  "SELECT * FROM seeders ";
+        String query =  "SELECT * FROM seeders;";
 
-            res = db.queryTable(sampleQuery);
-            System.out.println("Executed query, result = " + res.toString());
-
-        }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-
-        }
-
-        return res;
+        return runQuery(query).toString();
 
     }
 
     /**
-    * TODO: replace dummy answer by real query
     * Upon getting the name of a file from the client,
     * returns all the seeders and clients that have that files
     * @return the seeders and clients that match the file, in json format
     **/
     @GET
-    @Path("getfile/{file}")
+    @Path("getowners/{hash}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getSeedersFromFile(@PathParam("file") String file)
+    public String getChunkOwners(@PathParam("hash") String filehash)
     {
 
-        /*try{
-            // get unique database manager
-            DBManager_singleton db = DBManager_singleton.getInstance();
-            // execute dummy query
-            String sampleQuery =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
-                    "WHERE file_hash = 'file-hash-1'";
+        String query =  "SELECT * FROM chunk_owners WHERE file_hash='"
+        + filehash
+        + "';";
 
-            res = db.queryTable(sampleQuery).toString();
-            System.out.println("Executed query, result = " + res);
-
-        }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-
-        }*/
-
-        // 1. Scan seeders table for file
-        // 2. Extract file hash
-        // 3. Return all the chunk owners concerned, sorted by rarity
-
-        String res = "[{\"file_hash\":\"file-hash-" + file + "\",\"chunk_hash\":\"chunk-hash-1\"," +
-                "\"owner_ip\":\"localhost\",\"is_active\":\"t\"}]";
-
-
-
-        return res;
+        return runQuery(query).toString();
 
     }
 
@@ -134,7 +165,8 @@ public class ClientManagerResource{
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
-    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) {
+    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) 
+    {
         return new JSONArray();
     }
 
