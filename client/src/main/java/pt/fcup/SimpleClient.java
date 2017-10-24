@@ -242,7 +242,7 @@ public class SimpleClient {
         }
         catch(Exception e )
         {
-            System.err.println("Unhandled error: " + e);
+            e.printStackTrace();
 
         }  
 

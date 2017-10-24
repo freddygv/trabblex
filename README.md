@@ -6,6 +6,11 @@ This streaming service is a mesh between Bittorrent and Netflix. The idea is to 
 streaming service, so instead of only using the cloud servers, the clients must communicate between
 them and share data blocks for a specific file.
 
+# Log - quentin
+Taking care of the client manager, 
+and the client.
+
+
 
 # Documentation
 

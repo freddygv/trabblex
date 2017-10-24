@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fcup</groupId>
-    <artifactId>IceTest</artifactId>
+    <artifactId>ClientManager</artifactId>
     <version>1.0</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

@@ -8,6 +8,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
 import java.util.ArrayList;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -18,24 +21,23 @@ import org.json.JSONArray;
 @Path("clientmanager")
 public class ClientManagerResource{
 
-    DBManager_singleton db = null;
+    DBManager db = null;
 
     public ClientManagerResource()
     {
         try
         {
-            db = DBManager_singleton.getInstance();   
+            db = new DBManager();   
         }
-        catch(Exception e)
-        {
-            System.out.println("Couldn't get database singleton: " + e.toString());
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
         /*
             Dummy for tests
 
         */
-     /*  try{
+       try{
             String sampleQuery =  "INSERT INTO chunk_owners"
             + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
             + "VALUES"
@@ -80,7 +82,7 @@ public class ClientManagerResource{
         {
             System.err.println("Connection to DB Failed (" + e + ")");
 
-        }*/
+        }
 
     }
 
