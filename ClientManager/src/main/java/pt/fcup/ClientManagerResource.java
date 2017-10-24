@@ -29,7 +29,7 @@ public class ClientManagerResource{
         {
             db = new DBManager();   
         }
-        catch (IOException e) {
+        catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
@@ -37,7 +37,7 @@ public class ClientManagerResource{
             Dummy for tests
 
         */
-       try{
+    /*   try{
             String sampleQuery =  "INSERT INTO chunk_owners"
             + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
             + "VALUES"
@@ -82,7 +82,7 @@ public class ClientManagerResource{
         {
             System.err.println("Connection to DB Failed (" + e + ")");
 
-        }
+        }*/
 
     }
 
@@ -91,9 +91,9 @@ public class ClientManagerResource{
         JSONArray res = null;
 
         try{
-            System.out.println("Executing query " + query); 
+            //System.out.println("Executing query " + query); 
             res = db.queryTable(query);
-            System.out.println("Result = " + res.toString());
+            //System.out.println("Result = " + res.toString());
 
         }
         catch(Exception e)
@@ -183,7 +183,7 @@ public class ClientManagerResource{
             return null;
     }
 
-    public boolean informClientUnjoinable(String ip, int port)
+    public boolean startTCPSeed(String ip, int port)
     {
         // call Ice server via RPC
         return false;
@@ -196,7 +196,8 @@ public class ClientManagerResource{
     **/
     public boolean disconnectClient(String ip, int port)
     {
-            return false;
+        // call Ice server via RPC
+        return false;
     }
 
 }

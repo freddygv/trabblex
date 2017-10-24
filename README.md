@@ -7,9 +7,11 @@ streaming service, so instead of only using the cloud servers, the clients must 
 them and share data blocks for a specific file.
 
 # Log - quentin
-Taking care of the client manager, 
-and the client.
-
+* Taking care of the client manager, and the client.
+* Created a Downloader class, which connects to the seeder and downloads a chunk (TODO finish)
+    * give it a buffer, an ip + port + protocol and wait for it to finish
+    * meanwhile, can start other downloads
+    * Note: by convenience, format of the file stored in the name (eg file.mp4)
 
 
 # Documentation

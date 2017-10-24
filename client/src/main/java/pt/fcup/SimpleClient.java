@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
 
+
 /*import org.glassfish.jersey.client.*;*/
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
@@ -17,7 +18,6 @@ import org.json.JSONArray;
 import java.util.Scanner;
 
 
-
 public class SimpleClient {
 
     protected final String HOST = "http://127.0.0.1:8080";
@@ -26,11 +26,12 @@ public class SimpleClient {
     private Client client;
 
     private boolean verbose = false;
+    private final int chunkSize = 1024*10; // bytes
 
     JSONArray localSeederInfo;
 
     // max number of concurrent downloads
-    private int max_downloads = 3;
+    private int maxDownloads = 3;
 
     // could be used later for multi-server management
     //private final String seeder_identifier = "file_hash";
@@ -58,10 +59,8 @@ public class SimpleClient {
             {
                 case "seeder":
                     if(parts.length < 2)
-                    {
                         displayHelp();
                     
-                    }
                     else
                     {
                         switch(parts[1])
@@ -79,15 +78,9 @@ public class SimpleClient {
 
                 case "download":
                     if(parts.length < 2)
-                    {
                         displayHelp();
-                    
-                    }
                     else
-                    {
                         downloadFile(parts[1]);
-
-                    }
                     break;
 
                 case "list":
@@ -110,14 +103,9 @@ public class SimpleClient {
 
                 case "setmaxdownloads":
                     if(parts.length < 2)
-                    {
                         displayHelp();
-                    
-                    }
                     else
-                    {
-                        max_downloads = Integer.parseInt(parts[1]);
-                    }
+                        maxDownloads = Integer.parseInt(parts[1]);
                     break;
 
             }
@@ -271,7 +259,7 @@ public class SimpleClient {
     private String getHashFromName( String name )
     {
       
-        String hash_to_get = null;
+        String hashToGet = null;
 
         if(verbose)
             System.out.println("Searching for " + name);
@@ -280,12 +268,12 @@ public class SimpleClient {
         {
             if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name))
             {
-                hash_to_get = localSeederInfo.getJSONObject(i).getString("file_hash");
+                hashToGet = localSeederInfo.getJSONObject(i).getString("file_hash");
 
             }
         }
 
-        if(hash_to_get == null)
+        if(hashToGet == null)
         {
             System.out.println("File not found !");
 
@@ -293,10 +281,10 @@ public class SimpleClient {
         else
         {
             if(verbose)
-                System.out.println("Found, hash= " + hash_to_get);
+                System.out.println("Found, hash= " + hashToGet);
         }
 
-        return hash_to_get;
+        return hashToGet;
     }
 
     /*
@@ -325,8 +313,7 @@ public class SimpleClient {
         }
         catch(Exception e )
         {
-            System.err.println("Unhandled error: " + e);
-
+            e.printStackTrace();
         }  
 
         return result;
@@ -340,66 +327,62 @@ public class SimpleClient {
     private boolean downloadFile(String name)
     {
         
-        String hash_to_get = getHashFromName(name);
+        String hashToGet = getHashFromName(name);
 
-        if(hash_to_get == null)
+        if(hashToGet == null)
             return false;
 
-        String chunk_owners = getChunksFromHash(hash_to_get); 
+        String chunkOwners = getChunksFromHash(hashToGet); 
 
-        if(chunk_owners == null)
+        if(chunkOwners == null)
             return false;
 
         
         /*
-            Sort the owners by rarity 
+            Sort the owners by rarity and available-ness
         */
 
         /*
-            CM answers info from chunk_owners: (first chunk of the file)
-                owner_ip
-                chunk_hash - todo later
-                file_hash - todo later
-                Note: can be either another client or the portal's Seeder
-            ATM, use dummy info
+            Dummy test - take the first one that is active.
+            If none is active, request creation of one (TODO)
         */
 
-       /* String file = "test.mp4";
-        try
-        {
-            /*String result = client.target(URL)
-                                 .path("getfile/{file}")
-                                 .resolveTemplate("file", file)
-                                 .request(MediaType.TEXT_PLAIN_TYPE)
-                                 .get(String.class);
-            System.out.println(result);*/
-         /*   WebTarget webTarget 
-                = client.target(URL);
-            WebTarget employeeWebTarget 
-                = webTarget.path("resources/employees");
-            Invocation.Builder invocationBuilder 
-                = employeeWebTarget.request(MediaType.APPLICATION_JSON);
+        JSONArray chunkOwnersJSON = new JSONArray(chunkOwners);
+       
+        JSONObject obj = chunkOwnersJSON.getJSONObject(0);
+        System.out.println(obj.toString());
 
-            String response 
-                = invocationBuilder.get(String.class);
+        /*
+            Request to the client manager for the seeder to
+            connect via TCP to the client
+        */
 
+        /*
+            Starts a new seeder that downloads the file
+        */
+        byte[] chunkTest = new byte[chunkSize];
+
+        Downloader dwl = new Downloader(
+            obj.getString("file_name"),
+            obj.getString("seeder_ip"), Integer.parseInt(obj.getString("port")),
+            obj.getString("protocol"),
+            chunkTest
+        );
+        dwl.start();
+        try{
+            dwl.join();   
         }
-        /*        catch(javax.ws.rs.ProcessingException e)
+        catch(Exception e)
         {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }*/
-      /*  catch(Exception e )
-        {
-            System.err.println("Unhandled error: " + e);
-
+            e.printStackTrace();
         }
-    */
 
 
-        // Connect via TCP to the seeder
+        // check chunk hash
+
         return false;
     }
+
 
     /**
     * Get info from all local files
