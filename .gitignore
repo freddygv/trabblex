@@ -7,7 +7,7 @@ ServerSeeder/target
 **/.idea/workspace.xml
 **/.idea/tasks.xml
 .idea
-.idea/*
+**/.idea/*
 */.idea
 
 # Compiled class file
