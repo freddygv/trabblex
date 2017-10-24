@@ -2,12 +2,12 @@ CREATE TABLE seeders (
   seeder_ip VARCHAR(45) NOT NULL,
   file_hash VARCHAR(64) NOT NULL PRIMARY KEY,
   file_name VARCHAR(64) NOT NULL,
-  file_size SMALLINT NOT NULL,
+  file_size VARCHAR(10) NOT NULL,
   protocol VARCHAR(3) NOT NULL,
   port SMALLINT NOT NULL,
   video_size_x SMALLINT NOT NULL,
   video_size_y SMALLINT NOT NULL,
-  bitrate SMALLINT NOT NULL
+  bitrate VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE file_keywords (

@@ -1,0 +1,24 @@
+
+{
+  "The Letter": {
+    "filepath": "tl_512kb.mp4",
+    "fileSize": "26.9 MB",
+    "video_size_x": "320",
+    "video_size_y": "240",
+    "bitrate": "800 kbps"
+  },
+  "The Vagabond": {
+    "filepath": "CC_1916_07_10_TheVagabond.mp4",
+    "fileSize": "150 MB",
+    "video_size_x": "640",
+    "video_size_y": "480",
+    "bitrate": "1 Mbps"
+  },
+  "Popeye the Sailor": {
+    "filepath": "PopeyeAliBaba_512kb.mp4",
+    "fileSize": "73.9 MB",
+    "video_size_x": "320",
+    "video_size_y": "240",
+    "bitrate": "700 kbps"
+  }
+}
