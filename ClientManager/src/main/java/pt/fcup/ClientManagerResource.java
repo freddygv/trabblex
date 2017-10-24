@@ -177,18 +177,12 @@ public class ClientManagerResource{
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    public JSONArray createSeed(String fileName)
+    public JSONArray createSeeder(String fileHash)
     {
         // Call Ice Server via RPC
-            return null;
+        // createSingleSeeder
+        return null;
     }
-
-    public boolean startTCPSeed(String ip, int port)
-    {
-        // call Ice server via RPC
-        return false;
-    }
-
 
     /**
     * Calls the IceServer to inform that the client disconnected

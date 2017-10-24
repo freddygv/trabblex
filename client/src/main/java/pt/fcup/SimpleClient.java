@@ -327,15 +327,17 @@ public class SimpleClient {
     private boolean downloadFile(String name)
     {
         
-        String hashToGet = getHashFromName(name);
+      //  String hashToGet = getHashFromName(name);
 
-        if(hashToGet == null)
-            return false;
+        // TODO uncomment when working
+      //  if(hashToGet == null)
+      //      return false;
 
-        String chunkOwners = getChunksFromHash(hashToGet); 
+      //  String chunkOwners = getChunksFromHash(hashToGet); 
 
-        if(chunkOwners == null)
-            return false;
+        // TODO uncomment when working
+        //if(chunkOwners == null)
+          //  return false;
 
         
         /*
@@ -347,25 +349,32 @@ public class SimpleClient {
             If none is active, request creation of one (TODO)
         */
 
-        JSONArray chunkOwnersJSON = new JSONArray(chunkOwners);
+      //  JSONArray chunkOwnersJSON = new JSONArray(chunkOwners);
        
-        JSONObject obj = chunkOwnersJSON.getJSONObject(0);
-        System.out.println(obj.toString());
+      //  JSONObject obj = chunkOwnersJSON.getJSONObject(0);
+     //   System.out.println(obj.toString());
 
         /*
-            Request to the client manager for the seeder to
-            connect via TCP to the client
+            If no seeder available,
+            Ask for the client manager to create one
         */
+        //JSONArray chunkOwnersJSONRequest = createSeeder(obj.getString("file_hash"));
 
         /*
             Starts a new seeder that downloads the file
         */
         byte[] chunkTest = new byte[chunkSize];
 
-        Downloader dwl = new Downloader(
+        /*Downloader dwl = new Downloader(
             obj.getString("file_name"),
             obj.getString("seeder_ip"), Integer.parseInt(obj.getString("port")),
             obj.getString("protocol"),
+            chunkTest
+        );*/
+        Downloader dwl = new Downloader(
+            "test popeye",
+            "localhost", 26000,
+            "TCP",
             chunkTest
         );
         dwl.start();
@@ -397,9 +406,9 @@ public class SimpleClient {
     * Creates a seeder for the designated file
     * @return all the seeders
     **/
-    private JSONArray createSeed(String fileName)
+    private JSONArray createSeeder(String fileHash)
     {
-        // call client Manager
+        // call client Manager - createSeeder
         return null;
     }
 
@@ -414,7 +423,6 @@ public class SimpleClient {
     {
         SimpleClient sc = new SimpleClient(args);
         sc.run();
-        //sc.downloadFile("blablabla");
     }
 
     

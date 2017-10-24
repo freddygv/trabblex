@@ -12,6 +12,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Seeder registration: DB insert failed.");
+            ec.printStackTrace();
             return false;
 
         }
@@ -25,6 +26,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Seeder de-registration: DB delete failed.");
+            ec.printStackTrace();
             return false;
 
         }

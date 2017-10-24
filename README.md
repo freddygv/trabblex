@@ -12,7 +12,20 @@ them and share data blocks for a specific file.
     * give it a buffer, an ip + port + protocol and wait for it to finish
     * meanwhile, can start other downloads
     * Note: by convenience, format of the file stored in the name (eg file.mp4)
+* If no seeder found (server or client), contact ClientManager and ask him to create a seeder
+* Added a method to the seeder that creates a tcp connection, for the client to connect to
+* TODO client to client connection
+* TODO have the seeder seed a single chunk and not the entire file
 
+* How does freddy manage file metadata ? + needs better exception management if file not found
+* When Ice portal can't connect to database manager, needs better exception management to indicate problem
+* Changed file size from string to int in registerSeeder, needs to take into account MB, GB....
+    * better exception management
+    * better file size extraction
+    * etc
+
+* The SeederServer manually creates and starts a seeder
+    * Implement via RPC call
 
 # Documentation
 

@@ -19,6 +19,11 @@ public class Seedbox {
     private final int MAX_OFFSET = 100;
     private Set<Integer> portsTaken = new HashSet<>();
 
+    public Seedbox()
+    {
+        
+    }
+
     public static void main(String[] args) {
         Seedbox sb = new Seedbox();
 
@@ -52,6 +57,7 @@ public class Seedbox {
 
         try {
             createSingleSeeder(videos.get(2));
+            System.in.read();
 
         } catch (IOException | FileHashException e) {
             throw new SeederGenerationException("Error generating seeder.", e);
@@ -90,6 +96,15 @@ public class Seedbox {
 
 
         }
+
+
+
+        // manually start the seeder's tcp seed
+        // later, will be done via RPC call from clientManagerResource
+        newSeeder.transferTCP();
+
+        System.in.read();
+
 
         return regSuccess;
     }
