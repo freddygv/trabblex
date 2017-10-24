@@ -4,9 +4,7 @@ import org.json.JSONObject;
 import pt.fcup.generated.*;
 import pt.fcup.exception.FileHashException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -25,9 +23,10 @@ public class Seeder {
     private final String video_size_y;
     private final String bitrate;
     private final String fileHash;
-    private final File videoFile;
 
-    public Seeder(String fileName, JSONObject fileMetadata) throws FileHashException {
+    private int numberOfChunks;
+
+    public Seeder(String fileName, JSONObject fileMetadata) throws FileHashException, IOException {
         this.fileName = fileName;
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
@@ -36,15 +35,21 @@ public class Seeder {
         video_size_y = fileMetadata.get("video_size_y").toString();
         bitrate = fileMetadata.get("bitrate").toString();
 
-//        fileHash = generateFileHash();
-
-        videoFile = new File(filepath);
         try {
-            fileHash = hashFile(videoFile);
-            System.out.println(fileHash);
+            fileHash = hashFile(new File(filepath));
+            System.out.println("SHA-256 Hash: " + fileHash);
 
         } catch (FileHashException e) {
             throw e;
+
+        }
+
+        try {
+            chunkAndHash();
+            System.out.println("Number of chunks: " + numberOfChunks);
+
+        } catch (IOException | FileHashException e) {
+            e.printStackTrace();
 
         }
 
@@ -73,6 +78,10 @@ public class Seeder {
 
     public String getFileHash() {
         return fileHash;
+    }
+
+    public int getNumberOfChunks() {
+        return numberOfChunks;
     }
 
     public String getFileName() {
@@ -139,14 +148,16 @@ public class Seeder {
         return regResult;
     }
 
-    // Source: http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
-    private static String convertByteArrayToHexString(byte[] arrayBytes) {
-        StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < arrayBytes.length; i++) {
-            stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
-                    .substring(1));
+    // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+    private final char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-        return stringBuffer.toString();
+        return new String(hexChars);
     }
 
     // TODO: Edit this function? Also dig into what it's doing more
@@ -164,13 +175,44 @@ public class Seeder {
 
             byte[] hashedBytes = digest.digest();
 
-            return convertByteArrayToHexString(hashedBytes);
+            return bytesToHex(hashedBytes);
 
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new FileHashException("Could not generate hash from file", e);
 
         }
     }
+
+    // https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
+    private void chunkAndHash() throws IOException, FileHashException {
+        int maxChunkSizeInBytes = 10 * 1024 * 1024; // 10 Mb
+        byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
+        String chunkName;
+        String chunkHash;
+        int chunkIndex = 0;
+
+        try (FileInputStream fi = new FileInputStream(new File(filepath));
+             BufferedInputStream bi = new BufferedInputStream(fi)) {
+
+            int bytesRead = 0;
+
+            while((bytesRead = bi.read(chunkBuffer)) > 0) {
+                chunkName = filepath + "-" +  Integer.toString(chunkIndex++);
+                File currentChunk = new File(chunkName);
+
+                try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
+                    fo.write(chunkBuffer, 0, bytesRead);
+                    chunkHash = hashFile(currentChunk);
+                    System.out.println("Chunk hash: " + chunkHash);
+                }
+            }
+
+            numberOfChunks = chunkIndex; // Number of chunks
+
+        }
+
+    }
+
 
     public void setHost(int port) {
         // TODO: Get IP from environment variable, will be the same for all seeders
