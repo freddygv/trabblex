@@ -19,6 +19,12 @@ class ClientManager extends ResourceConfig{
     // Base URI the Grizzly server will listen on
     public static final String BASE_URI = "http://localhost:8080/trabblex/";
 
+    public static void main(String[] args)
+    {
+        ClientManager cm = new ClientManager();
+
+    }
+
     /**
      * Start Grizzly HTTP server exposing JAX-RS resources
      */
