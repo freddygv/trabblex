@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 pt/fcup/exception/JSONParsingException.class
+=======
+>>>>>>> master
 pt/fcup/generated/_RegistrableIPrxI.class
 pt/fcup/Seedbox.class
 pt/fcup/exception/FileHashException.class
+<<<<<<< HEAD
 pt/fcup/generated/RegistrableIPrx.class
 pt/fcup/exception/SeederGenerationException.class
 pt/fcup/generated/RegistrableI.class
 pt/fcup/generated/RegistrableI$1.class
 pt/fcup/Seeder.class
+=======
+pt/fcup/generated/RegistrableI.class
+pt/fcup/generated/RegistrableI$1.class
+pt/fcup/exception/JSONParsingException.class
+pt/fcup/exception/SeederGenerationException.class
+>>>>>>> master

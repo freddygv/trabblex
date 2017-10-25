@@ -25,6 +25,8 @@ public class Seedbox {
     }
 
     public static void main(String[] args) {
+
+
         Seedbox sb = new Seedbox();
 
         try {
@@ -39,9 +41,15 @@ public class Seedbox {
 
     }
 
+    private void testPortGen() {
+        for (int i = 0; i < 30; i++) {
+            System.out.println(generatePort());
+        }
+    }
+
     private void run() throws JSONParsingException, SeederGenerationException {
         // TODO: Remove at the end, just used to flush the system
-        truncateSeeders();
+        truncateTables();
 
         List<String> videos = new ArrayList<>(Arrays.asList("The Letter",
                                                             "The Vagabond",
@@ -66,22 +74,17 @@ public class Seedbox {
         }
 
         // TODO: Remove at the end, just used to flush the system
-        querySeeders();
+        queryTables();
     }
 
     /**
      * Instantiates a seeder to provide file requested
      * @param filename name of the file requested
      */
-    private boolean createSingleSeeder(String filename) throws IOException, FileHashException {
+    private Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
 
-        Seeder newSeeder = null;
-        try {
-            newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename));
-        } catch (FileHashException e) {
-            throw e;
-
-        }
+        Seeder newSeeder;
+        newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename));
 
         int seederPort = generatePort();
         newSeeder.setHost(seederPort);
@@ -97,16 +100,13 @@ public class Seedbox {
 
         }
 
-
-
         // manually start the seeder's tcp seed
         // later, will be done via RPC call from clientManagerResource
         newSeeder.transferTCP();
 
         System.in.read();
 
-
-        return regSuccess;
+        return newSeeder;
     }
 
     private int generatePort() {
@@ -114,7 +114,7 @@ public class Seedbox {
 
         int randomOffset;
         while (true) {
-            randomOffset = rand.nextInt(MAX_OFFSET);
+            randomOffset = rand.nextInt(MAX_OFFSET) * 20;
 
             // If portsTaken already has the number, false is returned
             if (portsTaken.add(randomOffset)) {
@@ -128,11 +128,15 @@ public class Seedbox {
      * For debugging only, queries the DB to check if all files were added.
      * Call before 'return seeders;'
      */
-    private void truncateSeeders() {
+    private void truncateTables() {
         try {
             DBManager testDB = new DBManager();
             System.out.println("Truncating seeders table:");
             testDB.singleUpdate("DELETE FROM seeders WHERE file_hash IS NOT NULL;");
+
+            System.out.println("Truncating chunk_owners table:");
+            testDB.singleUpdate("DELETE FROM chunk_owners WHERE file_hash IS NOT NULL;");
+
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
@@ -142,11 +146,14 @@ public class Seedbox {
      * For debugging only, queries the DB to check if all files were added.
      * Call before 'return seeders;'
      */
-    private void querySeeders() {
+    private void queryTables() {
         try {
             DBManager testDB = new DBManager();
             System.out.println("Querying seeders table:");
             System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM seeders;").toString());
+
+            System.out.println("Querying chunk_owners table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, chunk_hash, owner_port FROM chunk_owners;").toString());
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();

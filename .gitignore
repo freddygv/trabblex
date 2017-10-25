@@ -17,7 +17,7 @@ ServerSeeder/target
 *.log
 
 # Video files
-*.mp4
+**/videos/*
 
 # BlueJ files
 *.ctxt
@@ -32,6 +32,9 @@ ServerSeeder/target
 *.zip
 *.tar.gz
 *.rar
+
+# Maven files
+.lst
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
