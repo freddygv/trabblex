@@ -21,7 +21,6 @@ public class Seedbox {
 
     public static void main(String[] args) {
 
-
         Seedbox sb = new Seedbox();
 
         try {
@@ -34,12 +33,6 @@ public class Seedbox {
 
         }
 
-    }
-
-    private void testPortGen() {
-        for (int i = 0; i < 30; i++) {
-            System.out.println(generatePort());
-        }
     }
 
     private void run() throws JSONParsingException, SeederGenerationException {
