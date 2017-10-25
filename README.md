@@ -30,6 +30,13 @@ them and share data blocks for a specific file.
 * TODO in downloader - give him the download folder
 * TODO - real file transfer, chunk management...
 
+* If no seeder available for a chunk, create one:
+    * Create the seeder - scan the whole file
+    * The seeder then creates a chunk seeder based on which chunk was asked for by the client
+    * Needs a table mapping the chunks to the file
+
+* Chunk management: the client calls the seedbox to know how many chunks a file has
+
 # Documentation
 
 | Software | Link |

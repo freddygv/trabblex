@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Hashtable;
 
 // TCP imports
 import java.io.BufferedInputStream;
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 
 public class Seeder {
     private final int MAX_RETRIES = 4;
@@ -37,9 +39,13 @@ public class Seeder {
     private final String fileHash;
 
     private int numberOfChunks;
-    private List<String> chunkHashes = new ArrayList<>();
+    private int maxChunkSizeInBytes;
 
-    public Seeder(String fileName, JSONObject fileMetadata) throws FileHashException, IOException {
+    // TODO check w freddy if ok - <hash, filePartName>
+    //private List<String, String> chunkHashes = new ArrayList<>();
+    private Hashtable<String, String> chunkHashes = new Hashtable<String, String>();
+
+    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) throws FileHashException, IOException {
         this.fileName = fileName;
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
@@ -47,6 +53,7 @@ public class Seeder {
         video_size_x = fileMetadata.get("video_size_x").toString();
         video_size_y = fileMetadata.get("video_size_y").toString();
         bitrate = fileMetadata.get("bitrate").toString();
+        maxChunkSizeInBytes = chunkSize; // 10 Mb
 
         try {
             fileHash = hashFile(new File(filepath));
@@ -159,13 +166,20 @@ public class Seeder {
     /*
         Will open a TCP connection and stream a chunk only one time
         Then, close the connection
+        @param seedNumber the relative number of the seeder
+            eg, seeder x out of 20
     */
-    public boolean transferTCP()
+    public boolean transferTCP(int seedNumber, String chunkHash)
     {
         try
         {
-            // TODO replace dummy port with real one
-            ServerSocket ssock = new ServerSocket(Integer.parseInt("26000"));
+
+            // TODO update Database to indicate that
+            // a new chunk_owner has been created
+
+            // NOTE: how to parallelize this ? Thread ?
+
+            ServerSocket ssock = new ServerSocket(Integer.parseInt(port + seedNumber));
             Socket socket = ssock.accept();
             
             InetAddress IA = InetAddress.getByName(ip); 
@@ -173,6 +187,7 @@ public class Seeder {
             // TODO atm - send entire file
             // next, send only a chunk
             File file = new File(filepath);
+
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis); 
               
@@ -195,7 +210,10 @@ public class Seeder {
                 contents = new byte[size]; 
                 bis.read(contents, 0, size); 
                 os.write(contents);
-                System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
+
+                // update every 20%
+                if((current*100)/fileLength % 20 == 0)
+                    System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
             }   
             
             os.flush(); 
@@ -267,7 +285,6 @@ public class Seeder {
 
     // https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
     private void chunkAndHash() throws IOException, FileHashException {
-        int maxChunkSizeInBytes = 10 * 1024 * 1024; // 10 Mb
         byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
         String chunkName;
         String chunkHash;
@@ -285,7 +302,7 @@ public class Seeder {
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
                     chunkHash = hashFile(currentChunk);
-                    chunkHashes.add(chunkHash);
+                    chunkHashes.put(chunkHash, chunkName);
                 }
             }
 

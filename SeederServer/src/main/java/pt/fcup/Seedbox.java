@@ -18,9 +18,12 @@ public class Seedbox {
     private final int BASE_PORT = 29200;
     private final int MAX_OFFSET = 100;
     private Set<Integer> portsTaken = new HashSet<>();
+    private int chunkSize;
 
     public Seedbox()
     {
+        // 10Mb
+        chunkSize = 10 * 1024 * 1024; 
         
     }
 
@@ -84,7 +87,8 @@ public class Seedbox {
     private Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
 
         Seeder newSeeder;
-        newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename));
+        // chunk size = 10mb
+        newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), chunkSize);
 
         int seederPort = generatePort();
         newSeeder.setHost(seederPort);
@@ -163,6 +167,11 @@ public class Seedbox {
     private JSONObject parseMetadata() throws IOException, JSONException {
         String metadata = new String(Files.readAllBytes(Paths.get(METADATA_LOCATION)));
         return new JSONObject(metadata);
+
+    }
+
+    private int getNumberOfChunks(String fileName)
+    {
 
     }
 

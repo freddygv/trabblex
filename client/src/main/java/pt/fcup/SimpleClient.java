@@ -340,6 +340,9 @@ public class SimpleClient {
         //if(chunkOwners == null)
           //  return false;
 
+        /*
+            
+        */
         
         /*
             Sort the owners by rarity and available-ness
@@ -356,9 +359,13 @@ public class SimpleClient {
      //   System.out.println(obj.toString());
 
         /*
-            If no seeder available,
-            Ask for the client manager to create one
+            Calculate the number of chunks the file has,
+            and compare it to the chunks in the database.
+            If some are missing, ask the client manager to create one
         */
+
+        
+
         //JSONArray chunkOwnersJSONRequest = createSeeder(obj.getString("file_hash"));
 
         /*
