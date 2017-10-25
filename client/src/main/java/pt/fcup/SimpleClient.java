@@ -320,6 +320,40 @@ public class SimpleClient {
     }
 
     /**
+    * Gets the number of chunks in the file
+    */
+    private int getFileNumberOfChunks(String name)
+    {
+        String nbChunksResult = null;
+
+        try
+        {
+
+            // Query database
+            nbChunksResult = client.target(URL)
+                                 .path("getnumberofchunks/" + name)
+                                 .request(MediaType.TEXT_PLAIN)
+                                 .get(String.class);
+        }
+        catch(javax.ws.rs.ProcessingException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(Exception e )
+        {
+            e.printStackTrace();
+        }  
+
+        if(nbChunksResult == null)
+        {
+            return -1;
+        }
+
+        return Integer.parseInt(nbChunkResult);
+    }
+
+    /**
     * Starts the download of a file
     * Via a TCP connection
     * @return a json of the specific seeders
@@ -329,7 +363,6 @@ public class SimpleClient {
         // TODO local chunk management
         int nbChunks = 0;
         int nbChunksAvailable = 0;
-        String nbChunksResult = null;
         
         /*
             (1) Get all the chunk owners related to the client
@@ -382,26 +415,7 @@ public class SimpleClient {
             and compare it to the chunks available in the seedbox.
         */
 
-        try
-        {
-
-            // Query database
-            nbChunksResult = client.target(URL)
-                                 .path("getnumberofchunks/" + name)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
-
-        nbChunks = Integer.parse(nbChunksResult);
+        nbChunks = getFileNumberOfChunks(name);
 
         if(nbChunks == -1)
         {
@@ -437,6 +451,12 @@ public class SimpleClient {
             */
             chunkOwners = getChunksFromHash(hashToGet); 
         }
+
+        /*
+            (4) Start downloaders based on rarity
+            If one fails, give him the next source for the chunk
+            If no sources available, request the creation of a seeder
+        */
 
         //JSONArray chunkOwnersJSONRequest = createSeeder(obj.getString("file_hash"));
 
