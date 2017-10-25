@@ -1,6 +1,8 @@
 package pt.fcup;
 
 import java.util.Properties;
+import java.util.ArrayList;
+
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -297,9 +299,6 @@ public class SimpleClient {
         String result = null;
         try
         {
-           
-            if(verbose)
-                System.out.println("Querying server...");
 
             // Query database
             result = client.target(URL)
@@ -327,26 +326,46 @@ public class SimpleClient {
     **/
     private boolean downloadFile(String name)
     {
-        
-      //  String hashToGet = getHashFromName(name);
-
-        // TODO uncomment when working
-      //  if(hashToGet == null)
-      //      return false;
-
-      //  String chunkOwners = getChunksFromHash(hashToGet); 
-
-        // TODO uncomment when working
-        //if(chunkOwners == null)
-          //  return false;
-
-        /*
-            
-        */
+        // TODO local chunk management
+        int nbChunks = 0;
+        int nbChunksAvailable = 0;
+        String nbChunksResult = null;
         
         /*
-            Sort the owners by rarity and available-ness
+            (1) Get all the chunk owners related to the client
         */
+        String hashToGet = getHashFromName(name);
+
+        if(hashToGet == null)
+        {
+            System.err.println("Couldn't solve hash from filename!");
+            return false;
+        }
+
+        String chunkOwners = getChunksFromHash(hashToGet); 
+
+        if(chunkOwners == null)
+        {
+            System.err.println("Couldn't get the chunk owners of the file!");
+            return false;
+        }
+
+        JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
+
+        /*
+            Count number of chunks available for download
+        */
+        List Hashtable<String, String> = new Hashtable<String, String>();
+        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
+        {
+            JSONObject obj = remoteChunkOwners.getJSONObject(i);
+            String hash = obj.getString("chunk_hash");
+            if(!chunks.contains(hash))
+            {
+                chunks.add(hash);
+            }
+            nbChunksAvailable ++;
+        }
 
         /*
             Dummy test - take the first one that is active.
@@ -359,12 +378,65 @@ public class SimpleClient {
      //   System.out.println(obj.toString());
 
         /*
-            Calculate the number of chunks the file has,
-            and compare it to the chunks in the database.
-            If some are missing, ask the client manager to create one
+            (2) Fetch the number of chunks the file has,
+            and compare it to the chunks available in the seedbox.
         */
 
-        
+        try
+        {
+
+            // Query database
+            nbChunksResult = client.target(URL)
+                                 .path("getnumberofchunks/" + name)
+                                 .request(MediaType.TEXT_PLAIN)
+                                 .get(String.class);
+        }
+        catch(javax.ws.rs.ProcessingException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(Exception e )
+        {
+            e.printStackTrace();
+        }  
+
+        nbChunks = Integer.parse(nbChunksResult);
+
+        if(nbChunks == -1)
+        {
+            System.err.println("Couldn't get number of file chunks !");
+            return false;
+        }
+
+        if(verbose)
+        {
+            System.out.println("Chunks in the file: " + nbChunks);
+            System.out.println("Chunks available for download: " + nbChunksAvailable);
+        }
+
+
+        /*
+            (3) If some chunk owners are missing, ask the client manager to create a seeder
+            that will provide those chunks
+        */
+        if(nbChunksAvailable != nbChunks)
+        {
+            if(requestCreateSeeder() == false)
+                return false;
+
+            // now, get (again) all the chunks
+            // TODO what if a client disconnects during the process ? gotta
+            // separate all that code...
+            // TODO store chunk owners
+            /*
+                Maybe:
+                - manage all that in the downloader
+                - store chunk being downloaded 
+                - start x-1 downloaders
+            */
+            chunkOwners = getChunksFromHash(hashToGet); 
+        }
 
         //JSONArray chunkOwnersJSONRequest = createSeeder(obj.getString("file_hash"));
 
@@ -400,6 +472,33 @@ public class SimpleClient {
         return false;
     }
 
+    /**
+    * Requests the creation of a seeder for a file
+    * @return false if failure, true if success
+    **/
+    private boolean requestCreateSeeder(String fileName)
+    {
+        try
+        {
+            nbChunksResult = client.target(URL)
+                                 .path("createseeder/" + fileName)
+                                 .request(MediaType.TEXT_PLAIN)
+                                 .get(String.class);
+            return true;
+        }
+        catch(javax.ws.rs.ProcessingException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(Exception e )
+        {
+            e.printStackTrace();
+        }  
+
+        return false;
+
+    }
 
     /**
     * Get info from all local files

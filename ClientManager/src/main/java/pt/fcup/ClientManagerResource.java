@@ -165,18 +165,18 @@ public class ClientManagerResource{
 
     /**
     * Upon getting the hash of a file from the client,
-    * returns the number of chunks that this file has
+    * @return the number of chunks that this file has
     * (eg. file size / chunk size)
     **/
     @GET
-    @Path("getnumberofchunks/{hash}")
+    @Path("getnumberofchunks/{filename}")
     @Produces(MediaType.TEXT_PLAIN)
-    public int getNumberOfChunks(@PathParam("hash") String filehash)
+    public int getNumberOfChunksInFile(@PathParam("filename") String filename)
     {
 
         // Contact SeedBox via Ice 
-
-        return 0;
+        // getNumberOfChunksInFile
+        return null;
 
     }
 
@@ -192,11 +192,14 @@ public class ClientManagerResource{
 
     /**
     * Creates a seeder for the designated file
-    * @return all the seeders
+    * @return seeder info
     **/
-    public JSONArray createSeeder(String fileHash)
+    @GET
+    @Path("createseeder/{filename}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public JSONArray createSeeder(@PathParam("filename") String filename)
     {
-        // Call Ice Server via RPC
+        // Call Seedbox via Ice
         // createSingleSeeder
         return null;
     }
@@ -207,7 +210,7 @@ public class ClientManagerResource{
     **/
     public boolean disconnectClient(String ip, int port)
     {
-        // call Ice server via RPC
+        // call Seedbox via Ice
         return false;
     }
 

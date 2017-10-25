@@ -144,6 +144,7 @@ public class Seeder {
         boolean regResult = false;
         boolean neighborhoodResult = false;
 
+        // TODO accomodate the fact that chunkHashes is now a hashtable
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
@@ -176,6 +177,9 @@ public class Seeder {
 
             // TODO update Database to indicate that
             // a new chunk_owner has been created
+
+            // TODO once client has finished downloading,
+            // update chunk_owners
 
             // NOTE: how to parallelize this ? Thread ?
 

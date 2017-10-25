@@ -170,8 +170,22 @@ public class Seedbox {
 
     }
 
-    private int getNumberOfChunks(String fileName)
+    /**
+    * @return the number of chunks from the file (based on its size), or -1 if file not found
+    */
+    private int getNumberOfChunksInFile(String fileName)
     {
+        // TODO handle base_path as well, ensure consistency in all seeders and in seedbox
+        File file =new File("videos/" + filename);
+
+
+        if(file.exists())
+        {
+            double bytes = file.length() / chunkSize;
+            return (int)(Math.floor(bytes));
+        }
+
+        return (-1);
 
     }
 
