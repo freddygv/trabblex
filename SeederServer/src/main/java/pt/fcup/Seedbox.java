@@ -16,10 +16,12 @@ public class Seedbox {
     private JSONObject fileMetadata;
 
     private final int BASE_PORT = 29200;
-    private final int MAX_OFFSET = 100;
+    private final int MAX_OFFSET = 80;
     private Set<Integer> portsTaken = new HashSet<>();
 
     public static void main(String[] args) {
+
+
         Seedbox sb = new Seedbox();
 
         try {
@@ -32,6 +34,12 @@ public class Seedbox {
 
         }
 
+    }
+
+    private void testPortGen() {
+        for (int i = 0; i < 30; i++) {
+            System.out.println(generatePort());
+        }
     }
 
     private void run() throws JSONParsingException, SeederGenerationException {
@@ -94,7 +102,7 @@ public class Seedbox {
 
         int randomOffset;
         while (true) {
-            randomOffset = rand.nextInt(MAX_OFFSET);
+            randomOffset = rand.nextInt(MAX_OFFSET) * 10;
 
             // If portsTaken already has the number, false is returned
             if (portsTaken.add(randomOffset)) {
