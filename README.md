@@ -28,6 +28,7 @@ them and share data blocks for a specific file.
     * Implement via RPC call
 
 * TODO in downloader - give him the download folder
+* TODO - real file transfer, chunk management...
 
 # Documentation
 
