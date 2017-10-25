@@ -88,6 +88,42 @@ public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
+    default boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, String seederPort)
+    {
+        return sendHashes(chunkHashes, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+    }
+
+    default boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, String seederPort, java.util.Map<String, String> context)
+    {
+        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, context, true).waitForResponse();
+    }
+
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String fileHash, String seederIP, String seederPort)
+    {
+        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+    }
+
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String fileHash, String seederIP, String seederPort, java.util.Map<String, String> context)
+    {
+        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, context, false);
+    }
+
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_sendHashesAsync(String[] iceP_chunkHashes, String iceP_fileHash, String iceP_seederIP, String iceP_seederPort, java.util.Map<String, String> context, boolean sync)
+    {
+        com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "sendHashes", null, sync, null);
+        f.invoke(true, context, null, ostr -> {
+                     ostr.writeStringSeq(iceP_chunkHashes);
+                     ostr.writeString(iceP_fileHash);
+                     ostr.writeString(iceP_seederIP);
+                     ostr.writeString(iceP_seederPort);
+                 }, istr -> {
+                     boolean ret;
+                     ret = istr.readBool();
+                     return ret;
+                 });
+        return f;
+    }
+
     /**
      * Contacts the remote server to verify that the object implements this type.
      * Raises a local exception if a communication error occurs.

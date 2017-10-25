@@ -17,7 +17,7 @@ ServerSeeder/target
 *.log
 
 # Video files
-*.mp4
+**/videos/*
 
 # BlueJ files
 *.ctxt

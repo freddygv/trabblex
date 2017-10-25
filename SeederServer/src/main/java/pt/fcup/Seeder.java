@@ -3,10 +3,13 @@ package pt.fcup;
 import org.json.JSONObject;
 import pt.fcup.generated.*;
 import pt.fcup.exception.FileHashException;
+import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Seeder {
     private final int MAX_RETRIES = 4;
@@ -25,6 +28,7 @@ public class Seeder {
     private final String fileHash;
 
     private int numberOfChunks;
+    private List<String> chunkHashes = new ArrayList<>();
 
     public Seeder(String fileName, JSONObject fileMetadata) throws FileHashException, IOException {
         this.fileName = fileName;
@@ -112,32 +116,34 @@ public class Seeder {
                 ",'" + bitrate + "');";
 
         boolean regResult = false;
+        boolean neighborhoodResult = false;
 
+        String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
+
                 regResult = register.registerSeeder(insertionQuery);
+                neighborhoodResult = register.sendHashes(hashStringArray, fileHash, ip, port);
+
             }
 
-            if (regResult) {
+            if (regResult && neighborhoodResult) {
                 break;
             }
         }
 
-        return regResult;
+        return regResult && neighborhoodResult;
 
     }
 
-    // TODO: Should this also close the socket if the seeder has no client connections?
     public boolean deregisterSeeder() {
-        String deletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
-
         boolean regResult = false;
 
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
-                regResult = deregister.deregisterSeeder(deletionQuery);
+                regResult = deregister.deregisterSeeder(fileHash);
             }
 
             if (regResult) {
@@ -203,7 +209,7 @@ public class Seeder {
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
                     chunkHash = hashFile(currentChunk);
-                    System.out.println("Chunk hash: " + chunkHash);
+                    chunkHashes.add(chunkHash);
                 }
             }
 
