@@ -26,6 +26,8 @@ public interface RegistrableI extends com.zeroc.Ice.Object
 
     boolean deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
 
+    boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, String seederPort, com.zeroc.Ice.Current current);
+
     static final String[] _iceIds =
     {
         "::Ice::Object",
@@ -77,6 +79,26 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         return inS.setResult(ostr);
     }
 
+    static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_sendHashes(RegistrableI obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
+    {
+        com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
+        com.zeroc.Ice.InputStream istr = inS.startReadParams();
+        String[] iceP_chunkHashes;
+        String iceP_fileHash;
+        String iceP_seederIP;
+        String iceP_seederPort;
+        iceP_chunkHashes = istr.readStringSeq();
+        iceP_fileHash = istr.readString();
+        iceP_seederIP = istr.readString();
+        iceP_seederPort = istr.readString();
+        inS.endReadParams();
+        boolean ret = obj.sendHashes(iceP_chunkHashes, iceP_fileHash, iceP_seederIP, iceP_seederPort, current);
+        com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
+        ostr.writeBool(ret);
+        inS.endWriteParams(ostr);
+        return inS.setResult(ostr);
+    }
+
     final static String[] _iceOps =
     {
         "deregisterSeeder",
@@ -84,7 +106,8 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         "ice_ids",
         "ice_isA",
         "ice_ping",
-        "registerSeeder"
+        "registerSeeder",
+        "sendHashes"
     };
 
     @Override
@@ -122,6 +145,10 @@ public interface RegistrableI extends com.zeroc.Ice.Object
             case 5:
             {
                 return _iceD_registerSeeder(this, in, current);
+            }
+            case 6:
+            {
+                return _iceD_sendHashes(this, in, current);
             }
         }
 

@@ -1,5 +1,4 @@
 CREATE TABLE seeders (
-  seeder_ip VARCHAR(45) NOT NULL,
   file_hash VARCHAR(64) NOT NULL PRIMARY KEY,
   file_name VARCHAR(64) NOT NULL,
   file_size VARCHAR(10) NOT NULL,
