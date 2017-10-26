@@ -23,15 +23,11 @@ import java.util.Scanner;
 
 public class SimpleClient {
 
-    protected final String HOST = "http://127.0.0.1:8080";
-    protected final String URL = HOST + "/trabblex/clientmanager/";
-
-    private Client client;
-
     private boolean verbose = false;
     private final int chunkSize = 1024*10; // bytes
 
     JSONArray localSeederInfo;
+    JerseyClient client;
 
     // max number of concurrent downloads
     private int maxDownloads = 3;
@@ -42,8 +38,8 @@ public class SimpleClient {
 
     public SimpleClient(String[] args)
     {
-        client = ClientBuilder.newClient();
         localSeederInfo = new JSONArray();
+        client = new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/");
     }
 
     private void run()
@@ -132,42 +128,14 @@ public class SimpleClient {
         System.out.println("===========================");
     }
 
-    private queryClientManager(String path, String param)
-    {
-        String result = null;
-
-        try
-        {
-            if(param != null)
-            {
-                path = path + "/";
-            }
-
-            // Query database
-            result = client.target(URL)
-                                 .path(path + param)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
-
-        return result;
-    }
+   
 
     /**
     *   @return a list of the seeder on the remote server
     **/
     private JSONArray listSeeders()
     {
-        String result = queryClientManager("list", null);
+        String result = client.query("list", null);
 
         if(result == null)
         {
@@ -278,7 +246,7 @@ public class SimpleClient {
             return false;
         }
 
-        String chunkOwners = queryClientManager("getowners", hashToGet);
+        String chunkOwners = client.query("getowners", hashToGet);
 
         if(chunkOwners == null)
         {
@@ -289,44 +257,10 @@ public class SimpleClient {
         JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
 
         /*
-            Count number of chunks available for download
+            (2) Fetch the number of chunks the file has
         */
 
-        /*
-            NOTE: May not be possible... we don't know the
-            hashes of certain files ! 
-            We need all the hashes to dispatch the downloaders
-            Not needed if we manage seeder request creation in 
-            the downloader, if he can't find a source...
-        */
-       /* Hashtable chunks<String, String> = new Hashtable<String, String>();
-        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
-        {
-            JSONObject obj = remoteChunkOwners.getJSONObject(i);
-            String hash = obj.getString("chunk_hash");
-            if(!chunks.contains(hash))
-            {
-                chunks.add(hash);
-            }
-            nbChunksAvailable ++;
-        }*/
-
-        /*
-            Dummy test - take the first one that is active.
-            If none is active, request creation of one (TODO)
-        */
-
-      //  JSONArray chunkOwnersJSON = new JSONArray(chunkOwners);
-       
-      //  JSONObject obj = chunkOwnersJSON.getJSONObject(0);
-     //   System.out.println(obj.toString());
-
-        /*
-            (2) Fetch the number of chunks the file has,
-            and compare it to the chunks available in the seedbox.
-        */
-
-        String nbChunksStr = queryClientManager("getnumberofchunks", name);
+        String nbChunksStr = client.query("getnumberofchunks", name);
 
         if(nbChunksStr == null)
         {
@@ -342,6 +276,27 @@ public class SimpleClient {
             System.out.println("Chunks available for download: " + nbChunksAvailable);
         }
 
+        /*
+            (2b) Calculate the number of unique chunks available, 
+            and for each one how many sources are available
+        */
+        // Hashtable <chunk_hash, number_available>
+        Hashtable chunks<String, Integer> = new Hashtable<String, Integer>();
+        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
+        {
+            JSONObject obj = remoteChunkOwners.getJSONObject(i);
+            String hash = obj.getString("chunk_hash");
+            if(!chunks.contains(hash))
+            {
+                chunks.put(hash, 1);
+            }
+            else
+            {
+                chunks.put(hash, chunks.get(hash) + 1);
+            }
+            nbChunksAvailable ++;
+        }
+
 
         /*
             (3) If some chunk owners are missing, ask the client manager to create a seeder
@@ -349,7 +304,12 @@ public class SimpleClient {
         */
         if(nbChunksAvailable != nbChunks)
         {
-            String newSeeder = queryClientManager("createseeder", name);
+            String newSeeder = client.query("createseeder", name);
+            if(newSeeder == null)
+            {
+                System.err.println("Error requesting the creation of a new seeder");
+                return false;
+            }
             
 
             // now, get (again) all the chunks
@@ -368,7 +328,7 @@ public class SimpleClient {
                 https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html
                 - Manage seeder request creation in the downloader, if he can't find a source...
             */
-            String chunkOwners = queryClientManager("getowners", hashToGet);
+            String chunkOwners = client.queryy("getowners", hashToGet);
         }
 
         /*
@@ -409,17 +369,6 @@ public class SimpleClient {
         // check chunk hash
 
         return false;
-    }
-
-    /**
-    * Requests the creation of a seeder for a file
-    * @return false if failure, true if success
-    **/
-    private boolean requestCreateSeeder(String fileName)
-    {
-       // TODO call client manager
-        return false;
-
     }
 
     /**
