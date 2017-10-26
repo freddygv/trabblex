@@ -25,12 +25,12 @@ public class Seeder {
     private final String video_size_x;
     private final String video_size_y;
     private final String bitrate;
-    private final String fileHash;
 
+    private String fileHash;
     private int numberOfChunks;
     private List<String> chunkHashes = new ArrayList<>();
 
-    public Seeder(String fileName, JSONObject fileMetadata) throws FileHashException, IOException {
+    public Seeder(String fileName, JSONObject fileMetadata) {
         this.fileName = fileName;
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
@@ -38,24 +38,6 @@ public class Seeder {
         video_size_x = fileMetadata.get("video_size_x").toString();
         video_size_y = fileMetadata.get("video_size_y").toString();
         bitrate = fileMetadata.get("bitrate").toString();
-
-        try {
-            fileHash = hashFile(new File(filepath));
-            System.out.println("SHA-256 Hash: " + fileHash);
-
-        } catch (FileHashException e) {
-            throw e;
-
-        }
-
-        try {
-            chunkAndHash();
-            System.out.println("Number of chunks: " + numberOfChunks);
-
-        } catch (IOException | FileHashException e) {
-            e.printStackTrace();
-
-        }
 
 
     }
@@ -154,6 +136,30 @@ public class Seeder {
         return regResult;
     }
 
+    public boolean processVideo() throws FileHashException, IOException {
+        try {
+            fileHash = hashFile(new File(filepath));
+            System.out.println("SHA-256 Hash: " + fileHash);
+
+        } catch (FileHashException e) {
+            System.err.println("Error generating file hash.");
+            throw e;
+
+        }
+
+        try {
+            chunkAndHash();
+            System.out.println("Number of chunks: " + numberOfChunks);
+
+        } catch (IOException | FileHashException e) {
+            System.err.println("Error chunking file and hashing chunks.");
+            throw e;
+
+        }
+
+        return true;
+    }
+
     // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
     private final char[] hexArray = "0123456789ABCDEF".toCharArray();
     public String bytesToHex(byte[] bytes) {
@@ -208,6 +214,7 @@ public class Seeder {
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
+                    fo.close();
                     chunkHash = hashFile(currentChunk);
                     chunkHashes.add(chunkHash);
                 }

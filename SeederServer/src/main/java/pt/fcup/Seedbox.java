@@ -77,13 +77,10 @@ public class Seedbox {
         newSeeder.setHost(seederPort);
 
         boolean regSuccess = newSeeder.registerSeeder();
+        boolean videoProcSuccess = newSeeder.processVideo();
 
-        if (regSuccess) {
+        if (regSuccess && videoProcSuccess) {
             System.out.println("Seeder registration success for: " + newSeeder.getFileName());
-
-        } else {
-            System.out.println("Seeder registration failed for: " + newSeeder.getFileName());
-
 
         }
 
