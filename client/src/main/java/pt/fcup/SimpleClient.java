@@ -326,15 +326,15 @@ public class SimpleClient {
             and compare it to the chunks available in the seedbox.
         */
 
-        String nbChunksS = queryClientManager("getnumberofchunks", name);ksS
+        String nbChunksStr = queryClientManager("getnumberofchunks", name);
 
-        if(nbChunkss == null)
+        if(nbChunksStr == null)
         {
             System.err.println("Couldn't get number of file chunks !");
             return false;
         }
 
-        nbChunks = Integer.parseInt(nbChunksS);
+        nbChunks = Integer.parseInt(nbChunksStr);
 
         if(verbose)
         {
@@ -349,8 +349,8 @@ public class SimpleClient {
         */
         if(nbChunksAvailable != nbChunks)
         {
-            if(requestCreateSeeder(name) == false)
-                return false;
+            String newSeeder = queryClientManager("createseeder", name);
+            
 
             // now, get (again) all the chunks
             // TODO what if a client disconnects during the process ? gotta
@@ -418,7 +418,6 @@ public class SimpleClient {
     private boolean requestCreateSeeder(String fileName)
     {
        // TODO call client manager
-
         return false;
 
     }
@@ -429,16 +428,6 @@ public class SimpleClient {
     **/
     private JSONArray listFiles(String hash)
     {
-        return null;
-    }
-
-    /**
-    * Creates a seeder for the designated file
-    * @return all the seeders
-    **/
-    private JSONArray createSeeder(String fileHash)
-    {
-        // call client Manager - createSeeder
         return null;
     }
 
