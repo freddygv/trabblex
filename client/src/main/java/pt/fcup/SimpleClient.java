@@ -222,6 +222,29 @@ public class SimpleClient {
         return hashToGet;
     }
 
+    private Hashtable<String, Integer> sortAvailableChunks( )
+    {
+        nbChunksAvailable = 0;
+        Hashtable chunks<String, Integer> = new Hashtable<String, Integer>();
+
+        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
+        {
+            JSONObject obj = remoteChunkOwners.getJSONObject(i);
+            String hash = obj.getString("chunk_hash");
+            if(!chunks.containsKey(hash))
+            {
+                chunks.put(hash, 1);
+            }
+            else
+            {
+                chunks.put(hash, chunks.get(hash) + 1);
+            }
+            nbChunksAvailable ++;
+        }
+
+        return chunks;
+    }
+
 
     /**
     * Starts the download of a file
@@ -281,26 +304,12 @@ public class SimpleClient {
             and for each one how many sources are available
         */
         // Hashtable <chunk_hash, number_available>
-        Hashtable chunks<String, Integer> = new Hashtable<String, Integer>();
-        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
-        {
-            JSONObject obj = remoteChunkOwners.getJSONObject(i);
-            String hash = obj.getString("chunk_hash");
-            if(!chunks.contains(hash))
-            {
-                chunks.put(hash, 1);
-            }
-            else
-            {
-                chunks.put(hash, chunks.get(hash) + 1);
-            }
-            nbChunksAvailable ++;
-        }
-
+        Hashtable chunks<String, Integer> = sortAvailableChunks();
 
         /*
             (3) If some chunk owners are missing, ask the client manager to create a seeder
             that will provide those chunks
+            And then restart from the beginning...
         */
         if(nbChunksAvailable != nbChunks)
         {
@@ -311,29 +320,19 @@ public class SimpleClient {
                 return false;
             }
             
-
-            // now, get (again) all the chunks
-            // TODO what if a client disconnects during the process ? gotta
-            // separate all that code...
-            // TODO store chunk owners
-            /*
-                Maybe:
-                - manage all that in the downloader
-                - store chunk being downloaded 
-                - start x-1 downloaders
-
-                - Create a pool of nbChunks downloader processes and use a semaphore for them
-                to wait for each other ?
-                - In this case, how to manage chunk priorities ?
-                https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html
-                - Manage seeder request creation in the downloader, if he can't find a source...
-            */
-            String chunkOwners = client.queryy("getowners", hashToGet);
+            return downloadFile(String name);
         }
 
         /*
-            (4) Start downloaders based on rarity
-            If one fails, give him the next source for the chunk
+            (4) Get the chunks by rarity, and send all the corresponding seeders
+            to the downloader
+        */
+        
+
+        /*
+            (5) Start downloaders based on rarity
+            Give the downloader all the seeders for the chunk
+            If one seeder fails, he will take the next source
             If no sources available, request the creation of a seeder
         */
 
