@@ -176,68 +176,30 @@ public class SimpleClient {
 
         localSeederInfo = new JSONArray(result);
 
-        try
+
+        /*
+            Display seeder info nicely
+        */
+        for (int i = 0 ; i < localSeederInfo.length(); i++) 
         {
-            // Query database
-            String result = client.target(URL)
-                                 .path("list")
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
+            JSONObject obj = localSeederInfo.getJSONObject(i);
+            System.out.println(obj.getString("file_name")
+                + ": " + obj.getString("file_size") + "MB"
+                + " (" + obj.getString("video_size_x") + "x"
+                + obj.getString("video_size_y") + " @ "
+                + obj.getString("bitrate") + "b/s" + ")"
+                );
 
-            /*
-                Here we consider that the client connects only to one
-                server. Hence, we delete all local seeder info, then
-                re-load it from the server.
-
-                The client can't store info from multiple servers.
-
-                In theory it would be possible, but would add dev hours,
-                and not in the scope of this project.
-            */
-          
-            /*
-                Save seeder info locally for later use
-                Display seeder info from server
-            */
-
-            
-
-
-            /*
-                Display seeder info nicely
-            */
-            for (int i = 0 ; i < localSeederInfo.length(); i++) 
+            if(verbose)
             {
-                JSONObject obj = localSeederInfo.getJSONObject(i);
-                System.out.println(obj.getString("file_name")
-                    + ": " + obj.getString("file_size") + "MB"
-                    + " (" + obj.getString("video_size_x") + "x"
-                    + obj.getString("video_size_y") + " @ "
-                    + obj.getString("bitrate") + "b/s" + ")"
-                    );
-
-                if(verbose)
-                {
-                    // Maybe remove seeder ip, not really necessary
-                    System.out.println(">> seeder_ip: " + obj.getString("seeder_ip"));
-                    System.out.println(">> file_hash: " + obj.getString("file_hash"));
-                    System.out.println(">> protocol: " + obj.getString("protocol"));
-                    System.out.println(">> port: " + obj.getString("port"));
-                }
+                // Maybe remove seeder ip, not really necessary
+                System.out.println(">> seeder_ip: " + obj.getString("seeder_ip"));
+                System.out.println(">> file_hash: " + obj.getString("file_hash"));
+                System.out.println(">> protocol: " + obj.getString("protocol"));
+                System.out.println(">> port: " + obj.getString("port"));
             }
-
-   
         }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-
-        }  
+      
 
         return null;
     }
@@ -292,68 +254,6 @@ public class SimpleClient {
         return hashToGet;
     }
 
-    /*
-        Calls client manager to get chunk owners with 
-        corresponding file hash
-    */
-    private String getChunksFromHash(String hash)
-    {
-        String result = null;
-        try
-        {
-
-            // Query database
-            result = client.target(URL)
-                                 .path("getowners/" + hash)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
-
-        return result;
-    }
-
-    /**
-    * Gets the number of chunks in the file
-    */
-    private int getFileNumberOfChunks(String name)
-    {
-        String nbChunksResult = null;
-
-        try
-        {
-
-            // Query database
-            nbChunksResult = client.target(URL)
-                                 .path("getnumberofchunks/" + name)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
-
-        if(nbChunksResult == null)
-        {
-            return -1;
-        }
-
-        return Integer.parseInt(nbChunksResult);
-    }
 
     /**
     * Starts the download of a file
@@ -378,7 +278,7 @@ public class SimpleClient {
             return false;
         }
 
-        String chunkOwners = getChunksFromHash(hashToGet); 
+        String chunkOwners = queryClientManager("getowners", hashToGet);
 
         if(chunkOwners == null)
         {
@@ -426,13 +326,15 @@ public class SimpleClient {
             and compare it to the chunks available in the seedbox.
         */
 
-        nbChunks = getFileNumberOfChunks(name);
+        String nbChunksS = queryClientManager("getnumberofchunks", name);ksS
 
-        if(nbChunks == -1)
+        if(nbChunkss == null)
         {
             System.err.println("Couldn't get number of file chunks !");
             return false;
         }
+
+        nbChunks = Integer.parseInt(nbChunksS);
 
         if(verbose)
         {
@@ -466,7 +368,7 @@ public class SimpleClient {
                 https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html
                 - Manage seeder request creation in the downloader, if he can't find a source...
             */
-            chunkOwners = getChunksFromHash(hashToGet); 
+            String chunkOwners = queryClientManager("getowners", hashToGet);
         }
 
         /*
