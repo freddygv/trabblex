@@ -169,14 +169,14 @@ public class ClientManagerResource{
     * (eg. file size / chunk size)
     **/
     @GET
-    @Path("getnumberofchunks/{filename}")
+    @Path("getfilenumberofchunks/{filename}")
     @Produces(MediaType.TEXT_PLAIN)
     public int getNumberOfChunksInFile(@PathParam("filename") String filename)
     {
 
         // Contact SeedBox via Ice 
         // getNumberOfChunksInFile
-        return null;
+        return 0;
 
     }
 

@@ -132,17 +132,52 @@ public class SimpleClient {
         System.out.println("===========================");
     }
 
-
-    // TODO nicely print everything
-    private JSONArray listSeeders()
+    private queryClientManager(String path, String param)
     {
+        String result = null;
 
         try
         {
-           
-            if(verbose)
-                System.out.println("Querying server...");
+            if(param != null)
+            {
+                path = path + "/";
+            }
 
+            // Query database
+            result = client.target(URL)
+                                 .path(path + param)
+                                 .request(MediaType.TEXT_PLAIN)
+                                 .get(String.class);
+        }
+        catch(javax.ws.rs.ProcessingException e)
+        {
+            System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(Exception e )
+        {
+            e.printStackTrace();
+        }  
+
+        return result;
+    }
+
+    /**
+    *   @return a list of the seeder on the remote server
+    **/
+    private JSONArray listSeeders()
+    {
+        String result = queryClientManager("list", null);
+
+        if(result == null)
+        {
+            System.err.println("Error querying the server for the seeds");
+        }
+
+        localSeederInfo = new JSONArray(result);
+
+        try
+        {
             // Query database
             String result = client.target(URL)
                                  .path("list")
@@ -156,7 +191,7 @@ public class SimpleClient {
 
                 The client can't store info from multiple servers.
 
-                If theory it would be possible, but would add dev hours,
+                In theory it would be possible, but would add dev hours,
                 and not in the scope of this project.
             */
           
@@ -164,41 +199,8 @@ public class SimpleClient {
                 Save seeder info locally for later use
                 Display seeder info from server
             */
+
             
-
-            /*********************************************
-                Add json object to local json seeder info
-                if it doesn't already exist
-
-                Not really useful here, but could be used later 
-                for multi-server management ?
-            */
-
-            /*
-            JSONArray jrr = new JSONArray(result);
-            localSeederInfo=new jsonArray("[{}]");*/
-
-            /*for (int i = 0 ; i < jrr.length(); i++) 
-            {
-                JSONObject obj = jrr.getJSONObject(i);
-            */
-                
-            /*    if(!localSeederInfo
-                    .toString()
-                    .contains("\"" + seeder_identifier + "\":\""
-                        + obj.getString("" + seeder_identifier + "") + "\""))
-                {
-                    localSeederInfo.put(obj);
-
-                }
-
-            }********************************************/
-
-
-            if(verbose)
-                System.out.println("Server answered - copying and displaying results...");
-
-            localSeederInfo = new JSONArray(result);
 
 
             /*
@@ -350,13 +352,14 @@ public class SimpleClient {
             return -1;
         }
 
-        return Integer.parseInt(nbChunkResult);
+        return Integer.parseInt(nbChunksResult);
     }
 
     /**
     * Starts the download of a file
     * Via a TCP connection
     * @return a json of the specific seeders
+    * TODO implement handshake
     **/
     private boolean downloadFile(String name)
     {
@@ -388,7 +391,15 @@ public class SimpleClient {
         /*
             Count number of chunks available for download
         */
-        List Hashtable<String, String> = new Hashtable<String, String>();
+
+        /*
+            NOTE: May not be possible... we don't know the
+            hashes of certain files ! 
+            We need all the hashes to dispatch the downloaders
+            Not needed if we manage seeder request creation in 
+            the downloader, if he can't find a source...
+        */
+       /* Hashtable chunks<String, String> = new Hashtable<String, String>();
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
@@ -398,7 +409,7 @@ public class SimpleClient {
                 chunks.add(hash);
             }
             nbChunksAvailable ++;
-        }
+        }*/
 
         /*
             Dummy test - take the first one that is active.
@@ -436,7 +447,7 @@ public class SimpleClient {
         */
         if(nbChunksAvailable != nbChunks)
         {
-            if(requestCreateSeeder() == false)
+            if(requestCreateSeeder(name) == false)
                 return false;
 
             // now, get (again) all the chunks
@@ -448,6 +459,12 @@ public class SimpleClient {
                 - manage all that in the downloader
                 - store chunk being downloaded 
                 - start x-1 downloaders
+
+                - Create a pool of nbChunks downloader processes and use a semaphore for them
+                to wait for each other ?
+                - In this case, how to manage chunk priorities ?
+                https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html
+                - Manage seeder request creation in the downloader, if he can't find a source...
             */
             chunkOwners = getChunksFromHash(hashToGet); 
         }
@@ -498,23 +515,7 @@ public class SimpleClient {
     **/
     private boolean requestCreateSeeder(String fileName)
     {
-        try
-        {
-            nbChunksResult = client.target(URL)
-                                 .path("createseeder/" + fileName)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-            return true;
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
+       // TODO call client manager
 
         return false;
 
