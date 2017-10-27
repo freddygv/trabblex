@@ -37,6 +37,13 @@ them and share data blocks for a specific file.
 
 * Chunk management: the client calls the seedbox to know how many chunks a file has
 
+* Managing info on the download:
+    * class File
+    * has arraylist of seeders <hash, ip, port, protocol>
+    * manages download
+    * has file name, hash, number of chunks
+    * is passed to downloadFile when called recursively
+
 # Documentation
 
 | Software | Link |

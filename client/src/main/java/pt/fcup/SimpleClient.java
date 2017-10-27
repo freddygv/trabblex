@@ -49,21 +49,17 @@ public class SimpleClient {
 
         System.out.println("Client started");
 
-        do
-        {
+        do{
+            System.out.println("> ");
             input = sc.nextLine();
             String[] parts = input.split(" ");
 
-            switch(parts[0])
-            {
+            switch(parts[0]){
                 case "seeder":
                     if(parts.length < 2)
                         displayHelp();
-                    
-                    else
-                    {
-                        switch(parts[1])
-                        {
+                    else{
+                        switch(parts[1]){
                             case "list":
                                 listSeeders();
                                 break;
@@ -71,7 +67,6 @@ public class SimpleClient {
                             case "search":
                                 break;
                         }
-
                     }
                     break;
 
@@ -108,9 +103,7 @@ public class SimpleClient {
                     break;
 
             }
-
-        } 
-        while(input != "quit");
+        } while(input != "quit");
     }
 
     private void displayHelp()
@@ -167,7 +160,6 @@ public class SimpleClient {
                 System.out.println(">> port: " + obj.getString("port"));
             }
         }
-      
 
         return null;
     }
@@ -177,6 +169,8 @@ public class SimpleClient {
     * Get file info
     * if completely downloaded, full path, size; if
     * being downloaded: file size and neighbor list
+    * Since the client can only download one file at a time, 
+    *   only display info on that
     * @return file info in a json array
     **/
     public JSONArray fileInfo(String fileName)
@@ -222,7 +216,7 @@ public class SimpleClient {
         return hashToGet;
     }
 
-    private Hashtable<String, Integer> sortAvailableChunks( )
+    private Hashtable<String, Integer> sortAvailableChunks( int nbChunksAvailable, JSONArray remoteChunkOwners )
     {
         nbChunksAvailable = 0;
         Hashtable chunks<String, Integer> = new Hashtable<String, Integer>();
@@ -254,14 +248,24 @@ public class SimpleClient {
     **/
     private boolean downloadFile(String name)
     {
-        // TODO local chunk management
+        // number of chunks in the file
         int nbChunks = 0;
+
+        // the hash of the file we wish to download
+        String hashToGet = null;
+
+        // the owners of the chunk of the file (seeder + other clients)
+        JSONArray remoteChunkOwners = null;
+
+        // number of chunks available online (seeder + other clients)
         int nbChunksAvailable = 0;
+
         
         /*
-            (1) Get all the chunk owners related to the client
+            (1) Fetch all the chunk owners related to the client
         */
-        String hashToGet = getHashFromName(name);
+
+        hashToGet = getHashFromName(name);
 
         if(hashToGet == null)
         {
@@ -277,7 +281,8 @@ public class SimpleClient {
             return false;
         }
 
-        JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
+        remoteChunkOwners = new JSONArray(chunkOwners);
+
 
         /*
             (2) Fetch the number of chunks the file has
@@ -299,15 +304,20 @@ public class SimpleClient {
             System.out.println("Chunks available for download: " + nbChunksAvailable);
         }
 
-        /*
-            (2b) Calculate the number of unique chunks available, 
-            and for each one how many sources are available
-        */
-        // Hashtable <chunk_hash, number_available>
-        Hashtable chunks<String, Integer> = sortAvailableChunks();
 
         /*
-            (3) If some chunk owners are missing, ask the client manager to create a seeder
+            (3) Calculate the number of unique chunks available, 
+            and for each one how many sources are available
+            Note: this method means that the downloader works with
+            only one file at a time...
+        */
+        // Hashtable <chunk_hash, number_available>
+        Hashtable chunks<String, Integer> 
+                = sortAvailableChunks(nbChunksAvailable, 
+                                     remoteChunkOwners);
+
+        /*
+            (4) If some chunk owners are missing, ask the client manager to create a seeder
             that will provide those chunks
             And then restart from the beginning...
         */
@@ -320,12 +330,13 @@ public class SimpleClient {
                 return false;
             }
             
+            // restart, only this time with all the seeders needed...
             return downloadFile(String name);
         }
 
         /*
-            (4) Get the chunks by rarity, and send all the corresponding seeders
-            to the downloader
+            (5) Get the chunks by rarity using "chunks", 
+            and send all the corresponding seeders to the downloader using 
         */
         
 
