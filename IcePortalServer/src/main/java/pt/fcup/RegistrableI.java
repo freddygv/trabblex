@@ -70,7 +70,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
         }
     }
 
-    private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
+    public void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
         if(db == null) {
             db = new DBManager();
         }

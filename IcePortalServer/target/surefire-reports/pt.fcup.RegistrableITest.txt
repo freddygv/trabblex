@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: pt.fcup.RegistrableITest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.725 sec - in pt.fcup.RegistrableITest

@@ -103,10 +103,6 @@ public class Seeder {
         return bitrate;
     }
 
-    public void setChunkHashes(List<String> chunkHashes) {
-        this.chunkHashes = chunkHashes;
-    }
-
     /**
      * Registers Seeder/file with the portal and sends chunk hashes to update swarm/neighborhood
      *
