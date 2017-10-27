@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,10 +50,10 @@ public class Seeder {
         System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
-        fileSize = (int)fileMetadata.get("fileSize");
-        videoSizeX = (int)fileMetadata.get("videoSizeX");
-        videoSizeY = (int)fileMetadata.get("videoSizeY");
-        bitrate = (int)fileMetadata.get("bitrate");
+        fileSize = fileMetadata.getInt("fileSize");
+        videoSizeX = fileMetadata.getInt("videoSizeX");
+        videoSizeY = fileMetadata.getInt("videoSizeY");
+        bitrate = fileMetadata.getInt("bitrate");
         maxChunkSizeInBytes = chunkSize; // 10 Mb
 
 
@@ -313,6 +314,8 @@ public class Seeder {
 
         try (FileInputStream fi = new FileInputStream(new File(filepath));
              BufferedInputStream bi = new BufferedInputStream(fi)) {
+
+            chunkHashes = new ArrayList<>();
 
             int bytesRead = 0;
 
