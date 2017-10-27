@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.lang.ClassNotFoundException;
 
 public class RegistrableI implements pt.fcup.generated.RegistrableI {
+    private DBManager db;
+
     public boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port,
                                   int videoSizeX, int videoSizeY, int bitrate, com.zeroc.Ice.Current current) {
         try {
@@ -69,7 +71,10 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
     }
 
     private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
-        DBManager db = new DBManager();
+        if(db == null) {
+            db = new DBManager();
+        }
+
         db.singleUpdate(query);
 
     }
