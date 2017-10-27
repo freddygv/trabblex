@@ -40,10 +40,15 @@ public class Seeder {
     private int numberOfChunks;
     private int maxChunkSizeInBytes;
 
-    private List<String> chunkHashes = new ArrayList<>();
+    private List<String> chunkHashes;
 
-    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) {
+    public Seeder(String fileName, int port, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
+
+        // TODO: Get IP from environment variable, will be the same for all seeders
+        ip = "localhost";
+        this.port = Integer.toString(port);
+        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
         fileSize = fileMetadata.get("fileSize").toString();
@@ -101,6 +106,10 @@ public class Seeder {
 
     public String getBitrate() {
         return bitrate;
+    }
+
+    public void setChunkHashes(List<String> chunkHashes) {
+        this.chunkHashes = chunkHashes;
     }
 
     /**
@@ -344,18 +353,4 @@ public class Seeder {
 
     }
 
-
-    /**
-     * Stores Seeder address and port
-     * @param port first port in 20-port range
-     */
-    public void setHost(int port) {
-        // TODO: Get IP from environment variable, will be the same for all seeders
-        ip = "localhost";
-
-        this.port = Integer.toString(port);
-
-        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
-
-    }
 }
