@@ -1,11 +1,14 @@
 package pt.fcup;
 
 import java.util.Properties;
+import java.util.ArrayList;
+
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
+
 
 /*import org.glassfish.jersey.client.*;*/
 import javax.ws.rs.client.*;
@@ -14,8 +17,8 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.util.Scanner;
 
+import java.util.Scanner;
 
 
 public class SimpleClient {
@@ -26,11 +29,12 @@ public class SimpleClient {
     private Client client;
 
     private boolean verbose = false;
+    private final int chunkSize = 1024*10; // bytes
 
     JSONArray localSeederInfo;
 
     // max number of concurrent downloads
-    private int max_downloads = 3;
+    private int maxDownloads = 3;
 
     // could be used later for multi-server management
     //private final String seeder_identifier = "file_hash";
@@ -58,10 +62,8 @@ public class SimpleClient {
             {
                 case "seeder":
                     if(parts.length < 2)
-                    {
                         displayHelp();
                     
-                    }
                     else
                     {
                         switch(parts[1])
@@ -79,15 +81,9 @@ public class SimpleClient {
 
                 case "download":
                     if(parts.length < 2)
-                    {
                         displayHelp();
-                    
-                    }
                     else
-                    {
                         downloadFile(parts[1]);
-
-                    }
                     break;
 
                 case "list":
@@ -110,14 +106,9 @@ public class SimpleClient {
 
                 case "setmaxdownloads":
                     if(parts.length < 2)
-                    {
                         displayHelp();
-                    
-                    }
                     else
-                    {
-                        max_downloads = Integer.parseInt(parts[1]);
-                    }
+                        maxDownloads = Integer.parseInt(parts[1]);
                     break;
 
             }
@@ -141,99 +132,22 @@ public class SimpleClient {
         System.out.println("===========================");
     }
 
-
-    // TODO nicely print everything
-    private JSONArray listSeeders()
+    private queryClientManager(String path, String param)
     {
+        String result = null;
 
         try
         {
-           
-            if(verbose)
-                System.out.println("Querying server...");
-
-            // Query database
-            String result = client.target(URL)
-                                 .path("list")
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-
-            /*
-                Here we consider that the client connects only to one
-                server. Hence, we delete all local seeder info, then
-                re-load it from the server.
-
-                The client can't store info from multiple servers.
-
-                If theory it would be possible, but would add dev hours,
-                and not in the scope of this project.
-            */
-          
-            /*
-                Save seeder info locally for later use
-                Display seeder info from server
-            */
-            
-
-            /*********************************************
-                Add json object to local json seeder info
-                if it doesn't already exist
-
-                Not really useful here, but could be used later 
-                for multi-server management ?
-            */
-
-            /*
-            JSONArray jrr = new JSONArray(result);
-            localSeederInfo=new jsonArray("[{}]");*/
-
-            /*for (int i = 0 ; i < jrr.length(); i++) 
+            if(param != null)
             {
-                JSONObject obj = jrr.getJSONObject(i);
-            */
-                
-            /*    if(!localSeederInfo
-                    .toString()
-                    .contains("\"" + seeder_identifier + "\":\""
-                        + obj.getString("" + seeder_identifier + "") + "\""))
-                {
-                    localSeederInfo.put(obj);
-
-                }
-
-            }********************************************/
-
-
-            if(verbose)
-                System.out.println("Server answered - copying and displaying results...");
-
-            localSeederInfo = new JSONArray(result);
-
-
-            /*
-                Display seeder info nicely
-            */
-            for (int i = 0 ; i < localSeederInfo.length(); i++) 
-            {
-                JSONObject obj = localSeederInfo.getJSONObject(i);
-                System.out.println(obj.getString("file_name")
-                    + ": " + obj.getString("file_size") + "MB"
-                    + " (" + obj.getString("video_size_x") + "x"
-                    + obj.getString("video_size_y") + " @ "
-                    + obj.getString("bitrate") + "b/s" + ")"
-                    );
-
-                if(verbose)
-                {
-                    // Maybe remove seeder ip, not really necessary
-                    System.out.println(">> seeder_ip: " + obj.getString("seeder_ip"));
-                    System.out.println(">> file_hash: " + obj.getString("file_hash"));
-                    System.out.println(">> protocol: " + obj.getString("protocol"));
-                    System.out.println(">> port: " + obj.getString("port"));
-                }
+                path = path + "/";
             }
 
-   
+            // Query database
+            result = client.target(URL)
+                                 .path(path + param)
+                                 .request(MediaType.TEXT_PLAIN)
+                                 .get(String.class);
         }
         catch(javax.ws.rs.ProcessingException e)
         {
@@ -242,9 +156,50 @@ public class SimpleClient {
         }
         catch(Exception e )
         {
-            System.err.println("Unhandled error: " + e);
-
+            e.printStackTrace();
         }  
+
+        return result;
+    }
+
+    /**
+    *   @return a list of the seeder on the remote server
+    **/
+    private JSONArray listSeeders()
+    {
+        String result = queryClientManager("list", null);
+
+        if(result == null)
+        {
+            System.err.println("Error querying the server for the seeds");
+        }
+
+        localSeederInfo = new JSONArray(result);
+
+
+        /*
+            Display seeder info nicely
+        */
+        for (int i = 0 ; i < localSeederInfo.length(); i++) 
+        {
+            JSONObject obj = localSeederInfo.getJSONObject(i);
+            System.out.println(obj.getString("file_name")
+                + ": " + obj.getString("file_size") + "MB"
+                + " (" + obj.getString("video_size_x") + "x"
+                + obj.getString("video_size_y") + " @ "
+                + obj.getString("bitrate") + "b/s" + ")"
+                );
+
+            if(verbose)
+            {
+                // Maybe remove seeder ip, not really necessary
+                System.out.println(">> seeder_ip: " + obj.getString("seeder_ip"));
+                System.out.println(">> file_hash: " + obj.getString("file_hash"));
+                System.out.println(">> protocol: " + obj.getString("protocol"));
+                System.out.println(">> port: " + obj.getString("port"));
+            }
+        }
+      
 
         return null;
     }
@@ -271,7 +226,7 @@ public class SimpleClient {
     private String getHashFromName( String name )
     {
       
-        String hash_to_get = null;
+        String hashToGet = null;
 
         if(verbose)
             System.out.println("Searching for " + name);
@@ -280,12 +235,12 @@ public class SimpleClient {
         {
             if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name))
             {
-                hash_to_get = localSeederInfo.getJSONObject(i).getString("file_hash");
+                hashToGet = localSeederInfo.getJSONObject(i).getString("file_hash");
 
             }
         }
 
-        if(hash_to_get == null)
+        if(hashToGet == null)
         {
             System.out.println("File not found !");
 
@@ -293,112 +248,178 @@ public class SimpleClient {
         else
         {
             if(verbose)
-                System.out.println("Found, hash= " + hash_to_get);
+                System.out.println("Found, hash= " + hashToGet);
         }
 
-        return hash_to_get;
+        return hashToGet;
     }
 
-    /*
-        Calls client manager to get chunk owners with 
-        corresponding file hash
-    */
-    private String getChunksFromHash(String hash)
-    {
-        String result = null;
-        try
-        {
-           
-            if(verbose)
-                System.out.println("Querying server...");
-
-            // Query database
-            result = client.target(URL)
-                                 .path("getowners/" + hash)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
-
-        }
-        catch(Exception e )
-        {
-            System.err.println("Unhandled error: " + e);
-
-        }  
-
-        return result;
-    }
 
     /**
     * Starts the download of a file
     * Via a TCP connection
     * @return a json of the specific seeders
+    * TODO implement handshake
     **/
     private boolean downloadFile(String name)
     {
-        
-        String hash_to_get = getHashFromName(name);
-
-        if(hash_to_get == null)
-            return false;
-
-        String chunk_owners = getChunksFromHash(hash_to_get); 
-
-        if(chunk_owners == null)
-            return false;
-
+        // TODO local chunk management
+        int nbChunks = 0;
+        int nbChunksAvailable = 0;
         
         /*
-            Sort the owners by rarity 
+            (1) Get all the chunk owners related to the client
         */
+        String hashToGet = getHashFromName(name);
 
-        /*
-            CM answers info from chunk_owners: (first chunk of the file)
-                owner_ip
-                chunk_hash - todo later
-                file_hash - todo later
-                Note: can be either another client or the portal's Seeder
-            ATM, use dummy info
-        */
-
-       /* String file = "test.mp4";
-        try
+        if(hashToGet == null)
         {
-            /*String result = client.target(URL)
-                                 .path("getfile/{file}")
-                                 .resolveTemplate("file", file)
-                                 .request(MediaType.TEXT_PLAIN_TYPE)
-                                 .get(String.class);
-            System.out.println(result);*/
-         /*   WebTarget webTarget 
-                = client.target(URL);
-            WebTarget employeeWebTarget 
-                = webTarget.path("resources/employees");
-            Invocation.Builder invocationBuilder 
-                = employeeWebTarget.request(MediaType.APPLICATION_JSON);
-
-            String response 
-                = invocationBuilder.get(String.class);
-
+            System.err.println("Couldn't solve hash from filename!");
+            return false;
         }
-        /*        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
 
+        String chunkOwners = queryClientManager("getowners", hashToGet);
+
+        if(chunkOwners == null)
+        {
+            System.err.println("Couldn't get the chunk owners of the file!");
+            return false;
+        }
+
+        JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
+
+        /*
+            Count number of chunks available for download
+        */
+
+        /*
+            NOTE: May not be possible... we don't know the
+            hashes of certain files ! 
+            We need all the hashes to dispatch the downloaders
+            Not needed if we manage seeder request creation in 
+            the downloader, if he can't find a source...
+        */
+       /* Hashtable chunks<String, String> = new Hashtable<String, String>();
+        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
+        {
+            JSONObject obj = remoteChunkOwners.getJSONObject(i);
+            String hash = obj.getString("chunk_hash");
+            if(!chunks.contains(hash))
+            {
+                chunks.add(hash);
+            }
+            nbChunksAvailable ++;
         }*/
-      /*  catch(Exception e )
+
+        /*
+            Dummy test - take the first one that is active.
+            If none is active, request creation of one (TODO)
+        */
+
+      //  JSONArray chunkOwnersJSON = new JSONArray(chunkOwners);
+       
+      //  JSONObject obj = chunkOwnersJSON.getJSONObject(0);
+     //   System.out.println(obj.toString());
+
+        /*
+            (2) Fetch the number of chunks the file has,
+            and compare it to the chunks available in the seedbox.
+        */
+
+        String nbChunksStr = queryClientManager("getnumberofchunks", name);
+
+        if(nbChunksStr == null)
         {
-            System.err.println("Unhandled error: " + e);
-
+            System.err.println("Couldn't get number of file chunks !");
+            return false;
         }
-    */
+
+        nbChunks = Integer.parseInt(nbChunksStr);
+
+        if(verbose)
+        {
+            System.out.println("Chunks in the file: " + nbChunks);
+            System.out.println("Chunks available for download: " + nbChunksAvailable);
+        }
 
 
-        // Connect via TCP to the seeder
+        /*
+            (3) If some chunk owners are missing, ask the client manager to create a seeder
+            that will provide those chunks
+        */
+        if(nbChunksAvailable != nbChunks)
+        {
+            String newSeeder = queryClientManager("createseeder", name);
+            
+
+            // now, get (again) all the chunks
+            // TODO what if a client disconnects during the process ? gotta
+            // separate all that code...
+            // TODO store chunk owners
+            /*
+                Maybe:
+                - manage all that in the downloader
+                - store chunk being downloaded 
+                - start x-1 downloaders
+
+                - Create a pool of nbChunks downloader processes and use a semaphore for them
+                to wait for each other ?
+                - In this case, how to manage chunk priorities ?
+                https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html
+                - Manage seeder request creation in the downloader, if he can't find a source...
+            */
+            String chunkOwners = queryClientManager("getowners", hashToGet);
+        }
+
+        /*
+            (4) Start downloaders based on rarity
+            If one fails, give him the next source for the chunk
+            If no sources available, request the creation of a seeder
+        */
+
+        //JSONArray chunkOwnersJSONRequest = createSeeder(obj.getString("file_hash"));
+
+        /*
+            Starts a new seeder that downloads the file
+        */
+        byte[] chunkTest = new byte[chunkSize];
+
+        /*Downloader dwl = new Downloader(
+            obj.getString("file_name"),
+            obj.getString("seeder_ip"), Integer.parseInt(obj.getString("port")),
+            obj.getString("protocol"),
+            chunkTest
+        );*/
+        Downloader dwl = new Downloader(
+            "test-popeye.mp4",
+            "localhost", 26000,
+            "TCP",
+            chunkTest
+        );
+        dwl.start();
+        try{
+            dwl.join();   
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        // check chunk hash
+
         return false;
+    }
+
+    /**
+    * Requests the creation of a seeder for a file
+    * @return false if failure, true if success
+    **/
+    private boolean requestCreateSeeder(String fileName)
+    {
+       // TODO call client manager
+        return false;
+
     }
 
     /**
@@ -407,16 +428,6 @@ public class SimpleClient {
     **/
     private JSONArray listFiles(String hash)
     {
-        return null;
-    }
-
-    /**
-    * Creates a seeder for the designated file
-    * @return all the seeders
-    **/
-    private JSONArray createSeed(String fileName)
-    {
-        // call client Manager
         return null;
     }
 
@@ -431,7 +442,6 @@ public class SimpleClient {
     {
         SimpleClient sc = new SimpleClient(args);
         sc.run();
-        //sc.downloadFile("blablabla");
     }
 
     

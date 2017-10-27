@@ -8,6 +8,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
 import java.util.ArrayList;
 
+import java.io.IOException;
+import pt.fcup.generated.*;
+import java.sql.SQLException;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -18,24 +22,25 @@ import org.json.JSONArray;
 @Path("clientmanager")
 public class ClientManagerResource{
 
-    DBManager_singleton db = null;
+    DBManager db = null;
+    private final int MAX_RETRIES = 6;
+    private int numberOfChunks;
 
     public ClientManagerResource()
     {
         try
         {
-            db = DBManager_singleton.getInstance();   
+            db = new DBManager();   
         }
-        catch(Exception e)
-        {
-            System.out.println("Couldn't get database singleton: " + e.toString());
+        catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
         }
 
         /*
             Dummy for tests
 
         */
-     /*  try{
+    /*   try{
             String sampleQuery =  "INSERT INTO chunk_owners"
             + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
             + "VALUES"
@@ -89,9 +94,9 @@ public class ClientManagerResource{
         JSONArray res = null;
 
         try{
-            System.out.println("Executing query " + query); 
+            //System.out.println("Executing query " + query); 
             res = db.queryTable(query);
-            System.out.println("Result = " + res.toString());
+            //System.out.println("Result = " + res.toString());
 
         }
         catch(Exception e)
@@ -162,6 +167,23 @@ public class ClientManagerResource{
     }
 
     /**
+    * Upon getting the hash of a file from the client,
+    * @return the number of chunks that this file has
+    * (eg. file size / chunk size)
+    **/
+    @GET
+    @Path("getfilenumberofchunks/{filename}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public int getNumberOfChunksInFile(@PathParam("filename") String filename)
+    {
+
+        // Contact SeedBox via Ice 
+        // getNumberOfChunksInFile
+        return 0;
+
+    }
+
+    /**
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
@@ -173,20 +195,31 @@ public class ClientManagerResource{
 
     /**
     * Creates a seeder for the designated file
-    * @return all the seeders
+    * @return seeder info
     **/
-    public JSONArray createSeed(String fileName)
+    @GET
+    @Path("createseeder/{filename}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public JSONArray createSeeder(@PathParam("filename") String filename)
     {
-        // Call Ice Server via RPC
-            return null;
-    }
+        boolean reqResult = false;
 
-    public boolean informClientUnjoinable(String ip, int port)
-    {
-        // call Ice server via RPC
-        return false;
-    }
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RequestableIPrx create = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h localhost -p 8082"));
+                numberOfChunks = create.requestSeeder(filename);
+                System.out.println("Number of chunks: " + numberOfChunks);
+                reqResult = true;
+            }
 
+            if (reqResult) {
+                break;
+            }
+        }
+
+        // TODO: Make a real JSONArray, if needed
+        return new JSONArray();
+    }
 
     /**
     * Calls the IceServer to inform that the client disconnected
@@ -194,7 +227,22 @@ public class ClientManagerResource{
     **/
     public boolean disconnectClient(String ip, int port)
     {
-            return false;
+        boolean regResult = false;
+
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RequestableIPrx disconnect = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h localhost -p 8082"));
+                regResult = disconnect.disconnectClient();
+                System.out.println("Disconnection result: " + regResult);
+                regResult = true; // TODO: Remove when disconnect is implemented
+            }
+
+            if (regResult) {
+                break;
+            }
+        }
+
+        return regResult;
     }
 
 }

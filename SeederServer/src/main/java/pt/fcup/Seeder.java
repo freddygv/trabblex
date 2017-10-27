@@ -9,7 +9,17 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+
+// TCP imports
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
+
 
 public class Seeder {
     private final int MAX_RETRIES = 4;
@@ -28,9 +38,11 @@ public class Seeder {
 
     private String fileHash;
     private int numberOfChunks;
+    private int maxChunkSizeInBytes;
+
     private List<String> chunkHashes = new ArrayList<>();
 
-    public Seeder(String fileName, JSONObject fileMetadata) {
+    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
@@ -38,6 +50,7 @@ public class Seeder {
         video_size_x = fileMetadata.get("video_size_x").toString();
         video_size_y = fileMetadata.get("video_size_y").toString();
         bitrate = fileMetadata.get("bitrate").toString();
+        maxChunkSizeInBytes = chunkSize; // 10 Mb
 
 
     }
@@ -91,11 +104,21 @@ public class Seeder {
     }
 
     public boolean registerSeeder() {
+        // extract file size 
+        String[] parts = fileSize.split(" |\\.");
+        int fileSizeInt = Integer.parseInt(parts[0]);
+
+        // extract bitrate
+        parts = fileSize.split(" |\\.");
+        int bitrateInt = Integer.parseInt(parts[0]);
+
         String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
                 "port, video_size_x, video_size_y, bitrate) " +
-                "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSize + "'" +
+                "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSizeInt + "'" +
                 ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
-                ",'" + bitrate + "');";
+                ",'" + bitrateInt + "');";
+
+        System.out.println(insertionQuery);
 
         boolean regResult = false;
         boolean neighborhoodResult = false;
@@ -119,6 +142,77 @@ public class Seeder {
 
     }
 
+    /*
+        Will open a TCP connection and stream a chunk only one time
+        Then, close the connection
+        @param seedNumber the relative number of the seeder
+            eg, seeder x out of 20
+    */
+    public boolean transferTCP(int seedNumber, String chunkHash)
+    {
+        try
+        {
+
+            // TODO update Database to indicate that
+            // a new chunk_owner has been created
+
+            // TODO once client has finished downloading,
+            // update chunk_owners
+
+            // NOTE: how to parallelize this ? Thread ?
+
+            ServerSocket ssock = new ServerSocket(Integer.parseInt(port + seedNumber));
+            Socket socket = ssock.accept();
+            
+            InetAddress IA = InetAddress.getByName(ip); 
+            
+            // TODO atm - send entire file
+            // next, send only a chunk
+            File file = new File(filepath);
+
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis); 
+              
+            //Get socket's output stream
+            OutputStream os = socket.getOutputStream();
+                    
+            //Read File Contents into contents array 
+            byte[] contents;
+            long fileLength = file.length(); 
+            long current = 0;
+             
+            while(current!=fileLength){ 
+                int size = 10000;
+                if(fileLength - current >= size)
+                    current += size;    
+                else{ 
+                    size = (int)(fileLength - current); 
+                    current = fileLength;
+                } 
+                contents = new byte[size]; 
+                bis.read(contents, 0, size); 
+                os.write(contents);
+
+                // update every 20%
+                if((current*100)/fileLength % 20 == 0)
+                    System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
+            }   
+            
+            os.flush(); 
+            //File transfer done. Close the socket connection!
+            socket.close();
+            ssock.close();
+            System.out.println("File sent succesfully!");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    // TODO: Should this also close the socket if the seeder has no client connections?
     public boolean deregisterSeeder() {
         boolean regResult = false;
 
@@ -197,7 +291,6 @@ public class Seeder {
 
     // https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
     private void chunkAndHash() throws IOException, FileHashException {
-        int maxChunkSizeInBytes = 10 * 1024 * 1024; // 10 Mb
         byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
         String chunkName;
         String chunkHash;
