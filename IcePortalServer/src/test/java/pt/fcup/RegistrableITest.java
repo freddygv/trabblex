@@ -13,8 +13,10 @@ public class RegistrableITest {
     private RegistrableI testRequestHandler;
     private DBManager testDB;
     private com.zeroc.Ice.Current current;
+
     private String resultString;
     private String expectedString;
+    private boolean result;
 
     private final String fileHash = "my-test-sha256-hash";
     private final String fileName = "cool-video";
@@ -70,7 +72,7 @@ public class RegistrableITest {
 
     @Test
     public void registeredAfterRequest() throws Exception {
-        testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
+        result = testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
                 videoSizeX, videoSizeY, bitrate, current);
 
         JSONArray resultArray =  testDB.queryTable("SELECT * FROM seeders WHERE file_hash = '" + fileHash + "'");
@@ -106,12 +108,13 @@ public class RegistrableITest {
                             "\"bitrate\":\"" + bitrate + "\"}]";
 
         assertEquals(expectedString, resultString);
+        assertTrue(result);
 
     }
 
     @Test
     public void neighborhoodUpdated() throws Exception {
-        testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
+        result = testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
 
         JSONArray resultArray =  testDB.queryTable("SELECT * " +
                                                    "FROM chunk_owners WHERE file_hash = '" + fileHash + "' " +
@@ -154,12 +157,13 @@ public class RegistrableITest {
                             "\"is_seeder\":\"" + isSeeder + "\"}]";
 
         assertEquals(expectedString, resultString);
+        assertTrue(result);
 
     }
 
     @Test
     public void deregisteredSeederAfterRequest() throws Exception {
-        testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
+        result = testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
                 videoSizeX, videoSizeY, bitrate, current);
 
         testRequestHandler.deregisterSeeder(fileHash, current);
@@ -168,12 +172,13 @@ public class RegistrableITest {
         expectedString = "[]";
 
         assertEquals(expectedString, resultString);
+        assertTrue(result);
 
     }
 
     @Test
     public void deregisteredChunksAfterRequest() throws Exception {
-        testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
+        result = testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
 
         testRequestHandler.deregisterSeeder(fileHash, current);
 
@@ -181,6 +186,7 @@ public class RegistrableITest {
         expectedString = "[]";
 
         assertEquals(expectedString, resultString);
+        assertTrue(result);
 
     }
 
