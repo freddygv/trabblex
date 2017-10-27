@@ -13,7 +13,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
 
             String updateQuery;
 
-            updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%d', '%s', '%d', '%d', '%d');",
+            updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%d', '%s', '%d', '%d', '%d', '%d');",
                     fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate);
 
             System.out.println(updateQuery);
