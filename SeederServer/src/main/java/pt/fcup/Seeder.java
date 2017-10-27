@@ -9,8 +9,6 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Hashtable;
 
 // TCP imports
 import java.io.BufferedInputStream;
@@ -20,6 +18,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 
 public class Seeder {
@@ -36,16 +35,14 @@ public class Seeder {
     private final String video_size_x;
     private final String video_size_y;
     private final String bitrate;
-    private final String fileHash;
 
+    private String fileHash;
     private int numberOfChunks;
     private int maxChunkSizeInBytes;
 
-    // TODO check w freddy if ok - <hash, filePartName>
-    //private List<String, String> chunkHashes = new ArrayList<>();
-    private Hashtable<String, String> chunkHashes = new Hashtable<String, String>();
+    private List<String> chunkHashes = new ArrayList<>();
 
-    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) throws FileHashException, IOException {
+    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
@@ -54,24 +51,6 @@ public class Seeder {
         video_size_y = fileMetadata.get("video_size_y").toString();
         bitrate = fileMetadata.get("bitrate").toString();
         maxChunkSizeInBytes = chunkSize; // 10 Mb
-
-        try {
-            fileHash = hashFile(new File(filepath));
-            System.out.println("SHA-256 Hash: " + fileHash);
-
-        } catch (FileHashException e) {
-            throw e;
-
-        }
-
-        try {
-            chunkAndHash();
-            System.out.println("Number of chunks: " + numberOfChunks);
-
-        } catch (IOException | FileHashException e) {
-            e.printStackTrace();
-
-        }
 
 
     }
@@ -124,6 +103,12 @@ public class Seeder {
         return bitrate;
     }
 
+    /**
+     * Registers Seeder/file with the portal and sends chunk hashes to update swarm/neighborhood
+     *
+     * TODO: Send arguments instead, and build query in the portal
+     * @return true if file and neighborhood registrations are successful
+     */
     public boolean registerSeeder() {
         // extract file size 
         String[] parts = fileSize.split(" |\\.");
@@ -144,7 +129,7 @@ public class Seeder {
         boolean regResult = false;
         boolean neighborhoodResult = false;
 
-        // TODO accomodate the fact that chunkHashes is now a hashtable
+        // Retry policy
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
@@ -252,7 +237,38 @@ public class Seeder {
         return regResult;
     }
 
-    // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+    /**
+     * Generate hash for file, chunk file, then hash chunks
+     * @return true if video processed successfully
+     */
+    public boolean processVideo() throws FileHashException, IOException {
+        try {
+            fileHash = hashFile(new File(filepath));
+            System.out.println("SHA-256 Hash: " + fileHash);
+
+        } catch (FileHashException e) {
+            System.err.println("Error generating file hash.");
+            throw e;
+
+        }
+
+        try {
+            chunkAndHash();
+            System.out.println("Number of chunks: " + numberOfChunks);
+
+        } catch (IOException | FileHashException e) {
+            System.err.println("Error chunking file and hashing chunks.");
+            throw e;
+
+        }
+
+        return true;
+    }
+
+    /**
+     * Converts byte array to hex string
+     * https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+     */
     private final char[] hexArray = "0123456789ABCDEF".toCharArray();
     public String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
@@ -264,8 +280,14 @@ public class Seeder {
         return new String(hexChars);
     }
 
-    // TODO: Edit this function? Also dig into what it's doing more
-    // Source: http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
+    /**
+     * Read file to byte array with buffer, hash, then convert to hex string
+     * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
+     * @param file
+     * @return hex string hash
+     * @throws FileHashException
+     */
+    //
     private String hashFile(File file) throws FileHashException {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
@@ -287,7 +309,12 @@ public class Seeder {
         }
     }
 
-    // https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
+    /**
+     * Reads files with a buffer set to the max chunk size and writes them out to the original video directory
+     * https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
+     * @throws IOException
+     * @throws FileHashException
+     */
     private void chunkAndHash() throws IOException, FileHashException {
         byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
         String chunkName;
@@ -305,8 +332,9 @@ public class Seeder {
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
+                    fo.close();
                     chunkHash = hashFile(currentChunk);
-                    chunkHashes.put(chunkHash, chunkName);
+                    chunkHashes.add(chunkHash);
                 }
             }
 
@@ -317,6 +345,10 @@ public class Seeder {
     }
 
 
+    /**
+     * Stores Seeder address and port
+     * @param port first port in 20-port range
+     */
     public void setHost(int port) {
         // TODO: Get IP from environment variable, will be the same for all seeders
         ip = "localhost";

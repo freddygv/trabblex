@@ -9,6 +9,7 @@ import javax.ws.rs.PathParam;
 import java.util.ArrayList;
 
 import java.io.IOException;
+import pt.fcup.generated.*;
 import java.sql.SQLException;
 
 import org.json.JSONObject;
@@ -22,6 +23,8 @@ import org.json.JSONArray;
 public class ClientManagerResource{
 
     DBManager db = null;
+    private final int MAX_RETRIES = 6;
+    private int numberOfChunks;
 
     public ClientManagerResource()
     {
@@ -199,9 +202,23 @@ public class ClientManagerResource{
     @Produces(MediaType.TEXT_PLAIN)
     public JSONArray createSeeder(@PathParam("filename") String filename)
     {
-        // Call Seedbox via Ice
-        // createSingleSeeder
-        return null;
+        boolean reqResult = false;
+
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RequestableIPrx create = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h localhost -p 8082"));
+                numberOfChunks = create.requestSeeder(filename);
+                System.out.println("Number of chunks: " + numberOfChunks);
+                reqResult = true;
+            }
+
+            if (reqResult) {
+                break;
+            }
+        }
+
+        // TODO: Make a real JSONArray, if needed
+        return new JSONArray();
     }
 
     /**
@@ -210,8 +227,22 @@ public class ClientManagerResource{
     **/
     public boolean disconnectClient(String ip, int port)
     {
-        // call Seedbox via Ice
-        return false;
+        boolean regResult = false;
+
+        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RequestableIPrx disconnect = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h localhost -p 8082"));
+                regResult = disconnect.disconnectClient();
+                System.out.println("Disconnection result: " + regResult);
+                regResult = true; // TODO: Remove when disconnect is implemented
+            }
+
+            if (regResult) {
+                break;
+            }
+        }
+
+        return regResult;
     }
 
 }

@@ -3,6 +3,7 @@ package pt.fcup;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pt.fcup.exception.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,25 +18,22 @@ public class Seedbox {
 
     private final int BASE_PORT = 29200;
     private final int MAX_OFFSET = 100;
-    private Set<Integer> portsTaken = new HashSet<>();
-    private int chunkSize;
 
-    public Seedbox()
-    {
-        // 10Mb
-        chunkSize = 10 * 1024 * 1024; 
-        
-    }
+    private Set<Integer> portsTaken = new HashSet<>();
+
+    private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+
+    private static Seedbox sb;
+    public HashMap<String, Seeder> seederHashMap = new HashMap<>();
 
     public static void main(String[] args) {
 
-
-        Seedbox sb = new Seedbox();
+        sb = new Seedbox();
 
         try {
             sb.run();
 
-        } catch (JSONParsingException | SeederGenerationException e) {
+        } catch (JSONParsingException e) {
             System.err.println("Fatal exception, exiting.");
             e.printStackTrace();
             System.exit(1);
@@ -44,83 +42,107 @@ public class Seedbox {
 
     }
 
-    private void testPortGen() {
-        for (int i = 0; i < 30; i++) {
-            System.out.println(generatePort());
-        }
+    /**
+     * Provides RequestableI interface with access to the Seedbox object
+     */
+    public static Seedbox getSeedbox() {
+        return sb;
+
     }
 
-    private void run() throws JSONParsingException, SeederGenerationException {
+    private void run() throws JSONParsingException {
         // TODO: Remove at the end, just used to flush the system
         truncateTables();
 
-        List<String> videos = new ArrayList<>(Arrays.asList("The Letter",
-                                                            "The Vagabond",
-                                                            "Popeye the Sailor"));
+        // Parsing metadata for each video from a local JSON file
+        parseMetadata();
+
+        // Set up ICE adapter to accept incoming messages
+        startIceServer();
+
+    }
+
+    private void startIceServer() {
+        int status = 0;
+        com.zeroc.Ice.Communicator ic = null;
 
         try {
-            fileMetadata = parseMetadata();
+            ic = com.zeroc.Ice.Util.initialize();
 
-        } catch (IOException | JSONException e) {
-            throw new JSONParsingException("Error reading file metadata.", e);
+            // Creates ICE adapter and binds RequestableI interface
+            com.zeroc.Ice.ObjectAdapter adapter =
+                    ic.createObjectAdapterWithEndpoints("SeederRequestAdapter", "default -p 8082");
+            adapter.add(new RequestableI(), com.zeroc.Ice.Util.stringToIdentity("SeederRequest"));
+            adapter.activate();
+            ic.waitForShutdown();
+
+        } catch (com.zeroc.Ice.LocalException e) {
+            e.printStackTrace();
+            status = 1;
+
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            status = 1;
 
         }
 
-        try {
-            createSingleSeeder(videos.get(2));
-            System.in.read();
-
-        } catch (IOException | FileHashException e) {
-            throw new SeederGenerationException("Error generating seeder.", e);
-            // TODO: Seeder creation failures need to be handled somewhere
-
+        if (ic != null) {
+            try {
+                ic.destroy();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+                status = 1;
+            }
         }
-
-        // TODO: Remove at the end, just used to flush the system
-        queryTables();
+        System.exit(status);
     }
 
     /**
      * Instantiates a seeder to provide file requested
      * @param filename name of the file requested
      */
-    private Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
+    public Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
 
-        Seeder newSeeder;
-        // chunk size = 10mb
-        newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), chunkSize);
+        Seeder newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
 
+        // Generates random 20-port range for each seeder
         int seederPort = generatePort();
         newSeeder.setHost(seederPort);
 
+        // Hash file, chunk file, and hash chunks
+        boolean videoProcSuccess = newSeeder.processVideo();
+
+        // Register with the portal
         boolean regSuccess = newSeeder.registerSeeder();
 
-        if (regSuccess) {
+        if (regSuccess && videoProcSuccess) {
             System.out.println("Seeder registration success for: " + newSeeder.getFileName());
-
-        } else {
-            System.out.println("Seeder registration failed for: " + newSeeder.getFileName());
-
 
         }
 
+        // Storing seeders in a HashMap to allow access by filename
+        seederHashMap.put(filename, newSeeder);
+
         // manually start the seeder's tcp seed
         // later, will be done via RPC call from clientManagerResource
-        newSeeder.transferTCP();
-
-        System.in.read();
+//        newSeeder.transferTCP();
+//        System.in.read();
 
         return newSeeder;
     }
 
+    /**
+     * Generates random range of 20 ports and prevents collisions between seeders with a hashset
+     * TODO: Reuse port range if a port has been generated for a given file before, use hashmap
+     */
     private int generatePort() {
         Random rand = new SecureRandom();
 
         int randomOffset;
         while (true) {
+            // Reserving 20 adjacent ports from the offset
             randomOffset = rand.nextInt(MAX_OFFSET) * 20;
 
-            // If portsTaken already has the number, false is returned
             if (portsTaken.add(randomOffset)) {
                 return BASE_PORT + randomOffset;
 
@@ -129,8 +151,7 @@ public class Seedbox {
     }
 
     /**
-     * For debugging only, queries the DB to check if all files were added.
-     * Call before 'return seeders;'
+     * For debugging only, deletes contents of seeders and chunk_owners tables
      */
     private void truncateTables() {
         try {
@@ -147,8 +168,7 @@ public class Seedbox {
     }
 
     /**
-     * For debugging only, queries the DB to check if all files were added.
-     * Call before 'return seeders;'
+     * For debugging only, queries entire seeders and chunk_owners tables to check if all files were added.
      */
     private void queryTables() {
         try {
@@ -164,28 +184,21 @@ public class Seedbox {
         }
     }
 
-    private JSONObject parseMetadata() throws IOException, JSONException {
-        String metadata = new String(Files.readAllBytes(Paths.get(METADATA_LOCATION)));
-        return new JSONObject(metadata);
-
-    }
-
     /**
-    * @return the number of chunks from the file (based on its size), or -1 if file not found
-    */
-    private int getNumberOfChunksInFile(String fileName)
-    {
-        // TODO handle base_path as well, ensure consistency in all seeders and in seedbox
-        File file =new File("videos/" + filename);
+     * Reads metadata for all videos from a local JSON
+     * @return JSONObject keyed by filename
+     */
+    private JSONObject parseMetadata() throws JSONParsingException {
+        try {
+            String metadata = new String(Files.readAllBytes(Paths.get(METADATA_LOCATION)));
+            fileMetadata = new JSONObject(metadata);
 
+            return fileMetadata;
 
-        if(file.exists())
-        {
-            double bytes = file.length() / chunkSize;
-            return (int)(Math.floor(bytes));
+        } catch (IOException | JSONException e) {
+            throw new JSONParsingException("Error reading file metadata.", e);
+
         }
-
-        return (-1);
 
     }
 

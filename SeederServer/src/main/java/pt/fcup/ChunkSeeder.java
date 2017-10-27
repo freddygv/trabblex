@@ -21,4 +21,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public Class ChunkSeeder
+public class ChunkSeeder {
+
+}
