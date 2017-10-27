@@ -1,14 +1,12 @@
 package pt.fcup;
 
-import org.json.JSONObject;
-import pt.fcup.generated.*;
 import pt.fcup.exception.FileHashException;
 import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.*;
+import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
 // TCP imports
 import java.io.BufferedInputStream;
@@ -25,31 +23,36 @@ public class Seeder {
     private final int MAX_RETRIES = 4;
     private final String HASHING_ALGORITHM = "SHA-256";
     private final String PROTOCOL = "TCP";
-    private String ip;
-    private String port;
-
     private final String BASE_PATH = "videos/";
+
     private final String filepath;
     private final String fileName;
-    private final String fileSize;
-    private final String video_size_x;
-    private final String video_size_y;
-    private final String bitrate;
+    private final int fileSize;
+    private final int videoSizeX;
+    private final int videoSizeY;
+    private final int bitrate;
+    private final int port;
+    private final String ip;
 
     private String fileHash;
     private int numberOfChunks;
     private int maxChunkSizeInBytes;
 
-    private List<String> chunkHashes = new ArrayList<>();
+    private List<String> chunkHashes;
 
-    public Seeder(String fileName, JSONObject fileMetadata, int chunkSize) {
+    public Seeder(String fileName, int port, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
 
+        // TODO: Get IP from environment variable, will be the same for all seeders
+        ip = "localhost";
+        this.port = port;
+        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
+
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
-        fileSize = fileMetadata.get("fileSize").toString();
-        video_size_x = fileMetadata.get("video_size_x").toString();
-        video_size_y = fileMetadata.get("video_size_y").toString();
-        bitrate = fileMetadata.get("bitrate").toString();
+        fileSize = (int)fileMetadata.get("fileSize");
+        videoSizeX = (int)fileMetadata.get("videoSizeX");
+        videoSizeY = (int)fileMetadata.get("videoSizeY");
+        bitrate = (int)fileMetadata.get("bitrate");
         maxChunkSizeInBytes = chunkSize; // 10 Mb
 
 
@@ -63,12 +66,8 @@ public class Seeder {
         return ip;
     }
 
-    public String getPort() {
+    public int getPort() {
         return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
     }
 
     public String getFilepath() {
@@ -87,20 +86,24 @@ public class Seeder {
         return fileName;
     }
 
-    public String getFileSize() {
+    public int getFileSize() {
         return fileSize;
     }
 
-    public String getVideo_size_x() {
-        return video_size_x;
+    public int getVideoSizeX() {
+        return videoSizeX;
     }
 
-    public String getVideo_size_y() {
-        return video_size_y;
+    public int getVideoSizeY() {
+        return videoSizeY;
     }
 
-    public String getBitrate() {
+    public int getBitrate() {
         return bitrate;
+    }
+
+    public void setChunkHashes(List<String> chunkHashes) {
+        this.chunkHashes = chunkHashes;
     }
 
     /**
@@ -110,21 +113,6 @@ public class Seeder {
      * @return true if file and neighborhood registrations are successful
      */
     public boolean registerSeeder() {
-        // extract file size 
-        String[] parts = fileSize.split(" |\\.");
-        int fileSizeInt = Integer.parseInt(parts[0]);
-
-        // extract bitrate
-        parts = fileSize.split(" |\\.");
-        int bitrateInt = Integer.parseInt(parts[0]);
-
-        String insertionQuery = "INSERT INTO seeders(seeder_ip, file_hash, file_name, file_size, protocol, " +
-                "port, video_size_x, video_size_y, bitrate) " +
-                "VALUES('" + ip + "', '" + fileHash + "', '" + fileName + "', '" + fileSizeInt + "'" +
-                ",'" + PROTOCOL + "', '" + port + "', '" + video_size_x + "', '" + video_size_y + "'" +
-                ",'" + bitrateInt + "');";
-
-        System.out.println(insertionQuery);
 
         boolean regResult = false;
         boolean neighborhoodResult = false;
@@ -135,7 +123,9 @@ public class Seeder {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
 
-                regResult = register.registerSeeder(insertionQuery);
+                regResult = register.registerSeeder(fileHash, fileName, fileSize, PROTOCOL, port,
+                                                    videoSizeX, videoSizeY, bitrate);
+
                 neighborhoodResult = register.sendHashes(hashStringArray, fileHash, ip, port);
 
             }
@@ -168,7 +158,7 @@ public class Seeder {
 
             // NOTE: how to parallelize this ? Thread ?
 
-            ServerSocket ssock = new ServerSocket(Integer.parseInt(port + seedNumber));
+            ServerSocket ssock = new ServerSocket(port + seedNumber);
             Socket socket = ssock.accept();
             
             InetAddress IA = InetAddress.getByName(ip); 
@@ -344,18 +334,4 @@ public class Seeder {
 
     }
 
-
-    /**
-     * Stores Seeder address and port
-     * @param port first port in 20-port range
-     */
-    public void setHost(int port) {
-        // TODO: Get IP from environment variable, will be the same for all seeders
-        ip = "localhost";
-
-        this.port = Integer.toString(port);
-
-        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
-
-    }
 }

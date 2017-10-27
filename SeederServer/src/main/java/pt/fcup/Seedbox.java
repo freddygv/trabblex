@@ -103,11 +103,9 @@ public class Seedbox {
      */
     public Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
 
-        Seeder newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
-
         // Generates random 20-port range for each seeder
         int seederPort = generatePort();
-        newSeeder.setHost(seederPort);
+        Seeder newSeeder = new Seeder(filename, seederPort, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
 
         // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
