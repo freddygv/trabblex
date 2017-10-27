@@ -163,7 +163,7 @@ public class Seedbox {
             if (portsTaken.add(randomOffset)) {
                 return BASE_PORT + randomOffset;
 
-            } else if (i == 50) {
+            } else if (i == 30) {
                 throw new PortGenerationException("Did not find available port.");
 
             }
