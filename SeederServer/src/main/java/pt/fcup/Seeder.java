@@ -103,6 +103,12 @@ public class Seeder {
         return bitrate;
     }
 
+    /**
+     * Registers Seeder/file with the portal and sends chunk hashes to update swarm/neighborhood
+     *
+     * TODO: Send arguments instead, and build query in the portal
+     * @return true if file and neighborhood registrations are successful
+     */
     public boolean registerSeeder() {
         // extract file size 
         String[] parts = fileSize.split(" |\\.");
@@ -123,6 +129,7 @@ public class Seeder {
         boolean regResult = false;
         boolean neighborhoodResult = false;
 
+        // Retry policy
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
@@ -230,6 +237,10 @@ public class Seeder {
         return regResult;
     }
 
+    /**
+     * Generate hash for file, chunk file, then hash chunks
+     * @return true if video processed successfully
+     */
     public boolean processVideo() throws FileHashException, IOException {
         try {
             fileHash = hashFile(new File(filepath));
@@ -254,7 +265,10 @@ public class Seeder {
         return true;
     }
 
-    // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+    /**
+     * Converts byte array to hex string
+     * https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+     */
     private final char[] hexArray = "0123456789ABCDEF".toCharArray();
     public String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
@@ -266,8 +280,14 @@ public class Seeder {
         return new String(hexChars);
     }
 
-    // TODO: Edit this function? Also dig into what it's doing more
-    // Source: http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
+    /**
+     * Read file to byte array with buffer, hash, then convert to hex string
+     * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
+     * @param file
+     * @return hex string hash
+     * @throws FileHashException
+     */
+    //
     private String hashFile(File file) throws FileHashException {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
@@ -289,7 +309,12 @@ public class Seeder {
         }
     }
 
-    // https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
+    /**
+     * Reads files with a buffer set to the max chunk size and writes them out to the original video directory
+     * https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
+     * @throws IOException
+     * @throws FileHashException
+     */
     private void chunkAndHash() throws IOException, FileHashException {
         byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
         String chunkName;
@@ -320,6 +345,10 @@ public class Seeder {
     }
 
 
+    /**
+     * Stores Seeder address and port
+     * @param port first port in 20-port range
+     */
     public void setHost(int port) {
         // TODO: Get IP from environment variable, will be the same for all seeders
         ip = "localhost";

@@ -6,6 +6,9 @@ public class IceServer {
         p.run();
     }
 
+    /**
+     * Set up Ice adapter and bind RegistrableI interface
+     */
     private void run() {
         int status = 0;
         com.zeroc.Ice.Communicator ic = null;

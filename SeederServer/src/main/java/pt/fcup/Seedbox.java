@@ -18,8 +18,10 @@ public class Seedbox {
 
     private final int BASE_PORT = 29200;
     private final int MAX_OFFSET = 100;
+
     private Set<Integer> portsTaken = new HashSet<>();
-    private final int CHUNK_SIZE = 10 * 1024 * 1024;
+
+    private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
     private static Seedbox sb;
     public HashMap<String, Seeder> seederHashMap = new HashMap<>();
@@ -40,6 +42,9 @@ public class Seedbox {
 
     }
 
+    /**
+     * Provides RequestableI interface with access to the Seedbox object
+     */
     public static Seedbox getSeedbox() {
         return sb;
 
@@ -49,7 +54,10 @@ public class Seedbox {
         // TODO: Remove at the end, just used to flush the system
         truncateTables();
 
+        // Parsing metadata for each video from a local JSON file
         parseMetadata();
+
+        // Set up ICE adapter to accept incoming messages
         startIceServer();
 
     }
@@ -60,6 +68,8 @@ public class Seedbox {
 
         try {
             ic = com.zeroc.Ice.Util.initialize();
+
+            // Creates ICE adapter and binds RequestableI interface
             com.zeroc.Ice.ObjectAdapter adapter =
                     ic.createObjectAdapterWithEndpoints("SeederRequestAdapter", "default -p 8082");
             adapter.add(new RequestableI(), com.zeroc.Ice.Util.stringToIdentity("SeederRequest"));
@@ -75,6 +85,7 @@ public class Seedbox {
             status = 1;
 
         }
+
         if (ic != null) {
             try {
                 ic.destroy();
@@ -94,10 +105,14 @@ public class Seedbox {
 
         Seeder newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
 
+        // Generates random 20-port range for each seeder
         int seederPort = generatePort();
         newSeeder.setHost(seederPort);
 
+        // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
+
+        // Register with the portal
         boolean regSuccess = newSeeder.registerSeeder();
 
         if (regSuccess && videoProcSuccess) {
@@ -105,6 +120,7 @@ public class Seedbox {
 
         }
 
+        // Storing seeders in a HashMap to allow access by filename
         seederHashMap.put(filename, newSeeder);
 
         // manually start the seeder's tcp seed
@@ -115,14 +131,18 @@ public class Seedbox {
         return newSeeder;
     }
 
+    /**
+     * Generates random range of 20 ports and prevents collisions between seeders with a hashset
+     * TODO: Reuse port range if a port has been generated for a given file before, use hashmap
+     */
     private int generatePort() {
         Random rand = new SecureRandom();
 
         int randomOffset;
         while (true) {
+            // Reserving 20 adjacent ports from the offset
             randomOffset = rand.nextInt(MAX_OFFSET) * 20;
 
-            // If portsTaken already has the number, false is returned
             if (portsTaken.add(randomOffset)) {
                 return BASE_PORT + randomOffset;
 
@@ -131,8 +151,7 @@ public class Seedbox {
     }
 
     /**
-     * For debugging only, queries the DB to check if all files were added.
-     * Call before 'return seeders;'
+     * For debugging only, deletes contents of seeders and chunk_owners tables
      */
     private void truncateTables() {
         try {
@@ -149,8 +168,7 @@ public class Seedbox {
     }
 
     /**
-     * For debugging only, queries the DB to check if all files were added.
-     * Call before 'return seeders;'
+     * For debugging only, queries entire seeders and chunk_owners tables to check if all files were added.
      */
     private void queryTables() {
         try {
@@ -166,6 +184,10 @@ public class Seedbox {
         }
     }
 
+    /**
+     * Reads metadata for all videos from a local JSON
+     * @return JSONObject keyed by filename
+     */
     private JSONObject parseMetadata() throws JSONParsingException {
         try {
             String metadata = new String(Files.readAllBytes(Paths.get(METADATA_LOCATION)));
