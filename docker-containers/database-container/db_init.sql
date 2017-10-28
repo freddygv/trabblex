@@ -19,6 +19,5 @@ CREATE TABLE chunk_owners (
   chunk_hash VARCHAR(64) NOT NULL,
   owner_ip VARCHAR(64) NOT NULL,
   owner_port SMALLINT NOT NULL,
-  is_seeder BOOLEAN NOT NULL,
-  is_active BOOLEAN NOT NULL
+  is_seeder BOOLEAN NOT NULL
 );

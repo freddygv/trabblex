@@ -22,11 +22,11 @@ package pt.fcup.generated;
 
 public interface RegistrableI extends com.zeroc.Ice.Object
 {
-    boolean registerSeeder(String regMessage, com.zeroc.Ice.Current current);
+    boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate, com.zeroc.Ice.Current current);
 
     boolean deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
 
-    boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, String seederPort, com.zeroc.Ice.Current current);
+    boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current);
 
     static final String[] _iceIds =
     {
@@ -55,10 +55,24 @@ public interface RegistrableI extends com.zeroc.Ice.Object
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
-        String iceP_regMessage;
-        iceP_regMessage = istr.readString();
+        String iceP_fileHash;
+        String iceP_fileName;
+        int iceP_fileSize;
+        String iceP_protocol;
+        int iceP_port;
+        int iceP_videoSizeX;
+        int iceP_videoSizeY;
+        int iceP_bitrate;
+        iceP_fileHash = istr.readString();
+        iceP_fileName = istr.readString();
+        iceP_fileSize = istr.readInt();
+        iceP_protocol = istr.readString();
+        iceP_port = istr.readInt();
+        iceP_videoSizeX = istr.readInt();
+        iceP_videoSizeY = istr.readInt();
+        iceP_bitrate = istr.readInt();
         inS.endReadParams();
-        boolean ret = obj.registerSeeder(iceP_regMessage, current);
+        boolean ret = obj.registerSeeder(iceP_fileHash, iceP_fileName, iceP_fileSize, iceP_protocol, iceP_port, iceP_videoSizeX, iceP_videoSizeY, iceP_bitrate, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
         ostr.writeBool(ret);
         inS.endWriteParams(ostr);
@@ -86,11 +100,11 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         String[] iceP_chunkHashes;
         String iceP_fileHash;
         String iceP_seederIP;
-        String iceP_seederPort;
+        int iceP_seederPort;
         iceP_chunkHashes = istr.readStringSeq();
         iceP_fileHash = istr.readString();
         iceP_seederIP = istr.readString();
-        iceP_seederPort = istr.readString();
+        iceP_seederPort = istr.readInt();
         inS.endReadParams();
         boolean ret = obj.sendHashes(iceP_chunkHashes, iceP_fileHash, iceP_seederIP, iceP_seederPort, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();

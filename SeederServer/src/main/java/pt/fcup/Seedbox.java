@@ -57,6 +57,15 @@ public class Seedbox {
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
 
+
+        try {
+            createSingleSeeder("The Letter");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (FileHashException e) {
+            e.printStackTrace();
+        }
+
         // Set up ICE adapter to accept incoming messages
         startIceServer();
 
@@ -99,15 +108,14 @@ public class Seedbox {
 
     /**
      * Instantiates a seeder to provide file requested
+     *
      * @param filename name of the file requested
      */
     public Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
 
-        Seeder newSeeder = new Seeder(filename, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
-
         // Generates random 20-port range for each seeder
         int seederPort = generatePort();
-        newSeeder.setHost(seederPort);
+        Seeder newSeeder = new Seeder(filename, seederPort, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
 
         // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
@@ -186,6 +194,7 @@ public class Seedbox {
 
     /**
      * Reads metadata for all videos from a local JSON
+     *
      * @return JSONObject keyed by filename
      */
     private JSONObject parseMetadata() throws JSONParsingException {
