@@ -167,23 +167,6 @@ public class ClientManagerResource{
     }
 
     /**
-    * Upon getting the hash of a file from the client,
-    * @return the number of chunks that this file has
-    * (eg. file size / chunk size)
-    **/
-    @GET
-    @Path("getfilenumberofchunks/{filename}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public int getNumberOfChunksInFile(@PathParam("filename") String filename)
-    {
-
-        // Contact SeedBox via Ice 
-        // getNumberOfChunksInFile
-        return 0;
-
-    }
-
-    /**
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/

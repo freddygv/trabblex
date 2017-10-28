@@ -147,10 +147,13 @@ public class Seeder {
         @param seedNumber the relative number of the seeder
             eg, seeder x out of 20
     */
-    public boolean transferTCP(int seedNumber, String chunkHash)
+    public boolean transferTCP(/*int seedNumber, */String chunkHash)
     {
         try
         {
+            // Start X chunk seeders
+
+
 
             // TODO update Database to indicate that
             // a new chunk_owner has been created
@@ -186,6 +189,8 @@ public class Seeder {
 
             // send the number of chunks
             dos.writeInt(numberOfChunks);
+
+            // send the number of this chunk in particular
 
             //Read File Contents into contents array 
             byte[] contents;

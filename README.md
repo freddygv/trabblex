@@ -49,19 +49,21 @@ them and share data blocks for a specific file.
     * If needed, request a seeder
 
 ====== ALGORITHM ========
-Function compareNumberOfChunks:
-* Ask for chunk owners
-* Compare available number of chunks / chunks in file
-    * If chunks in file info not available, pass
-    * If smaller, ask for a seeder
+* Download the first chunk from the first seeder available
+    * If no seeder available, create one and recursive call
+* From metadata, get number of chunks
+* Assess if all chunks are available
+* If no, request seeder for missing chunks (NOTE how to know them ?? From file parts ?)
+* Start pool of downloaders
+    * If downloader fails, give him next chunk source
+    * If no more chunk sources, request new seeder
 
-Main:
-* Number of chunks in file = 0
-* While (nbChunks == 0 || nbChunksDownloaded != nbChunks)
-    * Start a pool of downloaders, sorted by rarest first
-    * If nbChunks == 0
-        * Call compareNumberOfChunks
-    * Assign downloaders
+* TODO later : in startup phase, only download metadata and not entire chunk ?
+* NOTE: now we also get the name of the file part in the metadata 
+    * TODO client side, extract file name --> chunk number
+
+* TODO client open tcp connection to other clients
+* TODO priority management
 
 # Documentation
 

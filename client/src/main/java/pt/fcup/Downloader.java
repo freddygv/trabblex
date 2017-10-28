@@ -13,9 +13,9 @@ class Downloader extends Thread
 	private String ip, hash, protocol, file;
 	private int port, chunkSize;
 	private byte[] contents;
-	private nbChunks;
+	private int nbChunks;
 
-	public Downloader(String file, String ip, int port, String protocol, byte[] buf)
+	public Downloader(String file, String ip, int port, String protocol, byte[] buf, int chunkNumber)
 	{
 		super();
 		this.ip = ip;
@@ -24,6 +24,11 @@ class Downloader extends Thread
 		this.port = port;
 		this.contents = buf;
 		this.file = file;
+	}
+
+	public int getNbChunks( )
+	{
+		return nbChunks;
 	}
 
 	@Override
@@ -39,12 +44,14 @@ class Downloader extends Thread
 		{
 			System.out.println(System.getProperty("user.dir"));
 			//Initialize socket
+			// TODO Try all the ports available (10)
+			// How to return if file downloaded correctly ?
 			Socket socket = new Socket(InetAddress.getByName(ip), port);
 			FileOutputStream fos = null;
 
 			try
 			{
-				fos = new FileOutputStream("downloads/" + file);
+				fos = new FileOutputStream("downloads/" + file + chunkNumber);
 			}
 			catch(IOException e)
 	        	{
@@ -62,6 +69,7 @@ class Downloader extends Thread
 			Properties properties = new Properties();
 			properties.load(new StringReader(propertiesText));
 			nbChunks = dis.readInt();
+			String fileChunkName = dis.readInt();
 
 			System.out.println("Number of chunks = " + nbChunks)
 

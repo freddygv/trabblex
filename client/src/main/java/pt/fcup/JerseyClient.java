@@ -18,6 +18,9 @@ import org.json.JSONArray;
 
 import java.util.Scanner;
 
+/*
+    Used to query the client manager
+*/
 
 public class JerseyClient {
 

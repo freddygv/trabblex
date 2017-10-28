@@ -1,4 +1,20 @@
 -------------------------------------------------------------------------------
 Test set: pt.fcup.DBManagerTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.589 sec - in pt.fcup.DBManagerTest
+Tests run: 3, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 0.317 sec <<< FAILURE! - in pt.fcup.DBManagerTest
+singleDeletionFromDB()  Time elapsed: 0.207 sec  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: relation "chunk_owners" does not exist
+  Position: 13
+	at pt.fcup.DBManagerTest.singleDeletionFromDB(DBManagerTest.java:61)
+
+queryTable()  Time elapsed: 0.031 sec  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <[{"schemaname":"public","tablename":"chunk_owners"},{"schemaname":"public","tablename":"seeders"}]> but was: <[]>
+	at pt.fcup.DBManagerTest.queryTable(DBManagerTest.java:29)
+
+singleInsertIntoDB()  Time elapsed: 0.007 sec  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: relation "chunk_owners" does not exist
+  Position: 13
+	at pt.fcup.DBManagerTest.singleInsertIntoDB(DBManagerTest.java:36)
+

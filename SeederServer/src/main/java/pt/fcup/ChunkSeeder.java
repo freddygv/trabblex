@@ -23,4 +23,15 @@ import java.net.Socket;
 
 public class ChunkSeeder {
 
+	public ChunkSeeder(String file, int port)
+	{
+		// open TCP connection on port X
+	}
+
+	public void run()
+	{
+		// wait for chunk number message via TCP
+		// seed via TCP the chunk that has been asked
+
+	}
 }
