@@ -28,10 +28,9 @@ them and share data blocks for a specific file.
     * Implement via RPC call
 
 * TODO in downloader - give him the download folder
-* TODO - real file transfer, chunk management...
 
-* If no seeder available for a chunk, create one:
-    * Create the seeder - scan the whole file
+* If no chunk seeder available for a chunk, create one:
+    * (((Create the seeder - scan the whole file))) -- done at start
     * The seeder then creates a chunk seeder based on which chunk was asked for by the client
     * Needs a table mapping the chunks to the file
 
@@ -43,6 +42,26 @@ them and share data blocks for a specific file.
     * manages download
     * has file name, hash, number of chunks
     * is passed to downloadFile when called recursively
+
+* First, download a chunk (the rarest one)
+    * Handshake
+    * Indicates total number of chunks in file
+    * If needed, request a seeder
+
+====== ALGORITHM ========
+Function compareNumberOfChunks:
+* Ask for chunk owners
+* Compare available number of chunks / chunks in file
+    * If chunks in file info not available, pass
+    * If smaller, ask for a seeder
+
+Main:
+* Number of chunks in file = 0
+* While (nbChunks == 0 || nbChunksDownloaded != nbChunks)
+    * Start a pool of downloaders, sorted by rarest first
+    * If nbChunks == 0
+        * Call compareNumberOfChunks
+    * Assign downloaders
 
 # Documentation
 

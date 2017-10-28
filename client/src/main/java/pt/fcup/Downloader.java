@@ -6,14 +6,14 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.*;
-
+import java.util.Properties;
 
 class Downloader extends Thread
 {
-	String ip, hash, protocol, file;
-	int port, chunkSize;
-	byte[] contents;
-
+	private String ip, hash, protocol, file;
+	private int port, chunkSize;
+	private byte[] contents;
+	private nbChunks;
 
 	public Downloader(String file, String ip, int port, String protocol, byte[] buf)
 	{
@@ -54,28 +54,37 @@ class Downloader extends Thread
 	           	e.printStackTrace();
 				Thread.currentThread().interrupt();
 	        	}
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			InputStream is = socket.getInputStream();
+
+			DataInputStream dis = new DataInputStream(socket.getInputStream());
+
+			// handshake
+			String propertiesText = dis.readUTF();
+			Properties properties = new Properties();
+			properties.load(new StringReader(propertiesText));
+			nbChunks = dis.readInt();
+
+			System.out.println("Number of chunks = " + nbChunks)
 
 			//No of bytes read in one read() call
 			int bytesRead = 0; 
 
-			while((bytesRead=is.read(contents))!=-1)
+			while((bytesRead=dis.read(contents)) > 0)
 			{
-			    bos.write(contents, 0, bytesRead);
+			    fos.write(contents, 0, bytesRead);
 			    // TODO add more relevant info
 			    System.out.println("Downloading chunk...");
 			}
 
-			bos.flush(); 
+			fos.flush(); 
+			fos.close();
 			socket.close(); 
 
 			System.out.println("Downloaded chunk " + hash + " successfully");
 		}
 		catch(Exception e)
-        	{
+        {
            	e.printStackTrace();
-        	}
+        }
 
 	}
 

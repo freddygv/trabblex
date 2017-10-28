@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Properties;
 
 
 public class Seeder {
@@ -181,8 +182,20 @@ public class Seeder {
             BufferedInputStream bis = new BufferedInputStream(fis); 
               
             //Get socket's output stream
-            OutputStream os = socket.getOutputStream();
-                    
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+            /*
+                Send header
+            */
+            StringWriter writer = new StringWriter();
+            Properties fileProperties = new Properties();
+            fileProperties.store(writer, "nbChunks");
+            writer.close();
+            dos.writeUTF(writer.toString());
+
+            // send the number of chunks
+            dos.writeInt(numberOfChunks);
+
             //Read File Contents into contents array 
             byte[] contents;
             long fileLength = file.length(); 
@@ -198,14 +211,15 @@ public class Seeder {
                 } 
                 contents = new byte[size]; 
                 bis.read(contents, 0, size); 
-                os.write(contents);
+                dos.write(contents);
 
                 // update every 20%
                 if((current*100)/fileLength % 20 == 0)
                     System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
             }   
             
-            os.flush(); 
+            dos.flush(); 
+            dos.close();
             //File transfer done. Close the socket connection!
             socket.close();
             ssock.close();

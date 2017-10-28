@@ -312,16 +312,16 @@ public class SimpleClient {
             only one file at a time...
         */
         // Hashtable <chunk_hash, number_available>
-        Hashtable chunks<String, Integer> 
+        /*Hashtable chunks<String, Integer> 
                 = sortAvailableChunks(nbChunksAvailable, 
-                                     remoteChunkOwners);
+                                     remoteChunkOwners);*/
 
         /*
             (4) If some chunk owners are missing, ask the client manager to create a seeder
             that will provide those chunks
             And then restart from the beginning...
         */
-        if(nbChunksAvailable != nbChunks)
+       /* if(nbChunksAvailable != nbChunks)
         {
             String newSeeder = client.query("createseeder", name);
             if(newSeeder == null)
@@ -332,12 +332,14 @@ public class SimpleClient {
             
             // restart, only this time with all the seeders needed...
             return downloadFile(String name);
-        }
+        }*/
 
         /*
             (5) Get the chunks by rarity using "chunks", 
             and send all the corresponding seeders to the downloader using 
         */
+
+
         
 
         /*
@@ -352,6 +354,7 @@ public class SimpleClient {
         /*
             Starts a new seeder that downloads the file
         */
+        ArrayList<Byte> file = new ArrayList<Byte>();
         byte[] chunkTest = new byte[chunkSize];
 
         /*Downloader dwl = new Downloader(
