@@ -28,7 +28,8 @@ public class SimpleClient {
 
     JSONArray localSeederInfo;
     JerseyClient client;
-    ArrayList<String> downloadedChunks = 
+
+    JSONArray localChunks = null;
 
     // max number of concurrent downloads
     private int maxDownloads = 3;
@@ -324,17 +325,15 @@ public class SimpleClient {
             In order to get metadata on the file
         */
 
-        byte[] chunkDl = new byte[chunkSize];
 
-        // TODO get chunk number from database based on hash
         JSONObject obj = remoteChunkOwners.getJSONObject(0);
-        int chunkNumber = obj.getString("chunk_number"); // TODO modify
+        int chunkNumber = obj.getString("chunk_number"); // TODO modify based on database modifs by Freddy
 
         Downloader firstdwl = new Downloader(
             obj.getString("file_name"),
-            obj.getString("seeder_ip"), Integer.parseInt(obj.getString("port")),
+            obj.getString("seeder_ip"), 
+            Integer.parseInt(obj.getString("port")),
             obj.getString("protocol"),
-            chunkDl,
             chunkNumber
         );
 
@@ -344,6 +343,8 @@ public class SimpleClient {
         try{
             firstdwl.join();   
             nbChunksDownloaded ++ ;
+            // store chunk info in local
+            localChunks.put(obj);
             // TODO update database
         }
         catch(Exception e)
@@ -386,16 +387,43 @@ public class SimpleClient {
         /* 
             (5) Download chunks one by one
             TODO later pool of downloaders
+            TODO priority management (later...)
+                -- could be done by using a treemap instead of hashmap for remoteChunkOwners
         */
         while(nbChunksDownloaded <= nbChunksInFile)
         {
             // determine next chunk to download
+            obj = remoteChunkOwners.getJSONObject(nbChunksDownloaded);
 
             // start downloader
-            
+            Downloader dwl = new Downloader(
+                obj.getString("file_name"),
+                obj.getString("seeder_ip"), 
+                Integer.parseInt(obj.getString("port")),
+                obj.getString("protocol"),
+                nbChunksDownloaded
+            );
+
+            // the thread will automatically save the file locally
+            dwl.start();
+
             // wait for it to finish
-            // update database
-            // start local seeder
+            try{
+                dwl.join();   
+                nbChunksDownloaded ++ ;
+                // store chunk info in local
+                localChunks.put(obj);
+                // TODO update database
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+                return false;
+            }
+
+            nbChunksDownloaded ++;
+
+            // TODO manage local seeder
         }
 
         // terminate all local seeders
