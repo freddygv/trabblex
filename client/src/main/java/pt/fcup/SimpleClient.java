@@ -259,6 +259,7 @@ public class SimpleClient {
         }
     }
 
+
     /**
     * Starts the download of a file
     * Via a TCP connection
@@ -388,7 +389,10 @@ public class SimpleClient {
         */
         while(nbChunksDownloaded <= nbChunksInFile)
         {
+            // determine next chunk to download
+
             // start downloader
+            
             // wait for it to finish
             // update database
             // start local seeder

@@ -12,17 +12,15 @@ class Downloader extends Thread
 {
 	private String ip, hash, protocol, file;
 	private int port, chunkSize;
-	private byte[] contents;
 	private int nbChunks;
 
-	public Downloader(String file, String ip, int port, String protocol, byte[] buf, int chunkNumber)
+	public Downloader(String file, String ip, int port, String protocol, int chunkNumber)
 	{
 		super();
 		this.ip = ip;
 		this.hash = hash;
 		this.protocol = protocol;
 		this.port = port;
-		this.contents = buf;
 		this.file = file;
 	}
 
@@ -71,7 +69,7 @@ class Downloader extends Thread
 
 			try
 			{
-				fos = new FileOutputStream("downloads/" + file + chunkNumber);
+				fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 			}
 			catch(IOException e)
 	        {
