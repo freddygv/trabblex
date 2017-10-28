@@ -424,13 +424,21 @@ public class SimpleClient {
             nbChunksDownloaded ++;
 
             // TODO manage local seeder
+            // TODO check file hash
         }
 
         // terminate all local seeders
         // update database
+
         // assemble file
+        assembleFile();
 
         return false;
+    }
+
+    private boolean assembleFile( )
+    {
+
     }
 
     /**
