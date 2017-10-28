@@ -220,10 +220,16 @@ public class SimpleClient {
         return hashToGet;
     }
 
-    private Hashtable<String, Integer> sortAvailableChunks( int nbChunksAvailable, JSONArray remoteChunkOwners )
+    /* 
+        Will return a table of chunks with for each chunk;
+            - hash
+            - list of <seeder ip, port>
+            - chunk number
+    */
+    /*private Hashtable<String, Integer> sortAvailableChunks( int nbChunksAvailable, JSONArray remoteChunkOwners )
     {
         nbChunksAvailable = 0;
-        Hashtable chunks<String, Integer> = new Hashtable<String, Integer>();
+        Hashtable chunks<String, Integer, Integer> = new Hashtable<String, Integer>();
 
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
         {
@@ -231,7 +237,7 @@ public class SimpleClient {
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
             {
-                chunks.put(hash, 1);
+                chunks.put(hash, 1, 0);
             }
             else
             {
@@ -241,7 +247,7 @@ public class SimpleClient {
         }
 
         return chunks;
-    }
+    }*/
 
 
     /**
@@ -367,9 +373,10 @@ public class SimpleClient {
             (4) Assess if all chunks are available 
             If no, create a seeder, and start all over again
         */
-        Hashtable chunks<String, Integer> 
+        /*Hashtable chunks<String, Integer> 
                 = sortAvailableChunks(nbChunksAvailable, 
-                                     remoteChunkOwners);
+                                     remoteChunkOwners);*/
+        ChunkManager chm = new ChunkManager(remoteChunkOwners);
 
         if(nbChunksAvailable != nbChunks)
         {
@@ -393,15 +400,18 @@ public class SimpleClient {
         while(nbChunksDownloaded <= nbChunksInFile)
         {
             // determine next chunk to download
-            obj = remoteChunkOwners.getJSONObject(nbChunksDownloaded);
+            Chunk nextChunkToDownload = chm.getRarestChunk();
+
+            // get a source for this chunk
+            Owner chunkSource = nextChunkToDownload.getSource();
 
             // start downloader
             Downloader dwl = new Downloader(
-                obj.getString("file_name"),
-                obj.getString("seeder_ip"), 
-                Integer.parseInt(obj.getString("port")),
-                obj.getString("protocol"),
-                nbChunksDownloaded
+                name,
+                chunkSource.ip,
+                chunkSource.port,
+                chunkSource.protocol,
+                nextChunkToDownload.chunkNumber
             );
 
             // the thread will automatically save the file locally
@@ -425,6 +435,9 @@ public class SimpleClient {
 
             // TODO manage local seeder
             // TODO check file hash
+
+            // mark chunk as downloaded
+            chm.markChunkDownloaded(nextChunkToDownload.hash);
         }
 
         // terminate all local seeders
