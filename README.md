@@ -65,6 +65,11 @@ them and share data blocks for a specific file.
 * TODO client open tcp connection to other clients
 * TODO priority management
 
+=== Meeting 28 oct
+* TODO Downloader:
+    see in file
+* Reassemble file
+
 # Documentation
 
 | Software | Link |

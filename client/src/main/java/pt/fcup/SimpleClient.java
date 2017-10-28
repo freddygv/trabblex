@@ -384,6 +384,7 @@ public class SimpleClient {
 
         /* 
             (5) Download chunks one by one
+            TODO later pool of downloaders
         */
         while(nbChunksDownloaded <= nbChunksInFile)
         {

@@ -42,11 +42,31 @@ class Downloader extends Thread
 
 		try
 		{
-			System.out.println(System.getProperty("user.dir"));
-			//Initialize socket
-			// TODO Try all the ports available (10)
-			// How to return if file downloaded correctly ?
-			Socket socket = new Socket(InetAddress.getByName(ip), port);
+
+			/*	
+				(1)
+				Send info to the seeder:
+				(((local ip, local port))) --> obtained via the socket info
+				filename, chunk number
+
+			*/
+
+			Socket clientSocket = new Socket(InetAddress.getByName(ip), port);
+			DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+			DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+
+			// the seeder is already assigned to a file so he only needs a chunk number
+  			dos.writeBytes(chunk);
+
+
+			clientSocket.close();
+
+            /*
+           		(2) 
+				Download file
+
+			*/
+
 			FileOutputStream fos = null;
 
 			try
@@ -54,15 +74,13 @@ class Downloader extends Thread
 				fos = new FileOutputStream("downloads/" + file + chunkNumber);
 			}
 			catch(IOException e)
-	        	{
+	        {
 	        		System.out.println("Couldn't create local file");
 	        		System.out.println("Please check if directory downloads exists");
 	        		System.out.println("    in same folder as jar");
-	           	e.printStackTrace();
-				Thread.currentThread().interrupt();
-	        	}
-
-			DataInputStream dis = new DataInputStream(socket.getInputStream());
+	           		e.printStackTrace();
+					Thread.currentThread().interrupt();
+	        }
 
 			// handshake
 			String propertiesText = dis.readUTF();
@@ -85,7 +103,7 @@ class Downloader extends Thread
 
 			fos.flush(); 
 			fos.close();
-			socket.close(); 
+			clientSocket.close(); 
 
 			System.out.println("Downloaded chunk " + hash + " successfully");
 		}
