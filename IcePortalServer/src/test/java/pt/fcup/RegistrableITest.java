@@ -27,6 +27,7 @@ public class RegistrableITest {
     private final int videoSizeY = 300;
     private final int bitrate = 512;
     private String[] chunkHashes = new String[]{"a", "b"};
+    private String[] chunkIDs = new String[]{"1", "2"};
     private String ip = "localhost";
     private String isSeeder = "t";
 
@@ -41,8 +42,10 @@ public class RegistrableITest {
     @Test
     void testDBUpdate() throws Exception {
         String chunkHash = "random-test-hash";
-        String insertionQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, owner_ip, owner_port, is_seeder) " +
-                "VALUES('" + fileHash + "', '" + chunkHash + "', '" + ip + "', '" + port + "', '" + isSeeder + "');";
+        String chunkID = "1234";
+
+        String insertionQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) " +
+                "VALUES('" + fileHash + "', '" + chunkHash + "', '" + chunkID + "', '" + ip + "', '" + port + "', '" + isSeeder + "');";
 
         testRequestHandler.dbUpdate(insertionQuery);
 
@@ -51,18 +54,21 @@ public class RegistrableITest {
 
         String resultHash = resultObject.getString("file_hash");
         String resultChunkHash = resultObject.getString("chunk_hash");
+        String resultChunkID = resultObject.getString("chunk_id");
         String resultIP = resultObject.getString("owner_ip");
         String resultPort = resultObject.getString("owner_port");
         String resultIsSeeder = resultObject.getString("is_seeder");
 
         resultString = "[{\"file_hash\":\"" + resultHash + "\"," +
                         "\"chunk_hash\":\"" + resultChunkHash + "\"," +
+                        "\"chunk_id\":\"" + resultChunkID + "\"," +
                         "\"owner_ip\":\"" + resultIP + "\"," +
                         "\"owner_port\":\"" + resultPort + "\"," +
                         "\"is_seeder\":\"" + resultIsSeeder + "\"}]";
 
         expectedString = "[{\"file_hash\":\"" + fileHash + "\"," +
                             "\"chunk_hash\":\"" + chunkHash + "\"," +
+                            "\"chunk_id\":\"" + chunkID + "\"," +
                             "\"owner_ip\":\"" + ip + "\"," +
                             "\"owner_port\":\"" + port + "\"," +
                             "\"is_seeder\":\"" + isSeeder + "\"}]";
@@ -114,7 +120,7 @@ public class RegistrableITest {
 
     @Test
     public void neighborhoodUpdated() throws Exception {
-        result = testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
+        result = testRequestHandler.sendHashes(chunkHashes, chunkIDs, fileHash, ip, port, current);
 
         JSONArray resultArray =  testDB.queryTable("SELECT * " +
                                                    "FROM chunk_owners WHERE file_hash = '" + fileHash + "' " +
@@ -129,29 +135,36 @@ public class RegistrableITest {
         String resultIsSeeder = resultObjectA.getString("is_seeder");
 
         String chunkHashA = resultObjectA.getString("chunk_hash");
+        String chunkIDA = resultObjectA.getString("chunk_id");
+
         String chunkHashB = resultObjectB.getString("chunk_hash");
+        String chunkIDB = resultObjectB.getString("chunk_id");
 
 
         resultString = "[{\"file_hash\":\"" + resultHash + "\"," +
                         "\"chunk_hash\":\"" + chunkHashA + "\"," +
+                        "\"chunk_id\":\"" + chunkIDA + "\"," +
                         "\"owner_ip\":\"" + resultIP + "\"," +
                         "\"owner_port\":\"" + resultPort + "\"," +
                         "\"is_seeder\":\"" + resultIsSeeder + "\"}," +
 
                         "{\"file_hash\":\"" + resultHash + "\"," +
                         "\"chunk_hash\":\"" + chunkHashB + "\"," +
+                        "\"chunk_id\":\"" + chunkIDB + "\"," +
                         "\"owner_ip\":\"" + resultIP + "\"," +
                         "\"owner_port\":\"" + resultPort + "\"," +
                         "\"is_seeder\":\"" + resultIsSeeder + "\"}]";
 
         expectedString = "[{\"file_hash\":\"" + fileHash + "\"," +
                             "\"chunk_hash\":\"" + chunkHashes[0] + "\"," +
+                            "\"chunk_id\":\"" + chunkIDs[0] + "\"," +
                             "\"owner_ip\":\"" + ip + "\"," +
                             "\"owner_port\":\"" + port + "\"," +
                             "\"is_seeder\":\"" + isSeeder + "\"}," +
 
                            "{\"file_hash\":\"" + fileHash + "\"," +
                             "\"chunk_hash\":\"" + chunkHashes[1] + "\"," +
+                            "\"chunk_id\":\"" + chunkIDs[1] + "\"," +
                             "\"owner_ip\":\"" + ip + "\"," +
                             "\"owner_port\":\"" + port + "\"," +
                             "\"is_seeder\":\"" + isSeeder + "\"}]";
@@ -178,7 +191,7 @@ public class RegistrableITest {
 
     @Test
     public void deregisteredChunksAfterRequest() throws Exception {
-        result = testRequestHandler.sendHashes(chunkHashes, fileHash, ip, port, current);
+        result = testRequestHandler.sendHashes(chunkHashes, chunkIDs, fileHash, ip, port, current);
 
         testRequestHandler.deregisterSeeder(fileHash, current);
 

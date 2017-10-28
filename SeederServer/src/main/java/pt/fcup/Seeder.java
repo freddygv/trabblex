@@ -40,6 +40,7 @@ public class Seeder {
     private int maxChunkSizeInBytes;
 
     private List<String> chunkHashes;
+    private List<String> chunkIDs;
 
     public Seeder(String fileName, int port, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
@@ -59,48 +60,12 @@ public class Seeder {
 
     }
 
-    public String getPROTOCOL() {
-        return PROTOCOL;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getFilepath() {
-        return filepath;
-    }
-
-    public String getFileHash() {
-        return fileHash;
-    }
-
     public int getNumberOfChunks() {
         return numberOfChunks;
     }
 
     public String getFileName() {
         return fileName;
-    }
-
-    public int getFileSize() {
-        return fileSize;
-    }
-
-    public int getVideoSizeX() {
-        return videoSizeX;
-    }
-
-    public int getVideoSizeY() {
-        return videoSizeY;
-    }
-
-    public int getBitrate() {
-        return bitrate;
     }
 
     /**
@@ -114,8 +79,10 @@ public class Seeder {
         boolean regResult = false;
         boolean neighborhoodResult = false;
 
-        // Retry policy
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
+        String[] idStringArray = chunkIDs.toArray(new String[chunkIDs.size()]);
+
+        // Retry policy
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
@@ -123,7 +90,7 @@ public class Seeder {
                 regResult = register.registerSeeder(fileHash, fileName, fileSize, PROTOCOL, port,
                                                     videoSizeX, videoSizeY, bitrate);
 
-                neighborhoodResult = register.sendHashes(hashStringArray, fileHash, ip, port);
+                neighborhoodResult = register.sendHashes(hashStringArray, idStringArray, fileHash, ip, port);
 
             }
 
@@ -312,18 +279,23 @@ public class Seeder {
              BufferedInputStream bi = new BufferedInputStream(fi)) {
 
             chunkHashes = new ArrayList<>();
+            chunkIDs = new ArrayList<>();
 
             int bytesRead = 0;
 
             while((bytesRead = bi.read(chunkBuffer)) > 0) {
-                chunkName = filepath + "-" +  Integer.toString(chunkIndex++);
+                chunkName = filepath + "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
                     fo.close();
                     chunkHash = hashFile(currentChunk);
+                    
                     chunkHashes.add(chunkHash);
+                    chunkIDs.add(Integer.toString(chunkIndex));
+
+                    chunkIndex++;
                 }
             }
 

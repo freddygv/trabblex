@@ -61,13 +61,15 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
      * Writes to chunk_owners table, adding a row per chunk_hash
      * @return true if database successfully updated with all chunks for a new file
      */
-    public boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current) {
-        String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, owner_ip, owner_port, is_seeder) ";
+    public boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort,
+                              com.zeroc.Ice.Current current) {
+
+        String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) ";
         String updateQuery;
         try {
             for (int i = 0; i < chunkHashes.length; i++) {
-                updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%d', 't');",
-                        fileHash, chunkHashes[i], seederIP, seederPort);
+                updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');",
+                        fileHash, chunkHashes[i], chunkIDs[i], seederIP, seederPort);
 
                 dbUpdate(updateQuery);
 

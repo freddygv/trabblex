@@ -26,7 +26,7 @@ public interface RegistrableI extends com.zeroc.Ice.Object
 
     boolean deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
 
-    boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current);
+    boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current);
 
     static final String[] _iceIds =
     {
@@ -98,15 +98,17 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
         String[] iceP_chunkHashes;
+        String[] iceP_chunkIDs;
         String iceP_fileHash;
         String iceP_seederIP;
         int iceP_seederPort;
         iceP_chunkHashes = istr.readStringSeq();
+        iceP_chunkIDs = istr.readStringSeq();
         iceP_fileHash = istr.readString();
         iceP_seederIP = istr.readString();
         iceP_seederPort = istr.readInt();
         inS.endReadParams();
-        boolean ret = obj.sendHashes(iceP_chunkHashes, iceP_fileHash, iceP_seederIP, iceP_seederPort, current);
+        boolean ret = obj.sendHashes(iceP_chunkHashes, iceP_chunkIDs, iceP_fileHash, iceP_seederIP, iceP_seederPort, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
         ostr.writeBool(ret);
         inS.endWriteParams(ostr);
