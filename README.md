@@ -90,6 +90,13 @@ Need to reset database at the start of the seedbox, or find a way to update it
 The chunk manager has difficulties knowing which protocol to use when not
 having it in the chunk_owners table -- added a quick, dirty fix
 
+The client now downloads all the chunks one by one, based on rarity
+(provided by the chunk manager)
+
+Each time a chunk has finished downloading, the client hashes it and verifies it.
+If hash is not correct, remove the source and start again.
+
+
 # Documentation
 
 | Software | Link |

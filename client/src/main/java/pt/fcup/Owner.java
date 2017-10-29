@@ -8,4 +8,5 @@ public class Owner
     public int port; 
     public String protocol;
     public boolean is_seeder;
+    public String hash;
 }

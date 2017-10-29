@@ -12,10 +12,11 @@ class Downloader extends Thread
 	private final String file;
 	private final int port;
 	private final int chunkNumber;
+	private final String hash;
 
 	private int nbChunks;
 
-	public Downloader(String file, int chunkNumber, String ip, int port, String protocol)
+	public Downloader(String file, int chunkNumber, String ip, int port, String protocol, String hash)
 	{
 		super();
 		this.ip = ip;
@@ -23,10 +24,11 @@ class Downloader extends Thread
 		this.port = port;
 		this.file = file;
 		this.chunkNumber = chunkNumber;
+		this.hash = hash;
 	}
 
 	@Override
-	public void run()
+	public void run() throws FileHashException
 	{
 		//System.out.println("Connecting to " + ip + ":" + port);
 
@@ -71,6 +73,11 @@ class Downloader extends Thread
 			fos.flush();
 			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
+			if(checkChunkHash() == false )
+			{
+				System.err.println("Error: chunk hash isn't good one");
+				throw new FileHashException;
+			}
 
 		}
 		catch(java.io.FileNotFoundException e)
@@ -88,5 +95,48 @@ class Downloader extends Thread
 	{
 		return nbChunks;
 	}
+
+
+	/**
+	*	Makes sure a chunk hash is correct
+	*/
+	public boolean checkChunkHash()
+	{
+		String realHash = hashFile("downloads/" + file + "-" + chunkNumber);
+		if(realHash != hash)
+			return false;
+		else
+			return true;
+	}
+
+	/**
+     * Read file to byte array with buffer, hash, then convert to hex string
+     * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
+     * @param file
+     * @return hex string hash
+     * @throws FileHashException
+     * Copied from Seeder.java, dirty...
+     */
+    //
+    private String hashFile(String file) throws FileHashException {
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
+
+            byte[] bytesBuffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(bytesBuffer)) > 0) {
+                digest.update(bytesBuffer, 0, bytesRead);
+            }
+
+            byte[] hashedBytes = digest.digest();
+
+            return bytesToHex(hashedBytes);
+
+        } catch (NoSuchAlgorithmException | IOException e) {
+            throw new FileHashException("Could not generate hash from file", e);
+
+        }
+    }
 
 }

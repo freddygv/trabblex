@@ -375,21 +375,24 @@ public class SimpleClient {
             // wait for it to finish
             try{
                 dwl.join();   
+                // mark chunk as downloaded
+                chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
+            }
+            catch(FileHashException e)
+            {
+                /*
+                    Chunk hash not correct !
+                    Extreme solution: remove chunk owner from our local database
+                */
+                    nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port, chunkSource.hash);
             }
             catch(Exception e)
             {
                 e.printStackTrace();
                 return false;
             }
-            // TODO add custom exception: source unjoinable, then inform chunkmanager
-            // that it needs to remove that source
 
             // TODO manage local seeder
-
-            // TODO check file hash
-
-            // mark chunk as downloaded
-            chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
 
             // TODO update database
 
@@ -400,6 +403,8 @@ public class SimpleClient {
 
         // assemble file
         assembleFile(name, nbChunksInFile);
+
+        System.out.println("File " + name + " successfully downloaded");
 
         return false;
     }
@@ -412,6 +417,7 @@ public class SimpleClient {
             {
                 java.nio.file.Path localFile = Paths.get("downloads/" + name + "-" + i);
                 Files.copy(localFile, mergingStream);
+                Files.delete(localFile);
             }
         }   
         catch(IOException e)
