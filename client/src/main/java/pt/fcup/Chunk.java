@@ -1,9 +1,9 @@
-import java.util.Properties;
-import java.util.ArrayList;
-
 package pt.fcup;
 
-
+import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONObject;
 
 
 /*
@@ -11,12 +11,10 @@ package pt.fcup;
 */
 public class Chunk
 {
-
-	public hash = 0;
-	public numberOfSources = 0;
-	public isDownloaded = 0;
-	public chunkNumber;
-	public List<Owner> owners = new List<Owner>();
+	public int numberOfSources = 0;
+	public boolean isDownloaded = false;
+	public int chunkNumber;
+	public ArrayList<Owner> owners = new ArrayList<Owner>();
 
 	public Chunk(JSONObject obj)
 	{
@@ -30,9 +28,9 @@ public class Chunk
 	{
 		Owner ow = new Owner();
 		ow.ip = obj.getString("seeder_ip");
-		ow.port = obj.getString("port");
+		ow.port = obj.getInt("port");
 		ow.protocol = obj.getString("protocol");
-		ow.is_seeder = obj.getString("is_seeder");
+		ow.is_seeder = obj.getBoolean("is_seeder");
 
 		owners.add(ow);
 

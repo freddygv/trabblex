@@ -2,6 +2,7 @@ package pt.fcup;
 
 import java.util.Properties;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 
 import javax.ws.rs.GET;
@@ -17,15 +18,14 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-
-import java.util.Scanner;
+import java.util.*;
 
 class ChunkManager
 {
+    Hashtable<String, Chunk> chunks = new Hashtable<String, Chunk>();
+
 	public ChunkManager(JSONArray remoteChunkOwners)
 	{
-		nbChunksAvailable = 0;
-        Hashtable chunks<String, Chunk> = new Hashtable<String, Chunk>();
 
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
         {
@@ -42,10 +42,7 @@ class ChunkManager
             	ch.addSource(obj);
                 chunks.put(hash, ch);
             }
-            nbChunksAvailable ++;
         }
-
-        return chunks;
 	}
 
 	public Chunk getRarestChunk()
@@ -53,23 +50,35 @@ class ChunkManager
 		Chunk ch = null;
 		int minowners = -1;
 
-		for(Chunk it : chunks)
+		Iterator iter = chunks.entrySet().iterator();
+		while (iter.hasNext())
 		{
-			if(minowners == -1 || it.getNumberOfSources < minowners)
+			Map.Entry pair = (Map.Entry)iter.next();
+			Chunk value = (Chunk)pair.getValue();
+			if(minowners == -1 || value.getNumberOfSources() < minowners)
 			{
-				if(it.isDownloaded == false)
+				if(value.isDownloaded == false)
 				{
-					ch = it;
-					minowners = it.getNumberOfSources;
+					ch = value;
+					minowners = ch.getNumberOfSources();
 				}
 			}
+
+        	iter.remove(); // avoids a ConcurrentModificationException
 		}
+    	
 
 		return ch;
 	}
 
-	public markChunkDownloaded(String hash)
+	public void markChunkDownloaded(Chunk ch)
 	{
-		chunks.get(hash).markDownloaded();
+		// note : verify this works
+		ch.markDownloaded();
+	}
+
+	public int getNbChunksAvailable()
+	{
+		return chunks.size();
 	}
 }

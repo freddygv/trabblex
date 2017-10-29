@@ -251,23 +251,6 @@ public class SimpleClient {
 
 
     /**
-    *    Updates the local list of chunks
-    *    If not all the chunks are available, requests a new seeder
-    *    @return the number of chunks available
-    */
-    private int getFileChunksAvailable( int nbChunksInFile )
-    {
-        // if we still don't know how many chunks are in the file, no
-        // point in doing this
-
-        if(nbChunksInFile == 0)
-        {
-            return -1;
-        }
-    }
-
-
-    /**
     * Starts the download of a file
     * Via a TCP connection
     * @return a json of the specific seeders
@@ -321,7 +304,7 @@ public class SimpleClient {
             }
             
             // restart, only this time with all the seeders needed...
-            return downloadFile(String name);   
+            return downloadFile(name);   
         }
 
         remoteChunkOwners = new JSONArray(chunkOwners);
@@ -333,14 +316,15 @@ public class SimpleClient {
 
 
         JSONObject obj = remoteChunkOwners.getJSONObject(0);
-        int chunkNumber = obj.getString("chunk_number"); // TODO modify based on database modifs by Freddy
+        int chunkNumber = obj.getInt("chunk_number"); // TODO modify based on database modifs by Freddy
 
         Downloader firstdwl = new Downloader(
             obj.getString("file_name"),
             obj.getString("seeder_ip"), 
             Integer.parseInt(obj.getString("port")),
             obj.getString("protocol"),
-            chunkNumber
+            chunkNumber,
+            chunkSize
         );
 
         // the thread will automatically save the file locally
@@ -377,8 +361,9 @@ public class SimpleClient {
                 = sortAvailableChunks(nbChunksAvailable, 
                                      remoteChunkOwners);*/
         ChunkManager chm = new ChunkManager(remoteChunkOwners);
+        nbChunksAvailable = chm.getNbChunksAvailable();
 
-        if(nbChunksAvailable != nbChunks)
+        if(nbChunksAvailable != nbChunksInFile)
         {
             String newSeeder = client.query("createseeder", name);
             if(newSeeder == null)
@@ -388,7 +373,7 @@ public class SimpleClient {
             }
             
             // restart, only this time with all the seeders needed...
-            return downloadFile(String name);
+            return downloadFile(name);
         }
 
         /* 
@@ -411,7 +396,8 @@ public class SimpleClient {
                 chunkSource.ip,
                 chunkSource.port,
                 chunkSource.protocol,
-                nextChunkToDownload.chunkNumber
+                nextChunkToDownload.chunkNumber,
+                chunkSize
             );
 
             // the thread will automatically save the file locally
@@ -421,15 +407,14 @@ public class SimpleClient {
             try{
                 dwl.join();   
                 nbChunksDownloaded ++ ;
-                // store chunk info in local
-                localChunks.put(obj);
-                // TODO update database
             }
             catch(Exception e)
             {
                 e.printStackTrace();
                 return false;
             }
+            // TODO add custom exception: source unjoinable, then inform chunkmanager
+            // that it needs to remove that source
 
             nbChunksDownloaded ++;
 
@@ -437,7 +422,9 @@ public class SimpleClient {
             // TODO check file hash
 
             // mark chunk as downloaded
-            chm.markChunkDownloaded(nextChunkToDownload.hash);
+            chm.markChunkDownloaded(nextChunkToDownload);
+
+            // TODO update database
         }
 
         // terminate all local seeders
@@ -451,7 +438,7 @@ public class SimpleClient {
 
     private boolean assembleFile( )
     {
-
+        return false;
     }
 
     /**

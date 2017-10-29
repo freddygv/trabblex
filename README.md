@@ -70,6 +70,18 @@ them and share data blocks for a specific file.
     see in file
 * Reassemble file
 
+* Created a Chunk management system which manages the chunks and its
+    sources for the client
+
+=== TODO in SimpleClient
+* TODO manage local seeder
+* TODO check file hash
+* TODO update database
+* TODO reassemble complete file
+
+=== TODO in ChunkManager
+* Inform source unavailable and update owners
+
 # Documentation
 
 | Software | Link |

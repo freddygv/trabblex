@@ -11,10 +11,12 @@ import java.util.Properties;
 class Downloader extends Thread
 {
 	private String ip, hash, protocol, file;
-	private int port, chunkSize;
+	private int port;
 	private int nbChunks;
+	private byte[] content;
+	private int chunkNumber;
 
-	public Downloader(String file, String ip, int port, String protocol, int chunkNumber)
+	public Downloader(String file, String ip, int port, String protocol, int chunkNumber, int chunkSize)
 	{
 		super();
 		this.ip = ip;
@@ -22,6 +24,9 @@ class Downloader extends Thread
 		this.protocol = protocol;
 		this.port = port;
 		this.file = file;
+		this.chunkNumber = chunkNumber;
+
+		content = new byte[chunkSize];
 	}
 
 	public int getNbChunks( )
@@ -54,7 +59,7 @@ class Downloader extends Thread
 			DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
 			// the seeder is already assigned to a file so he only needs a chunk number
-  			dos.writeBytes(chunk);
+  			dos.writeBytes(chunkNumber);
 
 
 			clientSocket.close();
@@ -87,14 +92,14 @@ class Downloader extends Thread
 			nbChunks = dis.readInt();
 			String fileChunkName = dis.readInt();
 
-			System.out.println("Number of chunks = " + nbChunks)
+			System.out.println("Number of chunks = " + nbChunks);
 
 			//No of bytes read in one read() call
 			int bytesRead = 0; 
 
-			while((bytesRead=dis.read(contents)) > 0)
+			while((bytesRead=dis.read(content)) > 0)
 			{
-			    fos.write(contents, 0, bytesRead);
+			    fos.write(content, 0, bytesRead);
 			    // TODO add more relevant info
 			    System.out.println("Downloading chunk...");
 			}
