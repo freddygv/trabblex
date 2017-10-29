@@ -20,6 +20,7 @@ public class Seedbox {
     private final int MAX_OFFSET = 100;
 
     private Set<Integer> portsTaken = new HashSet<>();
+    public HashMap<String, Integer> filePorts = new HashMap<>();
 
     private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -58,12 +59,13 @@ public class Seedbox {
         parseMetadata();
 
 
+        // TODO: Remove at the end, just used to testing
         try {
             createSingleSeeder("The Letter");
-        } catch (IOException e) {
+
+        } catch (IOException | FileHashException | PortGenerationException e) {
             e.printStackTrace();
-        } catch (FileHashException e) {
-            e.printStackTrace();
+
         }
 
         // Set up ICE adapter to accept incoming messages
@@ -111,11 +113,12 @@ public class Seedbox {
      *
      * @param filename name of the file requested
      */
-    public Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
+    public Seeder createSingleSeeder(String filename) throws IOException, FileHashException, PortGenerationException {
 
         // Generates random 20-port range for each seeder
-        int seederPort = generatePort();
+        int seederPort = generatePort(filename);
         Seeder newSeeder = new Seeder(filename, seederPort, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
+        filePorts.put(filename, seederPort);
 
         // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
@@ -131,22 +134,27 @@ public class Seedbox {
         // Storing seeders in a HashMap to allow access by filename
         seederHashMap.put(filename, newSeeder);
 
-        // manually start the seeder's tcp seed
-        // later, will be done via RPC call from clientManagerResource
-//        newSeeder.transferTCP();
-//        System.in.read();
+        // TODO: Should this be pulled out?
+        UploadManager um = new UploadManager();
+        um.createPool(newSeeder, seederPort);
 
         return newSeeder;
     }
 
     /**
      * Generates random range of 20 ports and prevents collisions between seeders with a hashset
-     * TODO: Reuse port range if a port has been generated for a given file before, use hashmap
      */
-    private int generatePort() {
+    private int generatePort(String file) throws PortGenerationException {
+        if(filePorts.get(file) != null) {
+            return filePorts.get(file).intValue();
+
+        }
+
         Random rand = new SecureRandom();
 
         int randomOffset;
+
+        int i = 0;
         while (true) {
             // Reserving 20 adjacent ports from the offset
             randomOffset = rand.nextInt(MAX_OFFSET) * 20;
@@ -154,7 +162,12 @@ public class Seedbox {
             if (portsTaken.add(randomOffset)) {
                 return BASE_PORT + randomOffset;
 
+            } else if (i == 30) {
+                throw new PortGenerationException("Did not find available port.");
+
             }
+
+            i++;
         }
     }
 

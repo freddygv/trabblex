@@ -17,6 +17,7 @@ CREATE TABLE file_keywords (
 CREATE TABLE chunk_owners (
   file_hash VARCHAR(64) NOT NULL,
   chunk_hash VARCHAR(64) NOT NULL,
+  chunk_id SMALLINT NOT NULL,
   owner_ip VARCHAR(64) NOT NULL,
   owner_port SMALLINT NOT NULL,
   is_seeder BOOLEAN NOT NULL

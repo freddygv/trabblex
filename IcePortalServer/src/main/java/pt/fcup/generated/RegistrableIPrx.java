@@ -95,31 +95,32 @@ public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, int seederPort)
+    default boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort)
     {
-        return sendHashes(chunkHashes, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return sendHashes(chunkHashes, chunkIDs, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default boolean sendHashes(String[] chunkHashes, String fileHash, String seederIP, int seederPort, java.util.Map<String, String> context)
+    default boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort, java.util.Map<String, String> context)
     {
-        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, context, true).waitForResponse();
+        return _iceI_sendHashesAsync(chunkHashes, chunkIDs, fileHash, seederIP, seederPort, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String fileHash, String seederIP, int seederPort)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort)
     {
-        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+        return _iceI_sendHashesAsync(chunkHashes, chunkIDs, fileHash, seederIP, seederPort, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String fileHash, String seederIP, int seederPort, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> sendHashesAsync(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort, java.util.Map<String, String> context)
     {
-        return _iceI_sendHashesAsync(chunkHashes, fileHash, seederIP, seederPort, context, false);
+        return _iceI_sendHashesAsync(chunkHashes, chunkIDs, fileHash, seederIP, seederPort, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_sendHashesAsync(String[] iceP_chunkHashes, String iceP_fileHash, String iceP_seederIP, int iceP_seederPort, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_sendHashesAsync(String[] iceP_chunkHashes, String[] iceP_chunkIDs, String iceP_fileHash, String iceP_seederIP, int iceP_seederPort, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "sendHashes", null, sync, null);
         f.invoke(true, context, null, ostr -> {
                      ostr.writeStringSeq(iceP_chunkHashes);
+                     ostr.writeStringSeq(iceP_chunkIDs);
                      ostr.writeString(iceP_fileHash);
                      ostr.writeString(iceP_seederIP);
                      ostr.writeInt(iceP_seederPort);

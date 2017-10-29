@@ -8,17 +8,11 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-// TCP imports
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 
 public class Seeder {
@@ -41,6 +35,7 @@ public class Seeder {
     private int maxChunkSizeInBytes;
 
     private List<String> chunkHashes;
+    private List<String> chunkIDs;
 
     public Seeder(String fileName, int port, JSONObject fileMetadata, int chunkSize) {
         this.fileName = fileName;
@@ -60,24 +55,17 @@ public class Seeder {
 
     }
 
-    public String getPROTOCOL() {
-        return PROTOCOL;
-    }
 
-    public String getIp() {
-        return ip;
+    public String getFilepath() {
+        return filepath;
     }
 
     public int getPort() {
         return port;
     }
 
-    public String getFilepath() {
-        return filepath;
-    }
-
-    public String getFileHash() {
-        return fileHash;
+    public String getIp() {
+        return ip;
     }
 
     public int getNumberOfChunks() {
@@ -86,26 +74,6 @@ public class Seeder {
 
     public String getFileName() {
         return fileName;
-    }
-
-    public int getFileSize() {
-        return fileSize;
-    }
-
-    public int getVideoSizeX() {
-        return videoSizeX;
-    }
-
-    public int getVideoSizeY() {
-        return videoSizeY;
-    }
-
-    public int getBitrate() {
-        return bitrate;
-    }
-
-    public void setChunkHashes(List<String> chunkHashes) {
-        this.chunkHashes = chunkHashes;
     }
 
     /**
@@ -119,8 +87,10 @@ public class Seeder {
         boolean regResult = false;
         boolean neighborhoodResult = false;
 
-        // Retry policy
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
+        String[] idStringArray = chunkIDs.toArray(new String[chunkIDs.size()]);
+
+        // Retry policy
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
@@ -128,7 +98,7 @@ public class Seeder {
                 regResult = register.registerSeeder(fileHash, fileName, fileSize, PROTOCOL, port,
                                                     videoSizeX, videoSizeY, bitrate);
 
-                neighborhoodResult = register.sendHashes(hashStringArray, fileHash, ip, port);
+                neighborhoodResult = register.sendHashes(hashStringArray, idStringArray, fileHash, ip, port);
 
             }
 
@@ -139,94 +109,6 @@ public class Seeder {
 
         return regResult && neighborhoodResult;
 
-    }
-
-    /*
-        Will open a TCP connection and stream a chunk only one time
-        Then, close the connection
-        @param seedNumber the relative number of the seeder
-            eg, seeder x out of 20
-    */
-    public boolean transferTCP(/*int seedNumber, */String chunkHash)
-    {
-        try
-        {
-            // Start X chunk seeders
-
-
-
-            // TODO update Database to indicate that
-            // a new chunk_owner has been created
-
-            // TODO once client has finished downloading,
-            // update chunk_owners
-
-            // NOTE: how to parallelize this ? Thread ?
-
-            ServerSocket ssock = new ServerSocket(port + seedNumber);
-            Socket socket = ssock.accept();
-            
-            InetAddress IA = InetAddress.getByName(ip); 
-            
-            // TODO atm - send entire file
-            // next, send only a chunk
-            File file = new File(filepath);
-
-            FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis); 
-              
-            //Get socket's output stream
-            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-
-            /*
-                Send header
-            */
-            StringWriter writer = new StringWriter();
-            Properties fileProperties = new Properties();
-            fileProperties.store(writer, "nbChunks");
-            writer.close();
-            dos.writeUTF(writer.toString());
-
-            // send the number of chunks
-            dos.writeInt(numberOfChunks);
-
-            // send the number of this chunk in particular
-
-            //Read File Contents into contents array 
-            byte[] contents;
-            long fileLength = file.length(); 
-            long current = 0;
-             
-            while(current!=fileLength){ 
-                int size = 10000;
-                if(fileLength - current >= size)
-                    current += size;    
-                else{ 
-                    size = (int)(fileLength - current); 
-                    current = fileLength;
-                } 
-                contents = new byte[size]; 
-                bis.read(contents, 0, size); 
-                dos.write(contents);
-
-                // update every 20%
-                if((current*100)/fileLength % 20 == 0)
-                    System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-            }   
-            
-            dos.flush(); 
-            dos.close();
-            //File transfer done. Close the socket connection!
-            socket.close();
-            ssock.close();
-            System.out.println("File sent succesfully!");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return true;
     }
 
     // TODO: Should this also close the socket if the seeder has no client connections?
@@ -335,18 +217,25 @@ public class Seeder {
              BufferedInputStream bi = new BufferedInputStream(fi)) {
 
             chunkHashes = new ArrayList<>();
+            chunkIDs = new ArrayList<>();
 
             int bytesRead = 0;
 
             while((bytesRead = bi.read(chunkBuffer)) > 0) {
-                chunkName = filepath + "-" +  Integer.toString(chunkIndex++);
+                chunkName = filepath + "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
                     fo.close();
                     chunkHash = hashFile(currentChunk);
+
                     chunkHashes.add(chunkHash);
+                    chunkIDs.add(Integer.toString(chunkIndex));
+
+                    System.out.println(String.format("Chunk index: %d, Chunk hash: %s", chunkIndex, chunkHash));
+
+                    chunkIndex++;
                 }
             }
 

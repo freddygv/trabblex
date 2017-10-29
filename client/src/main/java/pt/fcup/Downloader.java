@@ -1,114 +1,76 @@
 package pt.fcup;
 
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.*;
-import java.util.Properties;
 
 class Downloader extends Thread
 {
-	private String ip, hash, protocol, file;
-	private int port;
-	private int nbChunks;
-	private byte[] content;
-	private int chunkNumber;
+	private final String ip;
+	private final String protocol;
+	private final String file;
+	private final int port;
+	private final int chunkNumber;
 
-	public Downloader(String file, String ip, int port, String protocol, int chunkNumber, int chunkSize)
+	private int nbChunks;
+
+	public Downloader(String file, int chunkNumber, String ip, int port, String protocol)
 	{
 		super();
 		this.ip = ip;
-		this.hash = hash;
 		this.protocol = protocol;
 		this.port = port;
 		this.file = file;
 		this.chunkNumber = chunkNumber;
-
-		content = new byte[chunkSize];
-	}
-
-	public int getNbChunks( )
-	{
-		return nbChunks;
 	}
 
 	@Override
 	public void run()
 	{
-		if(protocol != "TCP")
-		{
+		if (protocol != "TCP") {
 			System.out.println("Sorry, " + protocol + " is not yet supported!");
 			Thread.currentThread().interrupt();
 		}
 
-		try
-		{
+		try (
+				Socket clientSocket = new Socket(InetAddress.getByName(ip), port);
 
-			/*	
-				(1)
-				Send info to the seeder:
-				(((local ip, local port))) --> obtained via the socket info
-				filename, chunk number
+				PrintWriter out =
+						new PrintWriter(clientSocket.getOutputStream(), true);
+				BufferedReader in =
+						new BufferedReader(
+								new InputStreamReader(clientSocket.getInputStream()));
 
-			*/
+				DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
-			Socket clientSocket = new Socket(InetAddress.getByName(ip), port);
-			DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
-			DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
+		) {
 
-			// the seeder is already assigned to a file so he only needs a chunk number
-  			dos.writeBytes(chunkNumber);
+			System.out.println("Running for chunk number " + chunkNumber);
+			out.println(chunkNumber);
 
 
-			clientSocket.close();
+			// TODO: Are these needed? where are these properties used
+//			// handshake
+//			String propertiesText = dis.readUTF();
+//			Properties properties = new Properties();
+//			properties.load(new StringReader(propertiesText));
 
-            /*
-           		(2) 
-				Download file
+			nbChunks = Integer.parseInt(in.readLine());
+			System.out.println("Number of chunks is: " + nbChunks);
 
-			*/
+			byte[] contents = new byte[1024*1024];
+			int bytesRead = 0;
+			while ((bytesRead = dis.read(contents)) > 0) {
+				fos.write(contents, 0, bytesRead);
 
-			FileOutputStream fos = null;
-
-			try
-			{
-				fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
-			}
-			catch(IOException e)
-	        {
-	        		System.out.println("Couldn't create local file");
-	        		System.out.println("Please check if directory downloads exists");
-	        		System.out.println("    in same folder as jar");
-	           		e.printStackTrace();
-					Thread.currentThread().interrupt();
-	        }
-
-			// handshake
-			String propertiesText = dis.readUTF();
-			Properties properties = new Properties();
-			properties.load(new StringReader(propertiesText));
-			nbChunks = dis.readInt();
-			String fileChunkName = dis.readInt();
-
-			System.out.println("Number of chunks = " + nbChunks);
-
-			//No of bytes read in one read() call
-			int bytesRead = 0; 
-
-			while((bytesRead=dis.read(content)) > 0)
-			{
-			    fos.write(content, 0, bytesRead);
-			    // TODO add more relevant info
-			    System.out.println("Downloading chunk...");
 			}
 
-			fos.flush(); 
-			fos.close();
-			clientSocket.close(); 
+			fos.flush();
+			System.out.println(String.format("Downloaded chunk #%s of '%s' successfully", chunkNumber, file));
 
-			System.out.println("Downloaded chunk " + hash + " successfully");
+
 		}
 		catch(Exception e)
         {
