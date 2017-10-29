@@ -57,7 +57,6 @@ class Downloader extends Thread
 			out.println(chunkNumber);
 			out.println(file);
 
-
 			nbChunks = Integer.parseInt(in.readLine());
 
 			byte[] contents = new byte[1024*1024];

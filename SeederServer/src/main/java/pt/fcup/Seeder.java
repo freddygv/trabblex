@@ -78,7 +78,7 @@ public class Seeder {
         String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
         String[] idStringArray = chunkIDs.toArray(new String[chunkIDs.size()]);
 
-        System.out.println("Registering seeder for " + fileName + " at port " + port);
+        System.out.println("Registering seeder for " + videoName + " at port " + port);
 
         // Retry policy
         for (int retries = 0; retries < MAX_RETRIES; retries++) {

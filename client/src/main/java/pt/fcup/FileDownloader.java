@@ -129,7 +129,13 @@ public class FileDownloader extends Thread
         {
 
             // debug
-            System.out.println("This is try " + tries);
+            System.out.println("This is try " + tries + "/" + remoteChunkOwners.length());
+
+            if(remoteChunkOwners.length() <= tries)
+            {
+                System.out.println("Couldn't get a source from seedbox");
+                return false;
+            }
 
             JSONObject obj = remoteChunkOwners.getJSONObject(tries);
 
@@ -310,7 +316,7 @@ public class FileDownloader extends Thread
 
         }
         else{
-            System.err.println("Error opening file " + file + " to check hash");
+            //System.err.println("Error opening file " + file + " to check hash");
             return false;
         }
 

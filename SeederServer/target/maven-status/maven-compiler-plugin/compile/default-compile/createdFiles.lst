@@ -4,8 +4,10 @@ pt/fcup/Seedbox.class
 pt/fcup/exception/FileHashException.class
 pt/fcup/generated/RegistrableIPrx.class
 pt/fcup/generated/RegistrableI.class
+pt/fcup/UploadServer.class
 pt/fcup/generated/RequestableIPrx.class
 pt/fcup/generated/RegistrableI$1.class
+pt/fcup/ChunkSeeder.class
 pt/fcup/IceServer.class
 pt/fcup/generated/RequestableI$1.class
 pt/fcup/exception/JSONParsingException.class

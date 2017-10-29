@@ -18,7 +18,6 @@ class ChunkSeeder extends Thread {
         this.numChunks = numChunks;
         this.filepath = filepath;
         this.filename = filename;
-
     }
 
     public void run() {
