@@ -53,7 +53,7 @@ public class Seedbox {
 
     private void run() throws JSONParsingException {
         // TODO: Remove at the end, just used to flush the system
-        //truncateTables();
+        truncateTables();
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();

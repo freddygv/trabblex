@@ -28,8 +28,10 @@ class Downloader extends Thread
 	@Override
 	public void run()
 	{
+		//System.out.println("Connecting to " + ip + ":" + port);
+
 		if (protocol != "TCP") {
-			System.out.println("Sorry, " + protocol + " is not yet supported!");
+			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
 			Thread.currentThread().interrupt();
 		}
 
@@ -47,7 +49,7 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-			System.out.println("Running for chunk number " + chunkNumber);
+			//System.out.println("Downloader: Running for chunk number " + chunkNumber);
 			out.println(chunkNumber);
 
 
@@ -58,7 +60,7 @@ class Downloader extends Thread
 //			properties.load(new StringReader(propertiesText));
 
 			nbChunks = Integer.parseInt(in.readLine());
-			System.out.println("Number of chunks is: " + nbChunks);
+			//System.out.println("Number of chunks is: " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
@@ -68,9 +70,13 @@ class Downloader extends Thread
 			}
 
 			fos.flush();
-			System.out.println(String.format("Downloaded chunk #%s of '%s' successfully", chunkNumber, file));
+			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
 
+		}
+		catch(java.io.FileNotFoundException e)
+		{
+			System.err.println("Couldn't create output file - check if downloads folder exists");
 		}
 		catch(Exception e)
         {

@@ -26,13 +26,19 @@ public class Chunk
 	*/
 	public void addSource(JSONObject obj)
 	{
+
 		Owner ow = new Owner();
-		ow.ip = obj.getString("seeder_ip");
-		ow.port = obj.getInt("port");
-		ow.protocol = obj.getString("protocol");
-		ow.is_seeder = obj.getBoolean("is_seeder");
+		ow.ip = obj.getString("owner_ip");
+		ow.port = obj.getInt("owner_port");
+		// quick and dirty fix :(
+		ow.protocol = "TCP";
+		// database returns t or f for true / false
+		ow.is_seeder = obj.getString("is_seeder").equalsIgnoreCase("t");
 
 		owners.add(ow);
+
+		// save chunk number
+		chunkNumber = obj.getInt("chunk_id");
 
 		numberOfSources ++;
 	}

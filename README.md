@@ -82,6 +82,14 @@ them and share data blocks for a specific file.
 === TODO in ChunkManager
 * Inform source unavailable and update owners
 
+Notes:
+When the database is already populated with the seeders and owners, 
+and we restart the seedbox - everything crashes and burns. 
+Need to reset database at the start of the seedbox, or find a way to update it 
+
+The chunk manager has difficulties knowing which protocol to use when not
+having it in the chunk_owners table -- added a quick, dirty fix
+
 # Documentation
 
 | Software | Link |

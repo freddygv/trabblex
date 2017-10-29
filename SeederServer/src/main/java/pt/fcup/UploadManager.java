@@ -19,7 +19,7 @@ public class UploadManager {
         boolean listening = true;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (listening) {
-                System.out.println("Listening for new connections...");
+                System.out.println("Listening for new connections on port " + port);
                 new ChunkSeeder(fileSeeder, serverSocket.accept()).start();
 
 //                    // TODO: Need to find a way to check for inactive seeder and break out of this loop

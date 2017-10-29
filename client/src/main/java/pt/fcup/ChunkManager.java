@@ -23,6 +23,7 @@ import java.util.*;
 class ChunkManager
 {
     Hashtable<String, Chunk> chunks = new Hashtable<String, Chunk>();
+    int nbChunksNotDownloaded = 0;
 
 	public ChunkManager(JSONArray remoteChunkOwners)
 	{
@@ -30,10 +31,14 @@ class ChunkManager
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
+
+        	//System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id"));
+
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
             {
                 chunks.put(hash, new Chunk(obj));
+                nbChunksNotDownloaded ++;
             }
             else
             {
@@ -55,26 +60,46 @@ class ChunkManager
 		{
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
+			//System.out.println("Evaluating chunk #" + value.chunkNumber);
 			if(minowners == -1 || value.getNumberOfSources() < minowners)
 			{
 				if(value.isDownloaded == false)
 				{
 					ch = value;
 					minowners = ch.getNumberOfSources();
+					//System.out.println("Next chunk to download is #" + ch.chunkNumber);
 				}
 			}
 
-        	iter.remove(); // avoids a ConcurrentModificationException
+        	//iter.remove(); // avoids a ConcurrentModificationException
 		}
     	
 
 		return ch;
 	}
 
-	public void markChunkDownloaded(Chunk ch)
+	public int numberOfChunksNotDownloaded()
 	{
-		// note : verify this works
-		ch.markDownloaded();
+		return nbChunksNotDownloaded;
+	}
+
+	public void markChunkDownloaded(int n)
+	{
+		Chunk ch = null;
+
+		Iterator iter = chunks.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)iter.next();
+			Chunk value = (Chunk)pair.getValue();
+			if(value.chunkNumber == n)
+			{
+				value.markDownloaded();
+				nbChunksNotDownloaded --;
+			}
+
+        	//iter.remove(); // avoids a ConcurrentModificationException
+		}
 	}
 
 	public int getNbChunksAvailable()
