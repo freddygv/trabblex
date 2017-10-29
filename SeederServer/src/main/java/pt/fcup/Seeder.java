@@ -8,14 +8,9 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-// TCP imports
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +55,19 @@ public class Seeder {
 
     }
 
+
+    public String getFilepath() {
+        return filepath;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
     public int getNumberOfChunks() {
         return numberOfChunks;
     }
@@ -101,76 +109,6 @@ public class Seeder {
 
         return regResult && neighborhoodResult;
 
-    }
-
-    /*
-        Will open a TCP connection and stream a chunk only one time
-        Then, close the connection
-        @param seedNumber the relative number of the seeder
-            eg, seeder x out of 20
-    */
-    public boolean transferTCP(int seedNumber, String chunkHash)
-    {
-        try
-        {
-
-            // TODO update Database to indicate that
-            // a new chunk_owner has been created
-
-            // TODO once client has finished downloading,
-            // update chunk_owners
-
-            // NOTE: how to parallelize this ? Thread ?
-
-            ServerSocket ssock = new ServerSocket(port + seedNumber);
-            Socket socket = ssock.accept();
-            
-            InetAddress IA = InetAddress.getByName(ip); 
-            
-            // TODO atm - send entire file
-            // next, send only a chunk
-            File file = new File(filepath);
-
-            FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis); 
-              
-            //Get socket's output stream
-            OutputStream os = socket.getOutputStream();
-                    
-            //Read File Contents into contents array 
-            byte[] contents;
-            long fileLength = file.length(); 
-            long current = 0;
-             
-            while(current!=fileLength){ 
-                int size = 10000;
-                if(fileLength - current >= size)
-                    current += size;    
-                else{ 
-                    size = (int)(fileLength - current); 
-                    current = fileLength;
-                } 
-                contents = new byte[size]; 
-                bis.read(contents, 0, size); 
-                os.write(contents);
-
-                // update every 20%
-                if((current*100)/fileLength % 20 == 0)
-                    System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-            }   
-            
-            os.flush(); 
-            //File transfer done. Close the socket connection!
-            socket.close();
-            ssock.close();
-            System.out.println("File sent succesfully!");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return true;
     }
 
     // TODO: Should this also close the socket if the seeder has no client connections?
@@ -291,9 +229,11 @@ public class Seeder {
                     fo.write(chunkBuffer, 0, bytesRead);
                     fo.close();
                     chunkHash = hashFile(currentChunk);
-                    
+
                     chunkHashes.add(chunkHash);
                     chunkIDs.add(Integer.toString(chunkIndex));
+
+                    System.out.println(String.format("Chunk index: %d, Chunk hash: %s", chunkIndex, chunkHash));
 
                     chunkIndex++;
                 }

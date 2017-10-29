@@ -134,10 +134,9 @@ public class Seedbox {
         // Storing seeders in a HashMap to allow access by filename
         seederHashMap.put(filename, newSeeder);
 
-        // manually start the seeder's tcp seed
-        // later, will be done via RPC call from clientManagerResource
-//        newSeeder.transferTCP();
-//        System.in.read();
+        // TODO: Should this be pulled out?
+        UploadManager um = new UploadManager();
+        um.createPool(newSeeder, seederPort);
 
         return newSeeder;
     }

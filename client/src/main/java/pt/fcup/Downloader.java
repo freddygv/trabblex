@@ -58,7 +58,7 @@ class Downloader extends Thread
 			InputStream is = socket.getInputStream();
 
 			//No of bytes read in one read() call
-			int bytesRead = 0; 
+			int bytesRead = 0;
 
 			while((bytesRead=is.read(contents))!=-1)
 			{
@@ -67,8 +67,8 @@ class Downloader extends Thread
 			    System.out.println("Downloading chunk...");
 			}
 
-			bos.flush(); 
-			socket.close(); 
+			bos.flush();
+			socket.close();
 
 			System.out.println("Downloaded chunk " + hash + " successfully");
 		}
