@@ -61,7 +61,7 @@ public class Seedbox {
 
         // TODO: Remove at the end, just used to testing
         try {
-            createSingleSeeder("The Letter");
+            createSingleSeeder("Popeye the Sailor");
 
         } catch (IOException | FileHashException | PortGenerationException e) {
             e.printStackTrace();

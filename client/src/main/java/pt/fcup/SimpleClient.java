@@ -320,11 +320,10 @@ public class SimpleClient {
 
         Downloader firstdwl = new Downloader(
             obj.getString("file_name"),
+            chunkNumber,
             obj.getString("seeder_ip"), 
             Integer.parseInt(obj.getString("port")),
-            obj.getString("protocol"),
-            chunkNumber,
-            chunkSize
+            obj.getString("protocol")
         );
 
         // the thread will automatically save the file locally
@@ -393,11 +392,10 @@ public class SimpleClient {
             // start downloader
             Downloader dwl = new Downloader(
                 name,
+                chunkNumber,
                 chunkSource.ip,
                 chunkSource.port,
-                chunkSource.protocol,
-                nextChunkToDownload.chunkNumber,
-                chunkSize
+                chunkSource.protocol
             );
 
             // the thread will automatically save the file locally

@@ -79,4 +79,9 @@ class Downloader extends Thread
 
 	}
 
+	public getNbChunks()
+	{
+		return nbChunks;
+	}
+
 }
