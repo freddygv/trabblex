@@ -17,8 +17,11 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-
 import java.util.Scanner;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 
 public class SimpleClient {
@@ -318,7 +321,8 @@ public class SimpleClient {
             (4) Assess if all chunks are available 
             If no, create a seeder, and start all over again
         */
-        if(chm.getNbChunksAvailable() != firstdwl.getNbChunks())
+        int nbChunksInFile = firstdwl.getNbChunks();
+        if(chm.getNbChunksAvailable() != nbChunksInFile)
         {
             String newSeeder = client.query("createseeder", name);
             if(newSeeder == null)
@@ -381,6 +385,7 @@ public class SimpleClient {
             // that it needs to remove that source
 
             // TODO manage local seeder
+
             // TODO check file hash
 
             // mark chunk as downloaded
@@ -394,14 +399,28 @@ public class SimpleClient {
         // update database
 
         // assemble file
-        assembleFile();
+        assembleFile(name, nbChunksInFile);
 
         return false;
     }
 
-    private boolean assembleFile( )
+    private boolean assembleFile(String name, int nbChunks)
     {
-        return false;
+        try (FileOutputStream fos = new FileOutputStream("downloads/" + name);
+            BufferedOutputStream mergingStream = new BufferedOutputStream(fos)) {
+            for (int i = 0; i < nbChunks; i++) 
+            {
+                java.nio.file.Path localFile = Paths.get("downloads/" + name + "-" + i);
+                Files.copy(localFile, mergingStream);
+            }
+        }   
+        catch(IOException e)
+        {
+            System.err.println("Error re-assembling the file\n");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     /**
