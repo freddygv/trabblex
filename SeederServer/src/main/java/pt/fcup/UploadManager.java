@@ -19,8 +19,14 @@ public class UploadManager {
         boolean listening = true;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (listening) {
+<<<<<<< HEAD
                 System.out.println("Listening for new connections on port " + port);
                 new ChunkSeeder(fileSeeder, serverSocket.accept()).start();
+=======
+                System.out.println("Listening for new connections...");
+                new ChunkSeeder(port, fileSeeder.getNumberOfChunks(), fileSeeder.getFilepath(), fileSeeder.getFileName(),
+                                serverSocket.accept()).start();
+>>>>>>> master
 
 //                    // TODO: Need to find a way to check for inactive seeder and break out of this loop
 //                    // TODO: Keep track of time? Let a certain amount of time pass before de-reg

@@ -12,7 +12,7 @@ class DummyDownloader {
     String ip = "localhost";
     String protocol = "TCP";
     String hash = "972C57B6BBADB9146778DFA6C503C19D9B4DC056AD50CD41B38FCC65E0D21162";
-    int port = 31080;
+    int port = 30200;
     int chunkSize;
     String chunkNumber = "1";
 
