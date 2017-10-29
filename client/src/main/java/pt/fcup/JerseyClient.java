@@ -45,6 +45,9 @@ public class JerseyClient {
             {
                 path = path + "/";
             }
+            else{
+                param = "";
+            }
 
             // Query database
             result = client.target(URL)
@@ -55,6 +58,11 @@ public class JerseyClient {
         catch(javax.ws.rs.ProcessingException e)
         {
             System.err.println("Cannot connect to server " + HOST);
+
+        }
+        catch(javax.ws.rs.NotFoundException e)
+        {
+            System.err.println("Resource not found: " + URL);
 
         }
         catch(Exception e )

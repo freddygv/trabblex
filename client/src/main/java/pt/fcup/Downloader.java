@@ -79,7 +79,7 @@ class Downloader extends Thread
 
 	}
 
-	public getNbChunks()
+	public int getNbChunks()
 	{
 		return nbChunks;
 	}
