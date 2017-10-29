@@ -96,6 +96,11 @@ The client now downloads all the chunks one by one, based on rarity
 Each time a chunk has finished downloading, the client hashes it and verifies it.
 If hash is not correct, remove the source and start again.
 
+* Created a file downloader class that can be started as a thread,
+so that the CLI is still available meanwhile
+
+* Note: the chunk removal if hash incorrect doesn't work...
+* Note: when a chunk is already in the download folder, fucks up everything
 
 # Documentation
 

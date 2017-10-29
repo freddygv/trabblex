@@ -35,58 +35,6 @@ public class ClientManagerResource{
         catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
-
-        /*
-            Dummy for tests
-
-        */
-    /*   try{
-            String sampleQuery =  "INSERT INTO chunk_owners"
-            + "(file_hash, chunk_hash, owner_ip, owner_port, is_seeder, is_active) "
-            + "VALUES"
-            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','1','1'),"
-            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_1','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','1','1');";
-
-            db.singleUpdate(sampleQuery);
-
-            sampleQuery =  "INSERT INTO chunk_owners "
-            + "VALUES"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','1','1'),"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_2','127.0.0.1','26','0','1'),"
-            + "('Dummy_hash_1','chunk_hash_3','127.0.0.1','26','1','1');";
-
-            db.singleUpdate(sampleQuery);
-
-
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error (" + e + ")");
-
-        }
-
-         try{
-            // execute dummy query
-            String sampleQuery =  "INSERT INTO seeders "
-            + "VALUES"
-            + "('http://127.0.0.1','Dummy_hash_1','Dummy_name_1','13','TCP','26000','1920','1080','600'),"
-            + "('http://127.0.0.1','Dummy_hash_3','Dummy_name_3','12','TCP','26000','1920','1080','600');"
-            ;
-
-            db.singleUpdate(sampleQuery);
-
-        }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-
-        }*/
-
     }
 
     private JSONArray runQuery( String query )
@@ -94,9 +42,9 @@ public class ClientManagerResource{
         JSONArray res = null;
 
         try{
-            //System.out.println("Executing query " + query); 
+            System.out.println("Executing query " + query); 
             res = db.queryTable(query);
-            //System.out.println("Result = " + res.toString());
+            System.out.println("Result = " + res.toString());
 
         }
         catch(Exception e)
@@ -141,7 +89,7 @@ public class ClientManagerResource{
     {
         JSONArray result = null;
 
-        String query =  "SELECT * FROM seeders;";
+        String query =  "SELECT * FROM videos;";
 
         return runQuery(query).toString();
 

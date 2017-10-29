@@ -34,7 +34,7 @@ public class Chunk
 		ow.protocol = "TCP";
 		// database returns t or f for true / false
 		ow.is_seeder = obj.getString("is_seeder").equalsIgnoreCase("t");
-		ow.hash = obj.getString("hash");
+		ow.hash = obj.getString("chunk_hash");
 
 		owners.add(ow);
 
@@ -50,13 +50,13 @@ public class Chunk
 	*/
 	public void removeOwner(String ip, int port, String hash)
 	{
-		for(int i = 0; i < owners.length; i++)
+		for(int i = 0; i < owners.size(); i++)
 		{
 			if(owners.get(i).ip == ip
 				&& owners.get(i).hash == hash
 				&& owners.get(i).port == port){
+				System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
 				owners.remove(i);
-				break;
 			}
 		}
 	}
@@ -65,6 +65,7 @@ public class Chunk
 	public Owner getSource()
 	{
 		// TODO get the first owner that isn't a seeder preferably
+		System.out.println("Providing source " + owners.get(0).ip + ":" + owners.get(0).port);
 		return owners.get(0);
 	}
 

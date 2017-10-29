@@ -53,20 +53,20 @@ public class Seedbox {
 
     private void run() throws JSONParsingException {
         // TODO: Remove at the end, just used to flush the system
-        truncateTables();
+        //truncateTables();
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
 
 
         // TODO: Remove at the end, just used to testing
-        try {
+      /*  try {
             createSingleSeeder("Popeye the Sailor");
 
         } catch (IOException | FileHashException | PortGenerationException e) {
             e.printStackTrace();
 
-        }
+        }*/
 
         // Set up ICE adapter to accept incoming messages
         startIceServer();

@@ -32,7 +32,8 @@ class ChunkManager
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
-        	System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id"));
+        	System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id")
+        		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")");
 
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
@@ -67,15 +68,32 @@ class ChunkManager
 				{
 					ch = value;
 					minowners = ch.getNumberOfSources();
-					//System.out.println("Next chunk to download is #" + ch.chunkNumber);
+					
 				}
 			}
 
         	//iter.remove(); // avoids a ConcurrentModificationException
 		}
+
+		System.out.println("Rarest chunk is number "+ ch.chunkNumber);
     	
 
 		return ch;
+	}
+
+	public Chunk getChunk(int n)
+	{
+		Iterator iter = chunks.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)iter.next();
+			Chunk value = (Chunk)pair.getValue();
+			if(value.chunkNumber == n)
+			{
+				return value;
+			}
+		}
+		return null;
 	}
 
 	public int numberOfChunksNotDownloaded()
@@ -85,21 +103,8 @@ class ChunkManager
 
 	public void markChunkDownloaded(int n)
 	{
-		Chunk ch = null;
-
-		Iterator iter = chunks.entrySet().iterator();
-		while (iter.hasNext())
-		{
-			Map.Entry pair = (Map.Entry)iter.next();
-			Chunk value = (Chunk)pair.getValue();
-			if(value.chunkNumber == n)
-			{
-				value.markDownloaded();
-				nbChunksNotDownloaded --;
-			}
-
-        	//iter.remove(); // avoids a ConcurrentModificationException
-		}
+		getChunk(n).markDownloaded();
+		nbChunksNotDownloaded --;
 	}
 
 	public int getNbChunksAvailable()

@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.*;
+import pt.fcup.exception.*;
 
 class Downloader extends Thread
 {
@@ -15,6 +16,7 @@ class Downloader extends Thread
 	private final String hash;
 
 	private int nbChunks;
+
 
 	public Downloader(String file, int chunkNumber, String ip, int port, String protocol, String hash)
 	{
@@ -28,13 +30,13 @@ class Downloader extends Thread
 	}
 
 	@Override
-	public void run() throws FileHashException
+	public void run()
 	{
 		//System.out.println("Connecting to " + ip + ":" + port);
 
 		if (protocol != "TCP") {
 			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
-			Thread.currentThread().interrupt();
+			return;
 		}
 
 		try (
@@ -54,15 +56,7 @@ class Downloader extends Thread
 			System.out.println("Downloader: requesting chunk number " + chunkNumber);
 			out.println(chunkNumber);
 
-
-			// TODO: Are these needed? where are these properties used
-//			// handshake
-//			String propertiesText = dis.readUTF();
-//			Properties properties = new Properties();
-//			properties.load(new StringReader(propertiesText));
-
 			nbChunks = Integer.parseInt(in.readLine());
-			System.out.println("Number of chunks is: " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
@@ -71,23 +65,28 @@ class Downloader extends Thread
 			}
 
 			fos.flush();
+			fos.close();
+			dis.close();
 			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
-
-			if(checkChunkHash() == false )
-			{
-				System.err.println("Error: chunk hash isn't good one");
-				throw new FileHashException;
-			}
 
 		}
 		catch(java.io.FileNotFoundException e)
 		{
 			System.err.println("Couldn't create output file - check if downloads folder exists");
 		}
+		catch(java.net.ConnectException e)
+		{
+        	System.out.println("couldn't connect to " + ip + ":" + port);
+        	return;
+		}
 		catch(Exception e)
         {
+        	System.out.println("couldn't connect to " + ip + ":" + port);
            	e.printStackTrace();
+        	return;
         }
+
+        return;
 
 	}
 
@@ -95,48 +94,4 @@ class Downloader extends Thread
 	{
 		return nbChunks;
 	}
-
-
-	/**
-	*	Makes sure a chunk hash is correct
-	*/
-	public boolean checkChunkHash()
-	{
-		String realHash = hashFile("downloads/" + file + "-" + chunkNumber);
-		if(realHash != hash)
-			return false;
-		else
-			return true;
-	}
-
-	/**
-     * Read file to byte array with buffer, hash, then convert to hex string
-     * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
-     * @param file
-     * @return hex string hash
-     * @throws FileHashException
-     * Copied from Seeder.java, dirty...
-     */
-    //
-    private String hashFile(String file) throws FileHashException {
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
-
-            byte[] bytesBuffer = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(bytesBuffer)) > 0) {
-                digest.update(bytesBuffer, 0, bytesRead);
-            }
-
-            byte[] hashedBytes = digest.digest();
-
-            return bytesToHex(hashedBytes);
-
-        } catch (NoSuchAlgorithmException | IOException e) {
-            throw new FileHashException("Could not generate hash from file", e);
-
-        }
-    }
-
 }
