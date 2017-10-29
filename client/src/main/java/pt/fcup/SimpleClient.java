@@ -54,7 +54,7 @@ public class SimpleClient {
         System.out.println("Client started");
 
         do{
-            System.out.println("> ");
+            System.out.print("> ");
             input = sc.nextLine();
             String[] parts = input.split(" ");
 

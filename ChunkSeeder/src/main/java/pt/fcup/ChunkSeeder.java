@@ -23,7 +23,7 @@ class ChunkSeeder extends Thread {
 
     public void run() {
         transferChunk();
-        System.out.println("File sent succesfully!");
+        System.out.println("Chunk " + chunkID + " sent succesfully!");
 
     }
 
@@ -45,7 +45,7 @@ class ChunkSeeder extends Thread {
 
             System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
 
-            System.out.println("Sending back number of chunks: " + numChunks);
+            //System.out.println("Sending back number of chunks: " + numChunks);
             out.println(numChunks);
 
             long fileLength = file.length();
@@ -55,14 +55,10 @@ class ChunkSeeder extends Thread {
 
             while((bytesRead = bis.read(contents)) > 0){
                 os.write(contents, 0, bytesRead);
-
-                // update every 20%
-                if((bytesRead*100)/fileLength % 20 == 0) {
-                    System.out.print("Sending file ... " + (bytesRead * 100) / fileLength + "% complete!");
-                }
             }
 
             os.flush();
+            os.close();
 
         } catch (IOException e) {
             // Do nothing, client can request again.

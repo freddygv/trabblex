@@ -32,7 +32,7 @@ class ChunkManager
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
-        	//System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id"));
+        	System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id"));
 
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))

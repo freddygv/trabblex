@@ -43,7 +43,7 @@
         <dependency>
             <groupId>fcup</groupId>
             <artifactId>ChunkSeeder</artifactId>
-            <version>1.0</version>
+            <version>1.21</version>
         </dependency>
         <dependency>
             <groupId>com.zeroc</groupId>

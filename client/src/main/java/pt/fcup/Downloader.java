@@ -49,7 +49,7 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-			//System.out.println("Downloader: Running for chunk number " + chunkNumber);
+			System.out.println("Downloader: requesting chunk number " + chunkNumber);
 			out.println(chunkNumber);
 
 
@@ -60,17 +60,16 @@ class Downloader extends Thread
 //			properties.load(new StringReader(propertiesText));
 
 			nbChunks = Integer.parseInt(in.readLine());
-			//System.out.println("Number of chunks is: " + nbChunks);
+			System.out.println("Number of chunks is: " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
 			while ((bytesRead = dis.read(contents)) > 0) {
 				fos.write(contents, 0, bytesRead);
-
 			}
 
 			fos.flush();
-			//System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
+			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
 
 		}
