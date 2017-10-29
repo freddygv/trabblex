@@ -66,7 +66,7 @@ class Downloader extends Thread
 			System.out.println("Number of chunks = " + nbChunks)
 
 			//No of bytes read in one read() call
-			int bytesRead = 0; 
+			int bytesRead = 0;
 
 			while((bytesRead=dis.read(contents)) > 0)
 			{
@@ -75,9 +75,9 @@ class Downloader extends Thread
 			    System.out.println("Downloading chunk...");
 			}
 
-			fos.flush(); 
+			fos.flush();
 			fos.close();
-			socket.close(); 
+			socket.close();
 
 			System.out.println("Downloaded chunk " + hash + " successfully");
 		}

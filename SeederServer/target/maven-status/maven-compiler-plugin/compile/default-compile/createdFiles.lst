@@ -5,9 +5,10 @@ pt/fcup/exception/FileHashException.class
 pt/fcup/generated/RegistrableIPrx.class
 pt/fcup/generated/RegistrableI.class
 pt/fcup/generated/RequestableIPrx.class
+pt/fcup/generated/RequestableI$1.class
+pt/fcup/UploadManager.class
 pt/fcup/generated/RegistrableI$1.class
 pt/fcup/ChunkSeeder.class
-pt/fcup/generated/RequestableI$1.class
 pt/fcup/exception/JSONParsingException.class
 pt/fcup/RequestableI.class
 pt/fcup/generated/RequestableI.class

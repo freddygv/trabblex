@@ -1,26 +1,78 @@
 package pt.fcup;
 
-import org.json.JSONObject;
-import pt.fcup.generated.*;
-import pt.fcup.exception.FileHashException;
-import pt.fcup.generated.RegistrableIPrx;
-
 import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Hashtable;
+import java.net.*;
 
-// TCP imports
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+class ChunkSeeder extends Thread {
+    private final int port;
+    private final String filepath;
+    private final String filename;
+    private final int numChunks;
+    private final Socket socket;
 
-public class ChunkSeeder {
+    private int chunkID;
 
+    public ChunkSeeder(Seeder fileSeeder, Socket socket) {
+        this.socket = socket;
+        this.port = fileSeeder.getPort();
+        this.numChunks = fileSeeder.getNumberOfChunks();
+        this.filepath = fileSeeder.getFilepath();
+        this.filename = fileSeeder.getFileName();
+
+    }
+
+    /**
+     * TODO: Client needs to notify portal that it has a chunk after transfer finishes
+     */
+    public void run() {
+        transferChunk();
+        System.out.println("File sent succesfully!");
+
+    }
+
+    private void transferChunk() {
+        File file = new File(filepath + "-" + chunkID);
+
+        try(
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
+
+                FileInputStream fis = new FileInputStream(file);
+
+                BufferedInputStream bis = new BufferedInputStream(fis);
+
+                OutputStream os = socket.getOutputStream()
+        )
+        {
+            chunkID = Integer.parseInt(in.readLine());
+            System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
+
+            System.out.println("Sending back number of chunks: " + numChunks);
+            out.println(numChunks);
+
+            long fileLength = file.length();
+
+            byte[] contents = new byte[(int)fileLength]; // 1MB
+            int bytesRead = 0;
+
+            while((bytesRead = bis.read(contents)) > 0){
+                os.write(contents, 0, bytesRead);
+
+                // update every 20%
+                if((bytesRead*100)/fileLength % 20 == 0) {
+                    System.out.print("Sending file ... " + (bytesRead * 100) / fileLength + "% complete!");
+                }
+            }
+
+            os.flush();
+
+        } catch (IOException e) {
+            // TODO: Improve error handling here
+            System.exit(1);
+            e.printStackTrace();
+
+        }
+    }
 }

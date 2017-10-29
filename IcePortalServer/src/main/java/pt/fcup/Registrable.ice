@@ -5,7 +5,7 @@ module generated {
         bool registerSeeder(string fileHash, string fileName, int fileSize, string protocol, int port,
                             int videoSizeX, int videoSizeY, int bitrate);
         bool deregisterSeeder(string deregMessage);
-        bool sendHashes(StringSeq chunkHashes, string fileHash, string seederIP, int seederPort);
+        bool sendHashes(StringSeq chunkHashes, StringSeq chunkIDs, string fileHash, string seederIP, int seederPort);
 
     };
 };
