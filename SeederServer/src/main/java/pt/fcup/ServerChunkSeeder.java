@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
 
-class ChunkSeeder extends Thread {
+class ServerChunkSeeder extends Thread {
     private final Socket socket;
 
     private String filename;
@@ -13,7 +13,7 @@ class ChunkSeeder extends Thread {
     private int chunkID;
     private Seedbox sb;
 
-    public ChunkSeeder(Socket socket) {
+    public ServerChunkSeeder(Socket socket) {
         this.socket = socket;
 
     }

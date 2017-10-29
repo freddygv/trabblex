@@ -47,11 +47,6 @@ public class Seeder {
 
     }
 
-
-    public String getFilepath() {
-        return filepath;
-    }
-
     public String getFullPath() {
         return fullPath;
     }

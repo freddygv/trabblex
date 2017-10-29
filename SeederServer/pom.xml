@@ -42,7 +42,7 @@
         </dependency>
         <!--<dependency>-->
             <!--<groupId>fcup</groupId>-->
-            <!--<artifactId>ChunkSeeder</artifactId>-->
+            <!--<artifactId>ServerChunkSeeder</artifactId>-->
             <!--<version>1.0</version>-->
         <!--</dependency>-->
         <dependency>

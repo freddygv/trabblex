@@ -19,7 +19,8 @@ public class UploadServer implements Runnable {
         try (ServerSocket serverSocket = new ServerSocket(BASE_PORT)) {
             while (listening) {
                 System.out.println("Listening for new connections...");
-                new ChunkSeeder(serverSocket.accept()).start();
+                ServerChunkSeeder cs = new ServerChunkSeeder(serverSocket.accept());
+                executor.execute(cs);
 
 //                    // TODO: Need to find a way to check for inactive seeder and break out of this loop
 //                    // TODO: Keep track of time? Let a certain amount of time pass before de-reg

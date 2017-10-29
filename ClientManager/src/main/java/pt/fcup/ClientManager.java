@@ -23,7 +23,7 @@ class ClientManager extends ResourceConfig{
     {
         ClientManager cm = new ClientManager();
 
-        // TODO: Remove at the end, using for debugging
+//         TODO: Remove at the end, using for debugging
 //        ClientManagerResource cr = new ClientManagerResource();
 //        cr.createSeeder("tl_512kb.mp4");
     }
