@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="pt.fcup.SeederTest" time="0.163" tests="1" errors="0" skipped="0" failures="0">
-=======
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="pt.fcup.SeederTest" time="0.146" tests="1" errors="0" skipped="0" failures="0">
->>>>>>> master
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="pt.fcup.SeederTest" time="0.085" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/java/jdk1.8.0_144/jre/lib/amd64"/>
@@ -62,9 +58,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-<<<<<<< HEAD
-  <testcase name="testPortGeneration" classname="pt.fcup.SeederTest" time="0.015"/>
-=======
-  <testcase name="testPortGeneration" classname="pt.fcup.SeederTest" time="0.022"/>
->>>>>>> master
+  <testcase name="testPortGeneration" classname="pt.fcup.SeederTest" time="0.014"/>
 </testsuite>

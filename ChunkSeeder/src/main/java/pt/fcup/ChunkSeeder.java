@@ -28,22 +28,21 @@ class ChunkSeeder extends Thread {
     }
 
     private void transferChunk() {
-        File file = new File(filepath + "-" + chunkID);
 
-        try(
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        try{
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(socket.getInputStream()));
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream()));
 
-                FileInputStream fis = new FileInputStream(file);
-
-                BufferedInputStream bis = new BufferedInputStream(fis);
-
-                OutputStream os = socket.getOutputStream()
-        )
-        {
             chunkID = Integer.parseInt(in.readLine());
+            File file = new File(filepath + "-" + chunkID);
+            FileInputStream fis = new FileInputStream(file);
+
+            BufferedInputStream bis = new BufferedInputStream(fis);
+
+            OutputStream os = socket.getOutputStream();
+
             System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
 
             System.out.println("Sending back number of chunks: " + numChunks);
