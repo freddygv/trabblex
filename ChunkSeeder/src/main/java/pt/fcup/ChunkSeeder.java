@@ -12,18 +12,15 @@ class ChunkSeeder extends Thread {
 
     private int chunkID;
 
-    public ChunkSeeder(Seeder fileSeeder, Socket socket) {
+    public ChunkSeeder(int port, int numChunks, String filepath, String filename, Socket socket) {
         this.socket = socket;
-        this.port = fileSeeder.getPort();
-        this.numChunks = fileSeeder.getNumberOfChunks();
-        this.filepath = fileSeeder.getFilepath();
-        this.filename = fileSeeder.getFileName();
+        this.port = port;
+        this.numChunks = numChunks;
+        this.filepath = filepath;
+        this.filename = filename;
 
     }
 
-    /**
-     * TODO: Client needs to notify portal that it has a chunk after transfer finishes
-     */
     public void run() {
         transferChunk();
         System.out.println("File sent succesfully!");
@@ -69,8 +66,7 @@ class ChunkSeeder extends Thread {
             os.flush();
 
         } catch (IOException e) {
-            // TODO: Improve error handling here
-            System.exit(1);
+            // Do nothing, client can request again.
             e.printStackTrace();
 
         }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="pt.fcup.SeederTest" time="0.146" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="pt.fcup.DBManagerTest" time="0.6" tests="3" errors="0" skipped="0" failures="0">
   <properties>
     <property name="idea.version" value="2017.2.5"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -60,5 +60,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="testPortGeneration" classname="pt.fcup.SeederTest" time="0.022"/>
+  <testcase name="singleDeletionFromDB" classname="pt.fcup.DBManagerTest" time="0.382"/>
+  <testcase name="queryTable" classname="pt.fcup.DBManagerTest" time="0.019"/>
+  <testcase name="singleInsertIntoDB" classname="pt.fcup.DBManagerTest" time="0.033"/>
 </testsuite>
