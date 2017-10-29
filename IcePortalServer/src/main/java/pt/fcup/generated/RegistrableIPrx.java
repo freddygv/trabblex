@@ -22,38 +22,31 @@ package pt.fcup.generated;
 
 public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
 {
-    default boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate)
+    default boolean registerSeeder(String fileHash)
     {
-        return registerSeeder(fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return registerSeeder(fileHash, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate, java.util.Map<String, String> context)
+    default boolean registerSeeder(String fileHash, java.util.Map<String, String> context)
     {
-        return _iceI_registerSeederAsync(fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate, context, true).waitForResponse();
+        return _iceI_registerSeederAsync(fileHash, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String fileHash)
     {
-        return _iceI_registerSeederAsync(fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+        return _iceI_registerSeederAsync(fileHash, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> registerSeederAsync(String fileHash, java.util.Map<String, String> context)
     {
-        return _iceI_registerSeederAsync(fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate, context, false);
+        return _iceI_registerSeederAsync(fileHash, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_registerSeederAsync(String iceP_fileHash, String iceP_fileName, int iceP_fileSize, String iceP_protocol, int iceP_port, int iceP_videoSizeX, int iceP_videoSizeY, int iceP_bitrate, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_registerSeederAsync(String iceP_fileHash, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "registerSeeder", null, sync, null);
         f.invoke(true, context, null, ostr -> {
                      ostr.writeString(iceP_fileHash);
-                     ostr.writeString(iceP_fileName);
-                     ostr.writeInt(iceP_fileSize);
-                     ostr.writeString(iceP_protocol);
-                     ostr.writeInt(iceP_port);
-                     ostr.writeInt(iceP_videoSizeX);
-                     ostr.writeInt(iceP_videoSizeY);
-                     ostr.writeInt(iceP_bitrate);
                  }, istr -> {
                      boolean ret;
                      ret = istr.readBool();
@@ -62,31 +55,31 @@ public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default boolean deregisterSeeder(String deregMessage)
+    default boolean deregisterSeeder(String fileHash)
     {
-        return deregisterSeeder(deregMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return deregisterSeeder(fileHash, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default boolean deregisterSeeder(String deregMessage, java.util.Map<String, String> context)
+    default boolean deregisterSeeder(String fileHash, java.util.Map<String, String> context)
     {
-        return _iceI_deregisterSeederAsync(deregMessage, context, true).waitForResponse();
+        return _iceI_deregisterSeederAsync(fileHash, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String deregMessage)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String fileHash)
     {
-        return _iceI_deregisterSeederAsync(deregMessage, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+        return _iceI_deregisterSeederAsync(fileHash, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String deregMessage, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> deregisterSeederAsync(String fileHash, java.util.Map<String, String> context)
     {
-        return _iceI_deregisterSeederAsync(deregMessage, context, false);
+        return _iceI_deregisterSeederAsync(fileHash, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_deregisterSeederAsync(String iceP_deregMessage, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_deregisterSeederAsync(String iceP_fileHash, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "deregisterSeeder", null, sync, null);
         f.invoke(true, context, null, ostr -> {
-                     ostr.writeString(iceP_deregMessage);
+                     ostr.writeString(iceP_fileHash);
                  }, istr -> {
                      boolean ret;
                      ret = istr.readBool();

@@ -16,6 +16,10 @@ class DummyDownloader {
     int chunkSize;
     String chunkNumber = "1";
 
+    /**
+     * Test purposes only
+     * @param args
+     */
     public static void main(String[] args) {
         new DummyDownloader().run();
     }

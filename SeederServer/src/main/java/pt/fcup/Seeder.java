@@ -18,15 +18,10 @@ import java.util.List;
 public class Seeder {
     private final int MAX_RETRIES = 4;
     private final String HASHING_ALGORITHM = "SHA-256";
-    private final String PROTOCOL = "TCP";
     private final String BASE_PATH = "videos/";
 
     private final String filepath;
     private final String fileName;
-    private final int fileSize;
-    private final int videoSizeX;
-    private final int videoSizeY;
-    private final int bitrate;
     private final int port;
     private final String ip;
 
@@ -46,10 +41,6 @@ public class Seeder {
         System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
 
         filepath = BASE_PATH + fileMetadata.get("filepath").toString();
-        fileSize = fileMetadata.getInt("fileSize");
-        videoSizeX = fileMetadata.getInt("videoSizeX");
-        videoSizeY = fileMetadata.getInt("videoSizeY");
-        bitrate = fileMetadata.getInt("bitrate");
         maxChunkSizeInBytes = chunkSize; // 10 Mb
 
 
@@ -97,8 +88,7 @@ public class Seeder {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h localhost -p 8081"));
 
-                regResult = register.registerSeeder(fileHash, fileName, fileSize, PROTOCOL, port,
-                                                    videoSizeX, videoSizeY, bitrate);
+                regResult = register.registerSeeder(fileHash);
 
                 neighborhoodResult = register.sendHashes(hashStringArray, idStringArray, fileHash, ip, port);
 
