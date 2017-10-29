@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class UploadManager {
 
-    // Maybe this should be: MAX_THREADS = Runtime.getRuntime().availableProcessors()
-    private static final int MAX_THREADS = 5;
+    private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
     public void createPool(Seeder fileSeeder, int port) throws IOException {
         System.out.println(String.format("Starting ThreadPool with %s threads", MAX_THREADS));
@@ -23,6 +23,7 @@ public class UploadManager {
                 new ChunkSeeder(fileSeeder, serverSocket.accept()).start();
 
 //                    // TODO: Need to find a way to check for inactive seeder and break out of this loop
+//                    // TODO: Keep track of time? Let a certain amount of time pass before de-reg
 //                    if (((ThreadPoolExecutor) executor).getActiveCount() == 0) {
 //                        listening = false;
 //                    }

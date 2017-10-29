@@ -22,10 +22,9 @@ class ChunkSeeder extends Thread {
     }
 
     /**
-     * TODO: Update chunk_owners after transfer
+     * TODO: Client needs to notify portal that it has a chunk after transfer finishes
      */
     public void run() {
-        System.out.println("In run...");
         transferChunk();
         System.out.println("File sent succesfully!");
 
@@ -47,7 +46,6 @@ class ChunkSeeder extends Thread {
                 OutputStream os = socket.getOutputStream()
         )
         {
-            System.out.println("Reading...");
             chunkID = Integer.parseInt(in.readLine());
             System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
 
@@ -70,8 +68,8 @@ class ChunkSeeder extends Thread {
 
             os.flush();
 
-
         } catch (IOException e) {
+            // TODO: Improve error handling here
             System.exit(1);
             e.printStackTrace();
 
