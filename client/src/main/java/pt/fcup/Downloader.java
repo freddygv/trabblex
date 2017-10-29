@@ -47,9 +47,9 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-			System.out.println("Running for chunk number " + chunkNumber);
+			System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
 			out.println(chunkNumber);
-
+			out.println(file);
 
 			// TODO: Are these needed? where are these properties used
 //			// handshake

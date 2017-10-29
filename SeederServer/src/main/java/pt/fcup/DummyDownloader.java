@@ -12,7 +12,7 @@ class DummyDownloader {
     String ip = "localhost";
     String protocol = "TCP";
     String hash = "972C57B6BBADB9146778DFA6C503C19D9B4DC056AD50CD41B38FCC65E0D21162";
-    int port = 30200;
+    int port = 29200;
     int chunkSize;
     String chunkNumber = "1";
 
@@ -45,7 +45,9 @@ class DummyDownloader {
                 FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
         ) {
 
-            System.out.println("Running for chunk number " + chunkNumber);
+            System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
+
+            out.println(file);
             out.println(chunkNumber);
 
             nbChunks = Integer.parseInt(in.readLine());
