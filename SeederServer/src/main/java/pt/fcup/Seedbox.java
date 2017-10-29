@@ -178,7 +178,7 @@ public class Seedbox {
         try {
             DBManager testDB = new DBManager();
             System.out.println("Truncating seeders table:");
-            testDB.singleUpdate("DELETE FROM seeders WHERE file_hash IS NOT NULL;");
+            testDB.singleUpdate("DELETE FROM videos WHERE file_hash IS NOT NULL;");
 
             System.out.println("Truncating chunk_owners table:");
             testDB.singleUpdate("DELETE FROM chunk_owners WHERE file_hash IS NOT NULL;");
@@ -194,8 +194,8 @@ public class Seedbox {
     private void queryTables() {
         try {
             DBManager testDB = new DBManager();
-            System.out.println("Querying seeders table:");
-            System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM seeders;").toString());
+            System.out.println("Querying videos table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM videos;").toString());
 
             System.out.println("Querying chunk_owners table:");
             System.out.println(testDB.queryTable("SELECT file_hash, chunk_hash, owner_port FROM chunk_owners;").toString());

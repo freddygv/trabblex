@@ -3,9 +3,7 @@ package pt.fcup;
 import com.zeroc.IceInternal.Ex;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,24 +16,24 @@ public class RegistrableITest {
     private String expectedString;
     private boolean result;
 
-    private final String fileHash = "my-test-sha256-hash";
-    private final String fileName = "cool-video";
-    private final int fileSize = 100;
-    private final String protocol = "tcp";
     private final int port = 12345;
-    private final int videoSizeX = 400;
-    private final int videoSizeY = 300;
-    private final int bitrate = 512;
-    private String[] chunkHashes = new String[]{"a", "b"};
-    private String[] chunkIDs = new String[]{"1", "2"};
-    private String ip = "localhost";
-    private String isSeeder = "t";
+    private final String ip = "localhost";
+    private final String fileHash = "my-test-sha256-hash";
+    private final String isSeeder = "t";
+    private final String[] chunkHashes = new String[]{"a", "b"};
+    private final String[] chunkIDs = new String[]{"1", "2"};
 
     @BeforeEach
     void setUp() throws Exception {
         testRequestHandler = new RegistrableI();
         testDB = new DBManager();
         current = new com.zeroc.Ice.Current();
+
+        String insertionQuery = "INSERT INTO videos (file_hash, file_name, file_size, protocol, port, " +
+                "video_size_x, video_size_y, bitrate, seeder_is_active) " +
+                "VALUES('%s', 'fake-movie', '27546', 'TCP', '30880', '320', '240', '800', 'f')";
+
+        testRequestHandler.dbUpdate(String.format(insertionQuery, fileHash));
 
     }
 
@@ -78,40 +76,27 @@ public class RegistrableITest {
 
     @Test
     public void registeredAfterRequest() throws Exception {
-        result = testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
-                videoSizeX, videoSizeY, bitrate, current);
 
-        JSONArray resultArray =  testDB.queryTable("SELECT * FROM seeders WHERE file_hash = '" + fileHash + "'");
+        result = testRequestHandler.registerSeeder(fileHash, current);
+
+        String videosQuery = "SELECT file_hash, seeder_is_active FROM videos WHERE file_hash = '%s'";
+
+        JSONArray resultArray = testDB.queryTable(String.format(videosQuery, fileHash));
+
+        System.out.println(resultArray);
+
         JSONObject resultObject = resultArray.getJSONObject(0);
 
-        String hash = resultObject.getString("file_hash");
-        String name = resultObject.getString("file_name");
-        String size = resultObject.getString("file_size");
-        String proto = resultObject.getString("protocol");
-        String seedPort = resultObject.getString("port");
-        String xSize = resultObject.getString("video_size_x");
-        String ySize = resultObject.getString("video_size_y");
-        String rate = resultObject.getString("bitrate");
+        String resultHash = resultObject.getString("file_hash");
+        String resultIsActive = resultObject.getString("seeder_is_active");
 
         String unformattedString = "[{\"file_hash\":\"%s\"," +
-                                    "\"file_name\":\"%s\"," +
-                                    "\"file_size\":\"%s\"," +
-                                    "\"protocol\":\"%s\"," +
-                                    "\"port\":\"%s\"," +
-                                    "\"videoSizeX\":\"%s\"," +
-                                    "\"videoSizeY\":\"%s\"," +
-                                    "\"bitrate\":\"%s\"}]";
+                                    "\"seeder_is_active\":\"%s\"}]";
 
-        resultString = String.format(unformattedString, hash, name, size, proto, seedPort, xSize, ySize, rate);
+        resultString = String.format(unformattedString, resultHash, resultIsActive);
 
         expectedString = "[{\"file_hash\":\"" + fileHash + "\"," +
-                            "\"file_name\":\"" + fileName + "\"," +
-                            "\"file_size\":\"" + fileSize + "\"," +
-                            "\"protocol\":\"" + protocol + "\"," +
-                            "\"port\":\"" + port + "\"," +
-                            "\"videoSizeX\":\"" + videoSizeX + "\"," +
-                            "\"videoSizeY\":\"" + videoSizeY + "\"," +
-                            "\"bitrate\":\"" + bitrate + "\"}]";
+                            "\"seeder_is_active\":\"t\"}]";
 
         assertEquals(expectedString, resultString);
         assertTrue(result);
@@ -176,13 +161,14 @@ public class RegistrableITest {
 
     @Test
     public void deregisteredSeederAfterRequest() throws Exception {
-        result = testRequestHandler.registerSeeder(fileHash, fileName, fileSize, protocol, port,
-                videoSizeX, videoSizeY, bitrate, current);
+        result = testRequestHandler.registerSeeder(fileHash, current);
 
         testRequestHandler.deregisterSeeder(fileHash, current);
 
-        resultString = testDB.queryTable("SELECT * FROM seeders WHERE file_hash = '" + fileHash + "'").toString();
-        expectedString = "[]";
+        String resultQuery = "SELECT seeder_is_active FROM videos WHERE file_hash = '%s';";
+        resultString = testDB.queryTable(String.format(resultQuery, fileHash)).toString();
+
+        expectedString = "[{\"seeder_is_active\":\"f\"}]";
 
         assertEquals(expectedString, resultString);
         assertTrue(result);
@@ -205,7 +191,7 @@ public class RegistrableITest {
 
     @AfterEach
     void tearDown() throws Exception {
-        testDB.singleUpdate("DELETE FROM seeders WHERE file_hash = '" + fileHash + "';");
+        testDB.singleUpdate("DELETE FROM videos WHERE file_hash = '" + fileHash + "';");
         testDB.singleUpdate("DELETE FROM chunk_owners WHERE file_hash = '" + fileHash + "';");
     }
 }

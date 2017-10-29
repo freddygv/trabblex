@@ -22,9 +22,9 @@ package pt.fcup.generated;
 
 public interface RegistrableI extends com.zeroc.Ice.Object
 {
-    boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port, int videoSizeX, int videoSizeY, int bitrate, com.zeroc.Ice.Current current);
+    boolean registerSeeder(String fileHash, com.zeroc.Ice.Current current);
 
-    boolean deregisterSeeder(String deregMessage, com.zeroc.Ice.Current current);
+    boolean deregisterSeeder(String fileHash, com.zeroc.Ice.Current current);
 
     boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current);
 
@@ -56,23 +56,9 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
         String iceP_fileHash;
-        String iceP_fileName;
-        int iceP_fileSize;
-        String iceP_protocol;
-        int iceP_port;
-        int iceP_videoSizeX;
-        int iceP_videoSizeY;
-        int iceP_bitrate;
         iceP_fileHash = istr.readString();
-        iceP_fileName = istr.readString();
-        iceP_fileSize = istr.readInt();
-        iceP_protocol = istr.readString();
-        iceP_port = istr.readInt();
-        iceP_videoSizeX = istr.readInt();
-        iceP_videoSizeY = istr.readInt();
-        iceP_bitrate = istr.readInt();
         inS.endReadParams();
-        boolean ret = obj.registerSeeder(iceP_fileHash, iceP_fileName, iceP_fileSize, iceP_protocol, iceP_port, iceP_videoSizeX, iceP_videoSizeY, iceP_bitrate, current);
+        boolean ret = obj.registerSeeder(iceP_fileHash, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
         ostr.writeBool(ret);
         inS.endWriteParams(ostr);
@@ -83,10 +69,10 @@ public interface RegistrableI extends com.zeroc.Ice.Object
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
-        String iceP_deregMessage;
-        iceP_deregMessage = istr.readString();
+        String iceP_fileHash;
+        iceP_fileHash = istr.readString();
         inS.endReadParams();
-        boolean ret = obj.deregisterSeeder(iceP_deregMessage, current);
+        boolean ret = obj.deregisterSeeder(iceP_fileHash, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
         ostr.writeBool(ret);
         inS.endWriteParams(ostr);

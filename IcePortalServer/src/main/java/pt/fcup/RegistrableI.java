@@ -8,27 +8,18 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
     private DBManager db;
 
     /**
-     * Writes to seeders table, adding host and file information
+     * Writes to videos table, adding host and file information
      * @return true if database successfully updated with new file
      */
-    public boolean registerSeeder(String fileHash, String fileName, int fileSize, String protocol, int port,
-                                  int videoSizeX, int videoSizeY, int bitrate, com.zeroc.Ice.Current current) {
+    public boolean registerSeeder(String fileHash, com.zeroc.Ice.Current current) {
         try {
-            String baseUpdateQuery = "INSERT INTO seeders(file_hash, file_name, file_size, protocol, " +
-                    "port, video_size_x, video_size_y, bitrate) ";
+            String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
 
-            String updateQuery;
-
-            updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%d', '%s', '%d', '%d', '%d', '%d');",
-                    fileHash, fileName, fileSize, protocol, port, videoSizeX, videoSizeY, bitrate);
-
-            System.out.println(updateQuery);
-            dbUpdate(updateQuery);
-
+            dbUpdate(String.format(updateQuery, fileHash));
             return true;
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
-            System.err.println("Seeder registration: DB insert failed.");
+            System.err.println("Seeder registration: DB update failed.");
             ec.printStackTrace();
             return false;
 
@@ -37,16 +28,16 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
     }
 
     /**
-     * Deletes from seeders table, removing de-registered seeder
+     * Deletes from videos table, removing de-registered seeder
      * @return true if records successfully deleted
      */
     public boolean deregisterSeeder(String fileHash, com.zeroc.Ice.Current current){
-        String seederDeletionQuery = "DELETE FROM seeders WHERE file_hash = '" + fileHash + "';";
-        String neighborDeletionQuery = "DELETE FROM chunk_owners WHERE file_hash = '" + fileHash + "';";
+        String seederDeletionQuery = "UPDATE videos SET seeder_is_active = 'f' WHERE file_hash = '%s';";
+        String neighborDeletionQuery = "DELETE FROM chunk_owners WHERE file_hash = '%s';";
 
         try {
-            dbUpdate(seederDeletionQuery);
-            dbUpdate(neighborDeletionQuery);
+            dbUpdate(String.format(seederDeletionQuery, fileHash));
+            dbUpdate(String.format(neighborDeletionQuery, fileHash));
             return true;
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
