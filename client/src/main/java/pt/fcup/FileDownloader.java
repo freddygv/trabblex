@@ -261,12 +261,22 @@ public class FileDownloader extends Thread
         // assemble file
         if(assembleFile(name, nbChunksInFile) == true)
         {
-            System.out.println("File " + name + " successfully downloaded");
         }
         else{
             System.out.println("Error assembling the file");
+            return false;
         }
-        return false;
+
+        // check file hash
+        if(checkHash("downloads/" + name, hashToGet) == true)
+        {
+            System.out.println("File " + name + " successfully downloaded");
+        }
+        else{
+            System.out.println("File " + name + " chunk is not valid :(");
+        }
+
+        return true;
     }
 
     private boolean assembleFile(String name, int nbChunks)
