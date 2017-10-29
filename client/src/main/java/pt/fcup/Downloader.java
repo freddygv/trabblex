@@ -70,7 +70,7 @@ class Downloader extends Thread
 			}
 
 			fos.flush();
-			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
+			//System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
 
 		}
