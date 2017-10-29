@@ -53,7 +53,7 @@ public class Seedbox {
 
     private void run() throws JSONParsingException {
         // TODO: Remove at the end, just used to flush the system
-        //truncateTables();
+        truncateTables();
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
@@ -61,7 +61,7 @@ public class Seedbox {
 
         // TODO: Remove at the end, just used to testing
         try {
-            createSingleSeeder("The Letter");
+            createSingleSeeder("The Vagabond");
 
         } catch (IOException | FileHashException | PortGenerationException e) {
             e.printStackTrace();
