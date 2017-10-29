@@ -2,7 +2,11 @@
 Test set: pt.fcup.SeederTest
 -------------------------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 sec - in pt.fcup.SeederTest
 =======
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.11 sec - in pt.fcup.SeederTest
+>>>>>>> master
+=======
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.107 sec - in pt.fcup.SeederTest
 >>>>>>> master

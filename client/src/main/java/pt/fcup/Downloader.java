@@ -53,8 +53,10 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-			System.out.println("Downloader: requesting chunk number " + chunkNumber);
+			System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
 			out.println(chunkNumber);
+			out.println(file);
+
 
 			nbChunks = Integer.parseInt(in.readLine());
 

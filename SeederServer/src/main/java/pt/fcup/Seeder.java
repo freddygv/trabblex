@@ -21,7 +21,8 @@ public class Seeder {
     private final String BASE_PATH = "videos/";
 
     private final String filepath;
-    private final String fileName;
+    private final String fullPath;
+    private final String videoName;
     private final int port;
     private final String ip;
 
@@ -32,17 +33,17 @@ public class Seeder {
     private List<String> chunkHashes;
     private List<String> chunkIDs;
 
-    public Seeder(String fileName, int port, JSONObject fileMetadata, int chunkSize) {
-        this.fileName = fileName;
+    public Seeder(String filepath, int port, JSONObject fileMetadata, int chunkSize) {
+        this.filepath = filepath;
+        fullPath = BASE_PATH + filepath;
 
         // TODO: Get IP from environment variable, will be the same for all seeders
         ip = "localhost";
         this.port = port;
-        System.out.println("Seeder IP:PORT for " + fileName + " is " + ip + ":" + port);
+        System.out.println("Seeder IP:PORT for " + filepath + " is " + ip + ":" + port);
 
-        filepath = BASE_PATH + fileMetadata.get("filepath").toString();
+        videoName = fileMetadata.get("videoName").toString();
         maxChunkSizeInBytes = chunkSize; // 10 Mb
-
 
     }
 
@@ -51,20 +52,16 @@ public class Seeder {
         return filepath;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public String getIp() {
-        return ip;
+    public String getFullPath() {
+        return fullPath;
     }
 
     public int getNumberOfChunks() {
         return numberOfChunks;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getVideoName() {
+        return videoName;
     }
 
     /**
@@ -127,7 +124,7 @@ public class Seeder {
      */
     public boolean processVideo() throws FileHashException, IOException {
         try {
-            fileHash = hashFile(new File(filepath));
+            fileHash = hashFile(new File(fullPath));
             System.out.println("SHA-256 Hash: " + fileHash);
 
         } catch (FileHashException e) {
@@ -205,7 +202,7 @@ public class Seeder {
         String chunkHash;
         int chunkIndex = 0;
 
-        try (FileInputStream fi = new FileInputStream(new File(filepath));
+        try (FileInputStream fi = new FileInputStream(new File(fullPath));
              BufferedInputStream bi = new BufferedInputStream(fi)) {
 
             chunkHashes = new ArrayList<>();
@@ -214,7 +211,7 @@ public class Seeder {
             int bytesRead = 0;
 
             while((bytesRead = bi.read(chunkBuffer)) > 0) {
-                chunkName = filepath + "-" +  Integer.toString(chunkIndex);
+                chunkName = fullPath + "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
