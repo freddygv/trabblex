@@ -40,7 +40,8 @@ public class Chunk
 		// save chunk number
 		chunkNumber = obj.getInt("chunk_id");
 
-		System.out.println("Adding source, now has " + owners.size() + " sources");
+		// debug
+		//System.out.println("Adding source, now has " + owners.size() + " sources");
 	}
 
 	/*
@@ -54,7 +55,8 @@ public class Chunk
 			if(owners.get(i).ip == ip
 				&& owners.get(i).hash == hash
 				&& owners.get(i).port == port){
-				System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
+				// debug
+				//System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
 				owners.remove(i);
 			}
 		}
@@ -69,8 +71,9 @@ public class Chunk
 			System.out.println("No source found!");
 			return null;
 		}
-		System.out.println("Providing source " + owners.get(0).ip + "/" + ":" + owners.get(0).port 
-			+ "(" + owners.size() + " sources available)");
+		// debug
+		//System.out.println("Providing source " + owners.get(0).ip + "/" + ":" + owners.get(0).port 
+		//	+ "(" + owners.size() + " sources available)");
 		return owners.get(0);
 	}
 

@@ -32,7 +32,8 @@ class Downloader extends Thread
 	@Override
 	public void run()
 	{ 
-		System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
+		// dobug
+		//System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
 
 		if (protocol != "TCP") {
 			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
@@ -53,16 +54,19 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-        	System.out.println("Connection successfull to " + ip + ":" + port);
-			System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
+			// debug
+        	//System.out.println("Connection successfull to " + ip + ":" + port);
+			//System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
 			out.println(chunkNumber);
 			out.println(file);
 
-        	System.out.println("Sent chunk number and file name");
+			// debug
+        	//System.out.println("Sent chunk number and file name");
 
 			nbChunks = Integer.parseInt(in.readLine());
 
-        	System.out.println("Got number of chunks = " + nbChunks);
+			// debug
+        	//System.out.println("Got number of chunks = " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
@@ -73,7 +77,8 @@ class Downloader extends Thread
 			fos.flush();
 			fos.close();
 			dis.close();
-			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
+			// debug
+			//System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
 		}
 		catch(java.io.FileNotFoundException e)
@@ -82,12 +87,14 @@ class Downloader extends Thread
 		}
 		catch(java.net.ConnectException e)
 		{
-        	System.out.println("Couldn't connect to " + ip + ":" + port);
+			// debug
+        	//System.out.println("Couldn't connect to " + ip + ":" + port);
         	return;
 		}
 		catch(Exception e)
         {
-        	System.out.println("Couldn't connect to " + ip + ":" + port);
+        	// debug
+        	//System.out.println("Couldn't connect to " + ip + ":" + port);
            	e.printStackTrace();
         	return;
         }

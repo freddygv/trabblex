@@ -129,11 +129,11 @@ public class FileDownloader extends Thread
         {
 
             // debug
-            System.out.println("This is try " + tries + "/" + remoteChunkOwners.length());
+            //System.out.println("This is try " + tries + "/" + remoteChunkOwners.length());
 
             if(remoteChunkOwners.length() <= tries)
             {
-                System.out.println("Couldn't get a source from seedbox");
+                System.err.println("ERR Couldn't get a source from seedbox for file " + name);
                 return false;
             }
 
@@ -170,7 +170,8 @@ public class FileDownloader extends Thread
                     chunkIsValid = true;
                 }
                 else{
-                    System.out.println("Error couldn't verify hash of chunk number "+ chunkNumber);
+                    //System.err.println("Error couldn't verify hash of chunk number "+ chunkNumber);
+                    // automatically managed now
                 }
             }
             catch(Exception e)
@@ -189,7 +190,8 @@ public class FileDownloader extends Thread
         int nbChunksInFile = firstdwl.getNbChunks();
         if(chm.getNbChunksAvailable() < nbChunksInFile)
         {
-            System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
+            // debug
+            //System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
             String newSeeder = client.query("createseeder", name);
             if(newSeeder == null)
             {
@@ -214,7 +216,9 @@ public class FileDownloader extends Thread
         */
         while(chm.numberOfChunksNotDownloaded() > 0)
         {
-            System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + "chunks");
+            // debug
+            //System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + "chunks");
+           
             // determine next chunk to download
             Chunk nextChunkToDownload = chm.getRarestChunk();
 
@@ -272,17 +276,17 @@ public class FileDownloader extends Thread
         {
         }
         else{
-            System.out.println("Error assembling the file");
+            System.err.println("Error assembling file " + name);
             return false;
         }
 
         // check file hash
         if(checkHash("downloads/" + name, hashToGet) == true)
         {
-            System.out.println("File " + name + " successfully downloaded");
+            System.out.println("File " + name + " successfully downloaded\n> ");
         }
         else{
-            System.out.println("File " + name + " chunk is not valid :(");
+            System.err.println("File " + name + " chunk is not valid :(");
         }
 
         return true;
@@ -323,12 +327,12 @@ public class FileDownloader extends Thread
             return false;
         }
 
-        // "downloads/" + file + "-" + chunkNumber
         String realHash = hashFile(file);
         if(!realHash.equals(hash))
         {
-            System.err.println("Error comparing remote file hash=" + hash + 
-                " and local hash=" + realHash);
+            // debug - now automatically managed
+            //System.err.println("Error comparing remote file hash=" + hash + 
+            //    " and local hash=" + realHash);
             return false;
         }
         else

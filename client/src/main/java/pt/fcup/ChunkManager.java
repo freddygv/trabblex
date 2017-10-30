@@ -34,13 +34,15 @@ class ChunkManager
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
-        	System.out.print("Chunk manager saving chunk " + obj.getString("chunk_id")
-        		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
+            // debug
+        	//System.out.print("Chunk manager saving chunk " + obj.getString("chunk_id")
+        	//	+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
 
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
             {
-            	System.out.println("New chunk !");
+            	// debug
+            	//System.out.println("New chunk !");
                 chunks.put(hash, new Chunk(obj));
 
                 // Check out if chunk number is already in list
@@ -52,7 +54,8 @@ class ChunkManager
             }
             else
             {
-            	System.out.println("Already available chunk, new source !");
+            	// debug
+            	//System.out.println("Already available chunk, new source !");
             	// update chunk info to add new source
             	chunks.get(hash).addSource(obj);
             }
@@ -92,7 +95,8 @@ class ChunkManager
 			return null;
 		}
 
-		System.out.println("Rarest chunk is number "+ ch.chunkNumber);
+		// debug
+		//System.out.println("Rarest chunk is number "+ ch.chunkNumber);
     	
 
 		return ch;
