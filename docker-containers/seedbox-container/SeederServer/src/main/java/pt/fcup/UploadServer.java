@@ -23,12 +23,6 @@ public class UploadServer implements Runnable {
                 ServerChunkSeeder cs = new ServerChunkSeeder(serverSocket.accept());
                 executor.execute(cs);
 
-                // TODO: Need to find a way to check for inactive seeder and break out of this loop
-                // TODO: Keep track of time? Let a certain amount of time pass before de-reg
-//                if (((ThreadPoolExecutor) executor).getActiveCount() == 0) {
-//                    listening = false;
-//                }
-
             }
 
         } catch (IOException e) {

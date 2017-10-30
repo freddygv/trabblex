@@ -54,14 +54,6 @@ public class Seedbox {
         Thread iceThread = new Thread(rpc, "RPC Thread");
         iceThread.start();
 
-        try {
-            createSingleSeeder("tl_512kb.mp4");
-        } catch (FileHashException e) {
-            e.printStackTrace();
-        } catch (PortGenerationException e) {
-            e.printStackTrace();
-        }
-
         UploadServer us = new UploadServer();
         Thread usThread = new Thread(us, "Upload Thread");
         usThread.start();

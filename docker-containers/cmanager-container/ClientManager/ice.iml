@@ -37,6 +37,5 @@
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-utils:2.5.0-b42" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.22.0-CR2" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
   </component>
 </module>
