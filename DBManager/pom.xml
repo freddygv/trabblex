@@ -6,7 +6,7 @@
 
     <groupId>fcup</groupId>
     <artifactId>DBManager</artifactId>
-    <version>1.2</version>
+    <version>1.4</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -60,9 +60,6 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
