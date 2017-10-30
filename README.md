@@ -102,6 +102,24 @@ so that the CLI is still available meanwhile
 * Note: the chunk removal if hash incorrect doesn't work...
 * Note: when a chunk is already in the download folder, fucks up everything
 
+* The client couldn't retrieve files from the seedbox because of a protocol problem
+    Note: write handshake protocol in report ?
+
+* At start of database, want to truncate table chunk_owners -- can't
+Need to go through with removing uncontactable chunk owners via ClientManager
+
+* Problem managing chunks, some have the same id and same file but different hashes
+* Note: will remove these owners from local database, but not from online storage
+    * Can be done later...
+
+=== To see w Freddy
+* When requesting a video, I ask for the file name (Popeye the sailor)
+But the seeder will search for the corresponding key in fileMetadata. But the key here would be "PopeyeAliBaba_512kb.mp4", so it finds nothing at all
+Solution: when inserting in database, in file_name put the file's path
+
+* The client now connects to a single port -- 29200. See port management w Freddy 
+But the chunk owners still have different ips... ?
+
 # Documentation
 
 | Software | Link |

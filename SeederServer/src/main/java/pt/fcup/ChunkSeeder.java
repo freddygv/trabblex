@@ -29,8 +29,8 @@ class ChunkSeeder extends Thread {
                         new InputStreamReader(socket.getInputStream()))
         )
         {
-            filename = in.readLine();
             chunkID = Integer.parseInt(in.readLine());
+            filename = in.readLine();
             System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
 
             Seeder seederRequested = sb.seederHashMap.get(filename);
@@ -63,7 +63,19 @@ class ChunkSeeder extends Thread {
             }
 
 
-        } catch (IOException e) {
+        }
+        catch(java.lang.NullPointerException e)
+        {
+            System.out.println("Coulnd't retrieve seeder from hash map (" + filename + ")");
+            try{
+                sb.createSingleSeeder(filename);
+            }
+            catch (Exception f) {
+                // Do nothing, client can request again.
+                f.printStackTrace();
+             }
+        } 
+        catch (IOException e) {
             // Do nothing, client can request again.
             e.printStackTrace();
 

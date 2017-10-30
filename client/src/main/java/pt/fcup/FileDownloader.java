@@ -148,6 +148,7 @@ public class FileDownloader extends Thread
 
             int chunkNumber = obj.getInt("chunk_id");
 
+            // Note: replaced file name by file path
             firstdwl = new Downloader(
                 name,
                 chunkNumber,
@@ -186,8 +187,9 @@ public class FileDownloader extends Thread
             If no, create a seeder, and start all over again
         */
         int nbChunksInFile = firstdwl.getNbChunks();
-        if(chm.getNbChunksAvailable() != nbChunksInFile)
+        if(chm.getNbChunksAvailable() < nbChunksInFile)
         {
+            System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
             String newSeeder = client.query("createseeder", name);
             if(newSeeder == null)
             {
@@ -212,6 +214,7 @@ public class FileDownloader extends Thread
         */
         while(chm.numberOfChunksNotDownloaded() > 0)
         {
+            System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + "chunks");
             // determine next chunk to download
             Chunk nextChunkToDownload = chm.getRarestChunk();
 

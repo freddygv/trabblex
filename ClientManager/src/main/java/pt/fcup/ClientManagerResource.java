@@ -131,7 +131,7 @@ public class ClientManagerResource{
     @GET
     @Path("createseeder/{filename}")
     @Produces(MediaType.TEXT_PLAIN)
-    public JSONArray createSeeder(@PathParam("filename") String filename)
+    public String createSeeder(@PathParam("filename") String filename)
     {
         boolean reqResult = false;
 
@@ -149,7 +149,9 @@ public class ClientManagerResource{
         }
 
         // TODO: Make a real JSONArray, if needed
-        return new JSONArray();
+        if (reqResult)
+            return "success";
+        return null;
     }
 
     /**

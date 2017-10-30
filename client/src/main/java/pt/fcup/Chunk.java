@@ -11,7 +11,6 @@ import org.json.JSONObject;
 */
 public class Chunk
 {
-	public int numberOfSources = 0;
 	public boolean isDownloaded = false;
 	public int chunkNumber;
 	public ArrayList<Owner> owners = new ArrayList<Owner>();
@@ -41,7 +40,7 @@ public class Chunk
 		// save chunk number
 		chunkNumber = obj.getInt("chunk_id");
 
-		numberOfSources ++;
+		System.out.println("Adding source, now has " + owners.size() + " sources");
 	}
 
 	/*
@@ -65,13 +64,19 @@ public class Chunk
 	public Owner getSource()
 	{
 		// TODO get the first owner that isn't a seeder preferably
-		System.out.println("Providing source " + owners.get(0).ip + ":" + owners.get(0).port);
+		if(owners.size() == 0)
+		{
+			System.out.println("No source found!");
+			return null;
+		}
+		System.out.println("Providing source " + owners.get(0).ip + "/" + ":" + owners.get(0).port 
+			+ "(" + owners.size() + " sources available)");
 		return owners.get(0);
 	}
 
 	public int getNumberOfSources()
 	{
-		return numberOfSources;
+		return owners.size();
 	}
 
 	public void markDownloaded()

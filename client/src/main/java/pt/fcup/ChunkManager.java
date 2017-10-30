@@ -23,8 +23,10 @@ import java.util.*;
 class ChunkManager
 {
     Hashtable<String, Chunk> chunks = new Hashtable<String, Chunk>();
+    ArrayList<String> chunksNotYetDownloaded = new ArrayList<String>();
     int nbChunksNotDownloaded = 0;
 
+    // TODO calculate unique number of chunks (based on numbers)
 	public ChunkManager(JSONArray remoteChunkOwners)
 	{
 
@@ -32,21 +34,27 @@ class ChunkManager
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
-        	System.out.println("Chunk manager saving chunk " + obj.getString("chunk_id")
-        		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")");
+        	System.out.print("Chunk manager saving chunk " + obj.getString("chunk_id")
+        		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
 
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
             {
+            	System.out.println("New chunk !");
                 chunks.put(hash, new Chunk(obj));
-                nbChunksNotDownloaded ++;
+
+                // Check out if chunk number is already in list
+                if(!chunksNotYetDownloaded.contains(obj.getString("chunk_id"))){
+                	nbChunksNotDownloaded ++;
+                	chunksNotYetDownloaded.add(obj.getString("chunk_id"));
+                }
+
             }
             else
             {
+            	System.out.println("Already available chunk, new source !");
             	// update chunk info to add new source
-            	Chunk ch = chunks.get(hash);
-            	ch.addSource(obj);
-                chunks.put(hash, ch);
+            	chunks.get(hash).addSource(obj);
             }
         }
 	}
@@ -61,8 +69,11 @@ class ChunkManager
 		{
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
-			//System.out.println("Evaluating chunk #" + value.chunkNumber);
-			if(minowners == -1 || value.getNumberOfSources() < minowners)
+
+			// quick and dirty fix: some chunks will be bad, eg bad file hash
+			// if they don't have any sources left, ignore them
+			if((minowners == -1 || value.getNumberOfSources() < minowners) 
+				&& value.getNumberOfSources() > 0)
 			{
 				if(value.isDownloaded == false)
 				{
@@ -73,6 +84,12 @@ class ChunkManager
 			}
 
         	//iter.remove(); // avoids a ConcurrentModificationException
+		}
+
+		if(ch == null)
+		{
+			System.out.println("Couldn't get rarest chunk!");
+			return null;
 		}
 
 		System.out.println("Rarest chunk is number "+ ch.chunkNumber);
@@ -103,7 +120,21 @@ class ChunkManager
 
 	public void markChunkDownloaded(int n)
 	{
-		getChunk(n).markDownloaded();
+		// mark all chunks number n as downloaded
+		Chunk ch = null;
+
+		Iterator iter = chunks.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)iter.next();
+			Chunk value = (Chunk)pair.getValue();
+
+			if(value.chunkNumber == n)
+			{
+				value.markDownloaded();
+			}
+
+		}
 		nbChunksNotDownloaded --;
 	}
 

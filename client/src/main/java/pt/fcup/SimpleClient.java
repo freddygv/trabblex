@@ -143,6 +143,7 @@ public class SimpleClient {
         if(result == null)
         {
             System.err.println("Error querying the server for the seeds");
+            return null;
         }
 
         localSeederInfo = new JSONArray(result);

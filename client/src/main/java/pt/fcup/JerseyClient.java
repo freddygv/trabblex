@@ -65,6 +65,10 @@ public class JerseyClient {
             System.err.println("Resource not found: " + URL);
 
         }
+        catch(javax.ws.rs.InternalServerErrorException e)
+        {
+            System.err.println("Could not connect to database");
+        }
         catch(Exception e )
         {
             e.printStackTrace();
