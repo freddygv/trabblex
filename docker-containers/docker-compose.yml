@@ -1,0 +1,30 @@
+version: '2.3'
+services:
+  postgres-server:
+    build: ./database-container
+    networks:
+      - mybridge
+    environment:
+     - POSTGRES_USER=driver
+     - POSTGRES_PASSWORD=verylongandsecurerootpassword
+     - POSTGRES_DB=prod
+  portal:
+    build: ./portal-container/IcePortalServer
+    networks:
+      - mybridge
+    depends_on:
+      - postgres-server
+  seedbox:
+    build: ./seedbox-container/SeederServer
+    networks:
+      - mybridge
+    depends_on:
+      - portal
+networks:
+  mybridge:
+
+  # clientmanager:
+  #   build: ./portal-container
+  #   ports:
+  #     - "80:80"
+  #     - "8082:8082"

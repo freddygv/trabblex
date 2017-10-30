@@ -1,0 +1,24 @@
+-------------------------------------------------------------------------------
+Test set: pt.fcup.RegistrableITest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 0.246 sec <<< FAILURE! - in pt.fcup.RegistrableITest
+registeredAfterRequest()  Time elapsed: 0.057 sec  <<< ERROR!
+java.net.UnknownHostException: postgres-server: nodename nor servname provided, or not known
+	at pt.fcup.RegistrableITest.setUp(RegistrableITest.java:32)
+
+deregisteredSeederAfterRequest()  Time elapsed: 0.008 sec  <<< ERROR!
+java.net.UnknownHostException: postgres-server
+	at pt.fcup.RegistrableITest.setUp(RegistrableITest.java:32)
+
+testDBUpdate()  Time elapsed: 0.006 sec  <<< ERROR!
+java.net.UnknownHostException: postgres-server
+	at pt.fcup.RegistrableITest.setUp(RegistrableITest.java:32)
+
+neighborhoodUpdated()  Time elapsed: 0.004 sec  <<< ERROR!
+java.net.UnknownHostException: postgres-server
+	at pt.fcup.RegistrableITest.setUp(RegistrableITest.java:32)
+
+deregisteredChunksAfterRequest()  Time elapsed: 0.007 sec  <<< ERROR!
+java.net.UnknownHostException: postgres-server
+	at pt.fcup.RegistrableITest.setUp(RegistrableITest.java:32)
+
