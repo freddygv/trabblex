@@ -3,11 +3,13 @@ package pt.fcup;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pt.fcup.exception.*;
+import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Seedbox {
@@ -54,7 +56,7 @@ public class Seedbox {
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
-//        writeVideosToDB();
+        writeVideosToDB();
 
         // Set up ICE adapter to accept incoming messages
         IceServer rpc = new IceServer();
@@ -115,8 +117,65 @@ public class Seedbox {
     }
 
     private void writeVideosToDB() {
+        String fileHash;
+        String filepath;
+        int fileSize;
+        int videoSizeX;
+        int videoSizeY;
+        int bitrate;
+
+        JSONObject currentItem;
+        Iterator<?> keys = fileMetadata.keys();
+        String currentKey;
+
+        boolean regResult = false;
+        while(keys.hasNext()) {
+            currentKey = (String)keys.next();
+            currentItem = fileMetadata.getJSONObject(currentKey);
+
+            fileHash = currentItem.getString("fileHash");
+            filepath = currentItem.getString("filepath");
+            fileSize = currentItem.getInt("fileSize");
+            videoSizeX = currentItem.getInt("videoSizeX");
+            videoSizeY = currentItem.getInt("videoSizeY");
+            bitrate = currentItem.getInt("bitrate");
+
+            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
+                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
+
+                regResult = deregister.initializeDB(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate);
+            }
+
+            if (regResult == false) {
+                System.err.println("Video db initialization failed for: " + currentKey);
+                fileMetadata.remove(currentKey);
+
+            }
+
+            // TODO: Remove
+            queryTables();
+
+        }
 
     }
+
+    /**
+     * For debugging only, queries entire seeders and chunk_owners tables to check if all files were added.
+     */
+    private void queryTables() {
+        try {
+            DBManager testDB = new DBManager(true);
+            System.out.println("Querying seeders table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM seeders;").toString());
+
+            System.out.println("Querying chunk_owners table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, chunk_hash, owner_port FROM chunk_owners;").toString());
+
+        } catch (SQLException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

@@ -1,5 +1,7 @@
 package pt.fcup;
 
+import com.zeroc.Ice.Current;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.lang.ClassNotFoundException;
@@ -70,6 +72,22 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Neighborhood update: DB insert failed.");
+            return false;
+
+        }
+    }
+
+    public boolean initializeDB(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate, Current current) {
+        try {
+            String initQuery = "INSERT INTO videos(file_hash, file_name, file_size, protocol, video_size_x, video_size_y, bitrate, seeder_is_active) " +
+                    "VALUES ('%s', '%s', '%d', 'TCP', '%d', '%d', '%d', 'f');";
+
+            dbUpdate(String.format(initQuery, fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate));
+            return true;
+
+        } catch (ClassNotFoundException | IOException | SQLException ec) {
+            System.err.println("Seeder registration: DB update failed.");
+            ec.printStackTrace();
             return false;
 
         }

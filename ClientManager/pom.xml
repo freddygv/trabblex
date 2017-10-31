@@ -35,7 +35,7 @@
     </dependencyManagement>
 
     <dependencies>
-         <dependency>
+        <dependency>
             <groupId>fcup</groupId>
             <artifactId>DBManager</artifactId>
             <version>1.0</version>

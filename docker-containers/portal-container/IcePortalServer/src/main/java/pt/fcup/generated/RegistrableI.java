@@ -28,6 +28,8 @@ public interface RegistrableI extends com.zeroc.Ice.Object
 
     boolean sendHashes(String[] chunkHashes, String[] chunkIDs, String fileHash, String seederIP, int seederPort, com.zeroc.Ice.Current current);
 
+    boolean initializeDB(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate, com.zeroc.Ice.Current current);
+
     static final String[] _iceIds =
     {
         "::Ice::Object",
@@ -101,6 +103,30 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         return inS.setResult(ostr);
     }
 
+    static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_initializeDB(RegistrableI obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
+    {
+        com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
+        com.zeroc.Ice.InputStream istr = inS.startReadParams();
+        String iceP_fileHash;
+        String iceP_filepath;
+        int iceP_fileSize;
+        int iceP_videoSizeX;
+        int iceP_videoSizeY;
+        int iceP_bitrate;
+        iceP_fileHash = istr.readString();
+        iceP_filepath = istr.readString();
+        iceP_fileSize = istr.readInt();
+        iceP_videoSizeX = istr.readInt();
+        iceP_videoSizeY = istr.readInt();
+        iceP_bitrate = istr.readInt();
+        inS.endReadParams();
+        boolean ret = obj.initializeDB(iceP_fileHash, iceP_filepath, iceP_fileSize, iceP_videoSizeX, iceP_videoSizeY, iceP_bitrate, current);
+        com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
+        ostr.writeBool(ret);
+        inS.endWriteParams(ostr);
+        return inS.setResult(ostr);
+    }
+
     final static String[] _iceOps =
     {
         "deregisterSeeder",
@@ -108,6 +134,7 @@ public interface RegistrableI extends com.zeroc.Ice.Object
         "ice_ids",
         "ice_isA",
         "ice_ping",
+        "initializeDB",
         "registerSeeder",
         "sendHashes"
     };
@@ -146,9 +173,13 @@ public interface RegistrableI extends com.zeroc.Ice.Object
             }
             case 5:
             {
-                return _iceD_registerSeeder(this, in, current);
+                return _iceD_initializeDB(this, in, current);
             }
             case 6:
+            {
+                return _iceD_registerSeeder(this, in, current);
+            }
+            case 7:
             {
                 return _iceD_sendHashes(this, in, current);
             }

@@ -24,10 +24,9 @@ COPY db.properties  /usr/src/app
 COPY repo           /usr/src/app/repo
 COPY wait-for-it.sh /usr/src/app
 RUN chmod +x wait-for-it.sh
-RUN mvn install -Dmaven.test.skip=true
 
 COPY src /usr/src/app/src
 
 CMD ["chmod", "+x", "wait-for-it.sh"]
 CMD ["./wait-for-it.sh", "postgres-server:5432", "--timeout=240"]
-CMD ["mvn", "package", "exec:java"]
+CMD ["mvn", "-U", "install", "exec:java"]
