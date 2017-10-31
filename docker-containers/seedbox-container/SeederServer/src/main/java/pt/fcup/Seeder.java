@@ -105,24 +105,6 @@ public class Seeder {
 
     }
 
-    // TODO: Should this also close the socket if the seeder has no client connections?
-    public boolean deregisterSeeder() {
-        boolean regResult = false;
-
-        for (int retries = 0; retries < MAX_RETRIES; retries++) {
-            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
-                regResult = deregister.deregisterSeeder(fileHash);
-            }
-
-            if (regResult) {
-                break;
-            }
-        }
-
-        return regResult;
-    }
-
     /**
      * Generate hash for file, chunk file, then hash chunks
      * @return true if video processed successfully

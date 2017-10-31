@@ -33,8 +33,6 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
             numChunks = newSeed.getNumberOfChunks();
 
-//            System.in.read(); // TODO: Should this line come back? Why is the seeder reading?
-
         } catch (IOException | FileHashException e) {
             // TODO: Handle seeder creation failure in ClientManager, if 0 is returned, consider failure
             System.err.println("Error generating seeder.");
@@ -45,17 +43,5 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
         }
 
-    }
-
-    /**
-     * TODO: Implement
-     * @param current
-     * @return
-     */
-    public boolean disconnectClient(com.zeroc.Ice.Current current) {
-        boolean successfulDisconnect = false;
-
-        System.err.println("Client disconnect not implemented, returning false");
-        return successfulDisconnect;
     }
 }

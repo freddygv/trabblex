@@ -55,37 +55,6 @@ public interface RequestableIPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default boolean disconnectClient()
-    {
-        return disconnectClient(com.zeroc.Ice.ObjectPrx.noExplicitContext);
-    }
-
-    default boolean disconnectClient(java.util.Map<String, String> context)
-    {
-        return _iceI_disconnectClientAsync(context, true).waitForResponse();
-    }
-
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> disconnectClientAsync()
-    {
-        return _iceI_disconnectClientAsync(com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
-    }
-
-    default java.util.concurrent.CompletableFuture<java.lang.Boolean> disconnectClientAsync(java.util.Map<String, String> context)
-    {
-        return _iceI_disconnectClientAsync(context, false);
-    }
-
-    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_disconnectClientAsync(java.util.Map<String, String> context, boolean sync)
-    {
-        com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "disconnectClient", null, sync, null);
-        f.invoke(true, context, null, null, istr -> {
-                     boolean ret;
-                     ret = istr.readBool();
-                     return ret;
-                 });
-        return f;
-    }
-
     /**
      * Contacts the remote server to verify that the object implements this type.
      * Raises a local exception if a communication error occurs.

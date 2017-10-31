@@ -159,29 +159,4 @@ public class ClientManagerResource{
             return "success";
         return null;
     }
-
-    /**
-     * Calls the IceServer to inform that the client disconnected
-     * @return success
-     **/
-    public boolean disconnectClient(String ip, int port)
-    {
-        boolean regResult = false;
-
-        for (int retries = 0; retries < MAX_RETRIES; retries++) {
-            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RequestableIPrx disconnect = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h " + host));
-                regResult = disconnect.disconnectClient();
-                System.out.println("Disconnection result: " + regResult);
-                regResult = true; // TODO: Remove when disconnect is implemented
-            }
-
-            if (regResult) {
-                break;
-            }
-        }
-
-        return regResult;
-    }
-
 }

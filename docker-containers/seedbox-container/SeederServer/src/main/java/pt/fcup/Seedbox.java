@@ -129,6 +129,10 @@ public class Seedbox {
     }
 
     private void writeVideosToDB() {
+        // TODO: Remove
+        System.out.println("Pre query");
+        queryTables();
+
         String fileHash;
         String filepath;
         int fileSize;
@@ -172,6 +176,7 @@ public class Seedbox {
         }
 
         // TODO: Remove
+        System.out.println("Post query");
         queryTables();
 
     }

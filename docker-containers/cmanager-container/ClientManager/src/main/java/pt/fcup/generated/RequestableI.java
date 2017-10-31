@@ -24,8 +24,6 @@ public interface RequestableI extends com.zeroc.Ice.Object
 {
     int requestSeeder(String fileName, com.zeroc.Ice.Current current);
 
-    boolean disconnectClient(com.zeroc.Ice.Current current);
-
     static final String[] _iceIds =
     {
         "::Ice::Object",
@@ -63,20 +61,8 @@ public interface RequestableI extends com.zeroc.Ice.Object
         return inS.setResult(ostr);
     }
 
-    static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_disconnectClient(RequestableI obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
-    {
-        com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
-        inS.readEmptyParams();
-        boolean ret = obj.disconnectClient(current);
-        com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
-        ostr.writeBool(ret);
-        inS.endWriteParams(ostr);
-        return inS.setResult(ostr);
-    }
-
     final static String[] _iceOps =
     {
-        "disconnectClient",
         "ice_id",
         "ice_ids",
         "ice_isA",
@@ -98,25 +84,21 @@ public interface RequestableI extends com.zeroc.Ice.Object
         {
             case 0:
             {
-                return _iceD_disconnectClient(this, in, current);
+                return com.zeroc.Ice.Object._iceD_ice_id(this, in, current);
             }
             case 1:
             {
-                return com.zeroc.Ice.Object._iceD_ice_id(this, in, current);
+                return com.zeroc.Ice.Object._iceD_ice_ids(this, in, current);
             }
             case 2:
             {
-                return com.zeroc.Ice.Object._iceD_ice_ids(this, in, current);
+                return com.zeroc.Ice.Object._iceD_ice_isA(this, in, current);
             }
             case 3:
             {
-                return com.zeroc.Ice.Object._iceD_ice_isA(this, in, current);
-            }
-            case 4:
-            {
                 return com.zeroc.Ice.Object._iceD_ice_ping(this, in, current);
             }
-            case 5:
+            case 4:
             {
                 return _iceD_requestSeeder(this, in, current);
             }
