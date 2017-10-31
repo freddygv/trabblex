@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import pt.fcup.exception.*;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -13,6 +14,8 @@ public class Seedbox {
 
     private final String METADATA_LOCATION = "file-metadata.json";
     private JSONObject fileMetadata;
+
+    private String iceHost;
 
     private final int BASE_PORT = 29200;
     public HashMap<String, Seeder> seederHashMap = new HashMap<>();
@@ -46,8 +49,12 @@ public class Seedbox {
     }
 
     private void run() throws JSONParsingException, IOException {
+        String portalAddress = InetAddress.getByName("portal").getHostAddress();
+        iceHost = String.format("%s -p 8081", portalAddress);
+
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
+//        writeVideosToDB();
 
         // Set up ICE adapter to accept incoming messages
         IceServer rpc = new IceServer();
@@ -67,7 +74,7 @@ public class Seedbox {
      */
     public Seeder createSingleSeeder(String filename) throws IOException, FileHashException, PortGenerationException {
 
-        Seeder newSeeder = new Seeder(filename, BASE_PORT, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
+        Seeder newSeeder = new Seeder(filename, BASE_PORT, iceHost, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
 
         // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
@@ -106,5 +113,10 @@ public class Seedbox {
         }
 
     }
+
+    private void writeVideosToDB() {
+
+    }
+
 
 }

@@ -20,12 +20,12 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY pom.xml             /usr/src/app
-COPY db.properties       /usr/src/app
 COPY file-metadata.json  /usr/src/app
 COPY repo                /usr/src/app/repo
 COPY videos              /usr/src/app/videos
 COPY wait-for-it.sh      /usr/src/app
 RUN chmod +x wait-for-it.sh
+RUN mvn install -Dmaven.test.skip=true
 
 COPY src /usr/src/app/src
 

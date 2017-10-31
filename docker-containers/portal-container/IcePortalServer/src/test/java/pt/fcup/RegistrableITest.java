@@ -30,9 +30,10 @@ public class RegistrableITest {
         testDB = new DBManager(true);
         current = new com.zeroc.Ice.Current();
 
-        String insertionQuery = "INSERT INTO videos (file_hash, file_name, file_size, protocol, port, " +
-                "video_size_x, video_size_y, bitrate, seeder_is_active) " +
-                "VALUES('%s', 'fake-movie', '27546', 'TCP', '30880', '320', '240', '800', 'f')";
+        String insertionQuery = "INSERT INTO videos (file_hash, file_name, file_size, protocol, " +
+                                                    "video_size_x, video_size_y, bitrate, seeder_is_active) " +
+
+                                "VALUES('%s', 'fake-movie', '27546', 'TCP', '320', '240', '800', 'f')";
 
         testRequestHandler.dbUpdate(String.format(insertionQuery, fileHash));
 

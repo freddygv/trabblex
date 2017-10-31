@@ -1,6 +1,7 @@
 
 {
   "tl_512kb.mp4": {
+    "fileHash": "C52057A4A2555D007A6B2D13FE2BBCA813AF936EBC3E26ACFF13CFAD5C54CED5",
     "videoName": "The Letter",
     "filepath": "tl_512kb.mp4",
     "fileSize": 27546,
@@ -9,6 +10,7 @@
     "bitrate": 800
   },
   "CC_1916_07_10_TheVagabond.mp4": {
+    "fileHash": "B07E7827BAAC4009C173DF2DFEDEC186CFDDE1AAB6CEBBF02C9D7C52D04A26EE",
     "videoName": "The Vagabond",
     "filepath": "CC_1916_07_10_TheVagabond.mp4",
     "fileSize": 153600,
@@ -17,6 +19,7 @@
     "bitrate": 1024
   },
   "PopeyeAliBaba_512kb.mp4": {
+    "fileHash": "0ED4C30A5625D538DEC9F1CF39BE643439CADF42AA27CEC17935DC0E7B073B25",
     "videoName": "Popeye the Sailor",
     "filepath": "PopeyeAliBaba_512kb.mp4",
     "fileSize": 75674,

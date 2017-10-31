@@ -6,7 +6,6 @@ import pt.fcup.generated.RegistrableIPrx;
 import java.io.*;
 import org.json.JSONObject;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,8 +28,7 @@ public class Seeder {
     private final int port;
     private final String ip;
 
-    private final String portalAddress;
-    private final String host;
+    private final String iceHost;
 
     private String fileHash;
     private int numberOfChunks;
@@ -39,14 +37,11 @@ public class Seeder {
     private List<String> chunkHashes;
     private List<String> chunkIDs;
 
-    public Seeder(String filepath, int port, JSONObject fileMetadata, int chunkSize) throws UnknownHostException {
+    public Seeder(String filepath, int port, String iceHost, JSONObject fileMetadata, int chunkSize) throws UnknownHostException {
         this.filepath = filepath;
         fullPath = BASE_PATH + filepath;
 
-
-        portalAddress = InetAddress.getByName("portal").getHostAddress();
-        host = String.format("%s -p 8081", portalAddress);
-
+        this.iceHost = iceHost;
 
         // TODO: Get IP from environment variable, will be the same for all seeders
         ip = "localhost";
@@ -87,7 +82,7 @@ public class Seeder {
         // Retry policy
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + host));
+                RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
 
                 regResult = register.registerSeeder(fileHash);
 
@@ -110,7 +105,7 @@ public class Seeder {
 
         for (int retries = 0; retries < MAX_RETRIES; retries++) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + host));
+                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
                 regResult = deregister.deregisterSeeder(fileHash);
             }
 

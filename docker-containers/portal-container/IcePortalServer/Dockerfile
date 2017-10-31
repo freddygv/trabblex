@@ -24,6 +24,7 @@ COPY db.properties  /usr/src/app
 COPY repo           /usr/src/app/repo
 COPY wait-for-it.sh /usr/src/app
 RUN chmod +x wait-for-it.sh
+RUN mvn install -Dmaven.test.skip=true
 
 COPY src /usr/src/app/src
 
