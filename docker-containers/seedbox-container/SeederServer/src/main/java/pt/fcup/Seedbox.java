@@ -140,8 +140,11 @@ public class Seedbox {
         Iterator<?> keys = fileMetadata.keys();
         String currentKey;
 
+        System.out.println("Initializing videos table...");
+
         boolean regResult = false;
         while(keys.hasNext()) {
+
             currentKey = (String)keys.next();
             currentItem = fileMetadata.getJSONObject(currentKey);
 
@@ -151,6 +154,8 @@ public class Seedbox {
             videoSizeX = currentItem.getInt("videoSizeX");
             videoSizeY = currentItem.getInt("videoSizeY");
             bitrate = currentItem.getInt("bitrate");
+
+            System.out.println(String.format("Current video: '%s' '%s'", currentKey, fileHash));
 
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
@@ -164,10 +169,10 @@ public class Seedbox {
 
             }
 
-            // TODO: Remove
-            queryTables();
-
         }
+
+        // TODO: Remove
+        queryTables();
 
     }
 
@@ -177,8 +182,8 @@ public class Seedbox {
     private void queryTables() {
         try {
             DBManager testDB = new DBManager(true);
-            System.out.println("Querying seeders table:");
-            System.out.println(testDB.queryTable("SELECT file_hash, file_name, port FROM seeders;").toString());
+            System.out.println("Querying videos table:");
+            System.out.println(testDB.queryTable("SELECT file_hash, file_name FROM videos;").toString());
 
             System.out.println("Querying chunk_owners table:");
             System.out.println(testDB.queryTable("SELECT file_hash, chunk_hash, owner_port FROM chunk_owners;").toString());

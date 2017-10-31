@@ -86,7 +86,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
             return true;
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
-            System.err.println("Seeder registration: DB update failed.");
+            System.err.println("Video initialization: DB update failed.");
             ec.printStackTrace();
             return false;
 
