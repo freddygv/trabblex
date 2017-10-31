@@ -19,17 +19,16 @@ ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY pom.xml             /usr/src/app
-COPY file-metadata.json  /usr/src/app
-COPY db.properties       /usr/src/app
-COPY repo                /usr/src/app/repo
-COPY videos              /usr/src/app/videos
-COPY wait-for-it.sh      /usr/src/app
+COPY src                /usr/src/app/src
+COPY pom.xml            /usr/src/app
+COPY db.properties      /usr/src/app
+COPY file-metadata.json /usr/src/app
+COPY repo               /usr/src/app/repo
+
+COPY wait-for-it.sh   /usr/src/app
+COPY seedbox-init.sh  /usr/src/app
+
 RUN chmod +x wait-for-it.sh
+RUN chmod +x seedbox-init.sh
 
-COPY src /usr/src/app/src
-
-CMD ["chmod", "+x", "wait-for-it.sh"]
-CMD ["./wait-for-it.sh", "postgres-server:5432", "--timeout=240"]
-CMD ["./wait-for-it.sh", "portal:8081", "--timeout=240"]
-CMD ["mvn", "-U", "install", "exec:java"]
+CMD ["./seedbox-init.sh"]

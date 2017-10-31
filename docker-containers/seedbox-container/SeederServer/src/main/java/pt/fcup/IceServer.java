@@ -1,7 +1,5 @@
 package pt.fcup;
 
-import java.net.InetAddress;
-
 public class IceServer implements Runnable {
     @Override
     public void run() {

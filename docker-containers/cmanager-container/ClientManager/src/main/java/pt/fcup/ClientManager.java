@@ -9,9 +9,9 @@ import java.net.URI;
 import javax.ws.rs.core.Application;
 
 /**
-*   Creates a Grizzly HTTP server and exposes a
-*   bunch of resources for the client to use
-**/
+ *   Creates a Grizzly HTTP server and exposes a
+ *   bunch of resources for the client to use
+ **/
 class ClientManager extends ResourceConfig{
 
     private DBManager db;
@@ -23,7 +23,7 @@ class ClientManager extends ResourceConfig{
     {
         ClientManager cm = new ClientManager();
 
-//         TODO: Remove at the end, using for debugging
+        // TODO: Remove at the end, using for debugging
 //        ClientManagerResource cr = new ClientManagerResource();
 //        cr.createSeeder("tl_512kb.mp4");
     }
@@ -42,8 +42,8 @@ class ClientManager extends ResourceConfig{
     }
 
     /**
-    * Create server and everything else necessary
-    */
+     * Create server and everything else necessary
+     */
     public ClientManager ()
     {
 

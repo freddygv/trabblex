@@ -76,7 +76,17 @@ public class Seedbox {
      */
     public Seeder createSingleSeeder(String filename) throws IOException, FileHashException, PortGenerationException {
 
-        Seeder newSeeder = new Seeder(filename, BASE_PORT, iceHost, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
+        Seeder newSeeder = null;
+
+        try{
+            newSeeder = new Seeder(filename, BASE_PORT, iceHost, fileMetadata.getJSONObject(filename), CHUNK_SIZE);
+        }
+        catch(JSONException e)
+        {
+            System.err.println("Couldn't retrieve " + filename + " from local json storage");
+            System.out.println(fileMetadata);
+            throw e;
+        }
 
         // Hash file, chunk file, and hash chunks
         boolean videoProcSuccess = newSeeder.processVideo();
@@ -87,6 +97,8 @@ public class Seedbox {
         if (regSuccess && videoProcSuccess) {
             System.out.println("Seeder registration success for: " + newSeeder.getVideoName());
 
+        } else {
+            System.out.println("Seeder registration UNSUCCESSFUL for: " + newSeeder.getVideoName());
         }
 
         System.out.println();
