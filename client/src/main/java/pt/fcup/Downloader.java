@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.*;
+import pt.fcup.exception.*;
 
 class Downloader extends Thread
 {
@@ -12,25 +13,31 @@ class Downloader extends Thread
 	private final String file;
 	private final int port;
 	private final int chunkNumber;
+	private final String hash;
 
 	private int nbChunks;
 
-	public Downloader(String file, int chunkNumber, String ip, int port, String protocol)
+
+	public Downloader(String file, int chunkNumber, String ip, int port, String protocol, String hash)
 	{
 		super();
 		this.ip = ip;
 		this.protocol = protocol;
-		this.port = port;
+		this.port = 29200;
 		this.file = file;
 		this.chunkNumber = chunkNumber;
+		this.hash = hash;
 	}
 
 	@Override
 	public void run()
-	{
+	{ 
+		// dobug
+		//System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
+
 		if (protocol != "TCP") {
-			System.out.println("Sorry, " + protocol + " is not yet supported!");
-			Thread.currentThread().interrupt();
+			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
+			return;
 		}
 
 		try (
@@ -47,36 +54,57 @@ class Downloader extends Thread
 				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 		) {
 
-			System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
+			// debug
+        	//System.out.println("Connection successfull to " + ip + ":" + port);
+			//System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
 			out.println(chunkNumber);
 			out.println(file);
 
-			// TODO: Are these needed? where are these properties used
-//			// handshake
-//			String propertiesText = dis.readUTF();
-//			Properties properties = new Properties();
-//			properties.load(new StringReader(propertiesText));
+			// debug
+        	//System.out.println("Sent chunk number and file name");
 
 			nbChunks = Integer.parseInt(in.readLine());
-			System.out.println("Number of chunks is: " + nbChunks);
+
+			// debug
+        	//System.out.println("Got number of chunks = " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
 			while ((bytesRead = dis.read(contents)) > 0) {
 				fos.write(contents, 0, bytesRead);
-
 			}
 
 			fos.flush();
-			System.out.println(String.format("Downloaded chunk #%s of '%s' successfully", chunkNumber, file));
+			fos.close();
+			dis.close();
+			// debug
+			//System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
-
+		}
+		catch(java.io.FileNotFoundException e)
+		{
+			System.err.println("Couldn't create output file - check if downloads folder exists");
+		}
+		catch(java.net.ConnectException e)
+		{
+			// debug
+        	//System.out.println("Couldn't connect to " + ip + ":" + port);
+        	return;
 		}
 		catch(Exception e)
         {
+        	// debug
+        	//System.out.println("Couldn't connect to " + ip + ":" + port);
            	e.printStackTrace();
+        	return;
         }
+
+        return;
 
 	}
 
+	public int getNbChunks()
+	{
+		return nbChunks;
+	}
 }

@@ -40,11 +40,6 @@
             <artifactId>DBManager</artifactId>
             <version>1.2</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>fcup</groupId>-->
-            <!--<artifactId>ServerChunkSeeder</artifactId>-->
-            <!--<version>1.0</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.zeroc</groupId>
             <artifactId>ice</artifactId>

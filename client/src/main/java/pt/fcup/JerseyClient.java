@@ -18,6 +18,9 @@ import org.json.JSONArray;
 
 import java.util.Scanner;
 
+/*
+    Used to query the client manager
+*/
 
 public class JerseyClient {
 
@@ -42,6 +45,9 @@ public class JerseyClient {
             {
                 path = path + "/";
             }
+            else{
+                param = "";
+            }
 
             // Query database
             result = client.target(URL)
@@ -53,6 +59,15 @@ public class JerseyClient {
         {
             System.err.println("Cannot connect to server " + HOST);
 
+        }
+        catch(javax.ws.rs.NotFoundException e)
+        {
+            System.err.println("Resource not found: " + URL);
+
+        }
+        catch(javax.ws.rs.InternalServerErrorException e)
+        {
+            System.err.println("Could not connect to database");
         }
         catch(Exception e )
         {
