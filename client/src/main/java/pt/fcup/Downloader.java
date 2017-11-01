@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.*;
-import pt.fcup.exception.*;
 
 class Downloader extends Thread
 {
@@ -23,7 +22,7 @@ class Downloader extends Thread
 		super();
 		this.ip = ip;
 		this.protocol = protocol;
-		this.port = 29200;
+		this.port = port;
 		this.file = file;
 		this.chunkNumber = chunkNumber;
 		this.hash = hash;

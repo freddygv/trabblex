@@ -40,6 +40,8 @@ public class SimpleClient {
     // could be used later for multi-server management
     //private final String seeder_identifier = "file_hash";
 
+    ArrayList<FileDownloader> files = new ArrayList<FileDownloader>();
+
 
     public SimpleClient(String[] args)
     {
@@ -88,6 +90,7 @@ public class SimpleClient {
                     break;
 
                 case "list":
+                    listFiles();
                     break;
 
                 case "info":
@@ -178,8 +181,6 @@ public class SimpleClient {
     * Get file info
     * if completely downloaded, full path, size; if
     * being downloaded: file size and neighbor list
-    * Since the client can only download one file at a time, 
-    *   only display info on that
     * @return file info in a json array
     **/
     public JSONArray fileInfo(String fileName)
@@ -233,16 +234,28 @@ public class SimpleClient {
     **/
     private void downloadFile(String name)
     {
-        (new FileDownloader(name, getHashFromName(name), client)).start();
+        FileDownloader f = new FileDownloader(name, getHashFromName(name), client);
+        f.start();
+        files.add(f);
     }
 
     /**
     * Get info from all local files
-    * @return file info in a json array
     **/
-    private JSONArray listFiles(String hash)
+    private void listFiles()
     {
-        return null;
+        for(int i = 0; i < files.size(); i++)
+        {
+            FileDownloader f = files.get(i);
+            System.out.println("=================");
+            System.out.println(f.getFileName());
+            if(f.getnbChunksNotDownloaded() <= 0)
+                System.out.println("Downloading Finished");
+            else 
+                System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
+
+
+        }
     }
 
     private boolean informClientUnjoinable(String ip, int port)

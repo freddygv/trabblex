@@ -65,16 +65,28 @@ public class Chunk
 
 	public Owner getSource()
 	{
-		// TODO get the first owner that isn't a seeder preferably
+		int sourceFromSeeder = -1;
+
+		// Get the first owner that isn't a seeder preferably
 		if(owners.size() == 0)
 		{
 			System.out.println("No source found!");
 			return null;
 		}
-		// debug
-		//System.out.println("Providing source " + owners.get(0).ip + "/" + ":" + owners.get(0).port 
-		//	+ "(" + owners.size() + " sources available)");
-		return owners.get(0);
+
+		for(int i = 0; i < owners.size(); i++)
+		{
+			if(owners.get(i).is_seeder == false)
+			{
+				System.out.println("Got source from client for chunk " + chunkNumber);
+				return owners.get(i);
+			}
+			else
+				sourceFromSeeder = i;
+		}
+
+		System.out.println("Got source from seeder for chunk " + chunkNumber);
+		return owners.get(sourceFromSeeder);
 	}
 
 	public int getNumberOfSources()

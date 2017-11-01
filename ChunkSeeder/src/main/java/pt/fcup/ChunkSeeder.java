@@ -5,22 +5,20 @@ import java.net.*;
 
 class ChunkSeeder extends Thread {
     private final int port;
-    private final String filepath;
-    private final String filename;
     private final int numChunks;
-    private final Socket socket;
+    private Socket socket;
 
     private int chunkID;
 
-    public ChunkSeeder(int port, int numChunks, String filepath, String filename, Socket socket) {
+    public ChunkSeeder(int port, int numChunks, Socket socket) {
         this.socket = socket;
         this.port = port;
         this.numChunks = numChunks;
-        this.filepath = filepath;
-        this.filename = filename;
     }
 
     public void run() {
+        System.out.println("Starting local chunk seeder");
+        System.out.println("Path%" + System.getProperty("user.dir"));
         transferChunk();
         System.out.println("Chunk " + chunkID + " sent succesfully!");
 
@@ -29,20 +27,31 @@ class ChunkSeeder extends Thread {
     private void transferChunk() {
 
         try{
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
 
             chunkID = Integer.parseInt(in.readLine());
-            File file = new File(filepath + "-" + chunkID);
+            // read filename, here we already 
+            String filepath = in.readLine();
+
+            System.out.println("Local seeder seeding file " + filepath);
+            File file = new File("sources/" + filepath + "-" + chunkID);
+
+            if(!file.exists())
+            {
+                System.out.println("Error opening file " + "sources/" + filepath + "-" + chunkID);
+                return;
+            }
+
             FileInputStream fis = new FileInputStream(file);
 
             BufferedInputStream bis = new BufferedInputStream(fis);
 
             OutputStream os = socket.getOutputStream();
+            PrintWriter out = new PrintWriter(os, true);
 
-            System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filename));
+            System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filepath));
 
             //System.out.println("Sending back number of chunks: " + numChunks);
             out.println(numChunks);
@@ -54,6 +63,7 @@ class ChunkSeeder extends Thread {
 
             while((bytesRead = bis.read(contents)) > 0){
                 os.write(contents, 0, bytesRead);
+                System.out.println("Writing bytes " + contents);
             }
 
             os.flush();

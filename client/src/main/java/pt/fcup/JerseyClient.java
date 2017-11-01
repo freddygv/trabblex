@@ -1,9 +1,6 @@
 package pt.fcup;
 
-import java.util.Properties;
-import java.util.ArrayList;
-
-
+import java.util.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -35,7 +32,17 @@ public class JerseyClient {
 		this.URL = HOST + URL;
 	}
 
-	public String query(String path, String param)
+    public String query(String path)
+    {
+        return query(path, null, null);
+    }
+
+    public String query(String path, String param)
+    {
+        return query(path, param, null);
+    }
+
+	public String query(String path, String param, Map<String,String> queryParams)
    	{
         String result = null;
 
@@ -49,11 +56,20 @@ public class JerseyClient {
                 param = "";
             }
 
-            // Query database
-            result = client.target(URL)
-                                 .path(path + param)
-                                 .request(MediaType.TEXT_PLAIN)
-                                 .get(String.class);
+            // Query client manager
+            WebTarget resourceWebTarget = client.target(URL).path(path + param);
+
+            // add query params
+            if(queryParams != null)
+            {
+                Iterator it = queryParams.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    resourceWebTarget = resourceWebTarget.queryParam(pair.getKey().toString(), pair.getValue());
+                }
+            }
+                
+            result = resourceWebTarget.request(MediaType.TEXT_PLAIN).get(String.class);
         }
         catch(javax.ws.rs.ProcessingException e)
         {
@@ -62,7 +78,8 @@ public class JerseyClient {
         }
         catch(javax.ws.rs.NotFoundException e)
         {
-            System.err.println("Resource not found: " + URL);
+            // debug
+            //System.err.println("Resource not found: " + URL);
 
         }
         catch(javax.ws.rs.InternalServerErrorException e)

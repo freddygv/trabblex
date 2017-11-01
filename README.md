@@ -111,6 +111,7 @@ Need to go through with removing uncontactable chunk owners via ClientManager
 * Problem managing chunks, some have the same id and same file but different hashes
 * Note: will remove these owners from local database, but not from online storage
     * Can be done later...
+    * Note: BIG security issue
 
 === To see w Freddy
 * When requesting a video, I ask for the file name (Popeye the sailor)
@@ -119,6 +120,21 @@ Solution: when inserting in database, in file_name put the file's path
 
 * The client now connects to a single port -- 29200. See port management w Freddy 
 But the chunk owners still have different ips... ?
+
+Note: the client will display info only on files downloaded since its start.
+On reboot, no info on files downloaded before will be available
+
+==== Working on Chunk Seeder, client side
+Note: coded local port for chunk seeding in hard
+Updated chunkSeeder, it doesn't need a socket, just a port
+
+Note: created an uploadserver as well client-side... could be factorized :(
+
+Client can now send query parameters as well
+
+Note: no longer deleting local chunk files, to be able to seed them...
+So the client isn't selfish: as long as he is running, he can seed ANY chunk of 
+the file he already has, even if the file has finished downloading
 
 # Documentation
 

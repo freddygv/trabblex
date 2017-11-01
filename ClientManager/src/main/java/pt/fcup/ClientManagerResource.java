@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import javax.ws.rs.QueryParam;
+
 /**
 * Gives the client a bunch of functionalities
 * Used as a resource by the client manager
@@ -42,18 +44,38 @@ public class ClientManagerResource{
         JSONArray res = null;
 
         try{
-            System.out.println("Executing query " + query); 
+            //System.out.println("Executing query " + query); 
             res = db.queryTable(query);
-            System.out.println("Result = " + res.toString());
+            //System.out.println("Result = " + res.toString());
 
         }
         catch(Exception e)
         {
             System.err.println("Connection to DB Failed (" + e + ")");
+            System.err.println("While running query \n>>>>>>>>>>>>>>>>\n" + query);
+            System.err.println(">>>>>>>>>>>>>>>>");
 
         }
 
         return res;
+    }
+
+    private void runUpdate( String query )
+    {
+
+        try{
+            //System.out.println("Executing query " + query); 
+            db.singleUpdate(query);
+            //System.out.println("Result = " + res.toString());
+
+        }
+        catch(Exception e)
+        {
+            System.err.println("Connection to DB Failed (" + e + ")");
+            System.err.println("While running query \n>>>>>>>>>>>>>>>>\n" + query);
+            System.err.println(">>>>>>>>>>>>>>>>");
+
+        }
     }
 
     /**
@@ -151,6 +173,60 @@ public class ClientManagerResource{
         // TODO: Make a real JSONArray, if needed
         if (reqResult)
             return "success";
+        return null;
+    }
+
+    /**
+    * Registers a client as chunk seeder
+    */
+    @Path("registerclientseeder")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String registerClientSeeder(@QueryParam("file_hash") String file_hash,
+                               @QueryParam("chunk_hash") String chunk_hash,
+                               @QueryParam("chunk_id") String chunk_id,
+                               @QueryParam("ip") String ip,
+                               @QueryParam("port") String port)
+    {
+        
+        String query =  "INSERT INTO chunk_owners(file_hash,chunk_hash,chunk_id,owner_ip,owner_port,is_seeder)"
+        +" VALUES('" + file_hash + "',"
+        + "'" + chunk_hash + "',"
+        + "'" + Integer.parseInt(chunk_id) + "',"
+        + "'" + ip + "',"
+        + "'" + Integer.parseInt(port) + "',"
+        + "'f'"
+        + ");";
+
+        runUpdate(query);
+
+        return null;
+    }
+
+    /**
+    * De-registers the client as chunk seeder
+    */
+    /**
+    * Registers a client as chunk seeder
+    */
+    @Path("unregisterclientseeder")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String unRegisterClientSeeder(@QueryParam("file_hash") String file_hash,
+                               @QueryParam("chunk_hash") String chunk_hash,
+                               @QueryParam("chunk_id") String chunk_id,
+                               @QueryParam("ip") String ip,
+                               @QueryParam("port") String port)
+    {
+        
+        String query =  "DELETE FROM chunk_owners WHERE "
+        +"file_hash='" + file_hash + "' AND "
+        + "chunk_hash='" + chunk_hash + "' AND "
+        + "chunk_id='" + Integer.parseInt(chunk_id) + "' AND "
+        + "owner_ip='" + ip + "' AND "
+        + "owner_port='" + Integer.parseInt(port) + "'"
+        + ";";
+
+        runUpdate(query);
+
         return null;
     }
 
