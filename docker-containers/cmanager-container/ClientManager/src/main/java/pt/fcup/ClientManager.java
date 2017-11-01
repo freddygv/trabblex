@@ -52,8 +52,6 @@ class ClientManager extends ResourceConfig{
         {
             final HttpServer server = startServer();
             System.out.println("Created server");
-            System.in.read();
-            server.stop();
 
         }
         catch(Exception e)
