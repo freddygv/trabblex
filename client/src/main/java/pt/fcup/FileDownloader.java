@@ -17,9 +17,9 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.util.Scanner;
-
+import java.util.*;
 import java.io.*;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -27,10 +27,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+
 public class FileDownloader extends Thread
 {
-    private String name, hashToGet;
+    private String name, fileHash;
     private JerseyClient client;
+    private int nbChunksNotDownloaded;
+
+    private final int localPort = 26000;
+    private final String localIP = "localhost";
 
     // TODO pass the hashing algorithm through the header...
     private final String HASHING_ALGORITHM = "SHA-256";
@@ -38,10 +43,20 @@ public class FileDownloader extends Thread
     public FileDownloader(String name, String hash, JerseyClient client)
     {
         this.name = name;
-        this.hashToGet = hash;
+        this.fileHash = hash;
 
         // client reference passed by the parent client
         this.client = client;
+    }
+
+    public String getFileName()
+    {
+        return name;
+    } 
+
+    public int getnbChunksNotDownloaded()
+    {
+        return nbChunksNotDownloaded;
     }
 
     /**
@@ -51,10 +66,16 @@ public class FileDownloader extends Thread
     @Override
     public void run()
     {
-        downloadFile();
+        try{
+            downloadFile();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    private boolean downloadFile()
+    private boolean downloadFile() throws IOException
     {
 
         // the owners of the chunk of the file (seeder + other clients)
@@ -65,19 +86,19 @@ public class FileDownloader extends Thread
 
         // storing the file
         ArrayList<Byte> file = new ArrayList<Byte>();
-        
+
         /*
             (1) Fetch all the chunk owners related to the client
         */
 
-        if(hashToGet == null)
+        if(fileHash == null)
         {
             System.err.println("Couldn't solve hash from filename!");
             System.err.println("Error downloading file " + name);
             Thread.currentThread().interrupt();
         }
 
-        String chunkOwners = client.query("getowners", hashToGet);
+        String chunkOwners = client.query("getowners", fileHash);
 
         if(chunkOwners == null)
         {
@@ -162,12 +183,21 @@ public class FileDownloader extends Thread
             firstdwl.start();
 
             try{
+
                 firstdwl.join();   
                 if(checkHash("downloads/" + name + "-" + chunkNumber, obj.getString("chunk_hash")) == true)
                 {
                     // mark chunk as downloaded
                     chm.markChunkDownloaded(chunkNumber);
                     chunkIsValid = true;
+
+                    // update database TODO later
+                    //client.query("registerclientseeder", null, queryParams);
+
+                    // move file to sources
+                    File f = new File("downloads/" + name + "-" + chunkNumber);
+                    File f2 = new File("sources/" + name + "-" + chunkNumber);
+                    f.renameTo(f2);
                 }
                 else{
                     //System.err.println("Error couldn't verify hash of chunk number "+ chunkNumber);
@@ -184,10 +214,18 @@ public class FileDownloader extends Thread
 
 
         /*
+            Create local seeders for that file
+        */
+        int nbChunksInFile = firstdwl.getNbChunks();
+        UploadServer up = new UploadServer(localPort, nbChunksInFile, "downloads/" + name);
+        Thread usThread = new Thread(up, "Client upload Thread");
+        usThread.start();
+
+
+        /*
             (4) Assess if all chunks are available 
             If no, create a seeder, and start all over again
         */
-        int nbChunksInFile = firstdwl.getNbChunks();
         if(chm.getNbChunksAvailable() < nbChunksInFile)
         {
             // debug
@@ -216,6 +254,7 @@ public class FileDownloader extends Thread
         */
         while(chm.numberOfChunksNotDownloaded() > 0)
         {
+            nbChunksNotDownloaded = chm.numberOfChunksNotDownloaded();
             // debug
             //System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + "chunks");
            
@@ -246,14 +285,39 @@ public class FileDownloader extends Thread
 
             // wait for it to finish
             try{
-                dwl.join();   
+                dwl.join(); 
+
+                Map<String,String> queryParams = new HashMap<String,String>();
+                queryParams.put("file_hash", fileHash);
+                queryParams.put("chunk_hash", chunkSource.hash);
+                queryParams.put("chunk_id", Integer.toString(nextChunkToDownload.chunkNumber));
+                queryParams.put("ip", localIP);
+                queryParams.put("port", Integer.toString(localPort));
+
                 if(checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true)
                 {
                     // mark chunk as downloaded
                     chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
+
+                    // update database
+                    client.query("registerclientseeder", null, queryParams);
+
+                    // move file to sources
+                    File f = new File("downloads/" + name + "-" + nextChunkToDownload.chunkNumber);
+                    File f2 = new File("sources/" + name + "-" + nextChunkToDownload.chunkNumber);
+                    f.renameTo(f2);
                 }
                 else{
                     nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port, chunkSource.hash);
+                    // inform database to remove chunk owner
+                    client.query("unregisterclientseeder", null, queryParams);
+                    System.out.println("Bad chunk hash " + "downloads/" + name + "-" + nextChunkToDownload.chunkNumber + "\n"
+                        + hashFile("downloads/" + name + "-" + nextChunkToDownload.chunkNumber) + "\n"
+                        + chunkSource.hash + "\n"
+                        + "Will now try another source");
+                    // delete local chunk and try again
+                    java.nio.file.Path localFile = Paths.get("downloads/" + name + "-" + nextChunkToDownload.chunkNumber);
+                    //Files.delete(localFile);
                 }
             }
             catch(Exception e)
@@ -261,10 +325,6 @@ public class FileDownloader extends Thread
                 e.printStackTrace();
                 return false;
             }
-
-            // TODO manage local seeder
-
-            // TODO update database
 
         }
 
@@ -281,9 +341,9 @@ public class FileDownloader extends Thread
         }
 
         // check file hash
-        if(checkHash("downloads/" + name, hashToGet) == true)
+        if(checkHash("downloads/" + name, fileHash) == true)
         {
-            System.out.println("File " + name + " successfully downloaded\n> ");
+            System.out.print("File " + name + " successfully downloaded\n> ");
         }
         else{
             System.err.println("File " + name + " chunk is not valid :(");
@@ -298,9 +358,9 @@ public class FileDownloader extends Thread
             BufferedOutputStream mergingStream = new BufferedOutputStream(fos)) {
             for (int i = 0; i < nbChunks; i++) 
             {
-                java.nio.file.Path localFile = Paths.get("downloads/" + name + "-" + i);
+                java.nio.file.Path localFile = Paths.get("sources/" + name + "-" + i);
                 Files.copy(localFile, mergingStream);
-                Files.delete(localFile);
+                //Files.delete(localFile);
             }
         }   
         catch(IOException e)
@@ -309,6 +369,14 @@ public class FileDownloader extends Thread
             e.printStackTrace();
             return false;
         }
+
+        /*
+
+            TODO keep runnin (eg seeding to other clients)
+            until the user requests to close
+
+        */
+
         return true;
     }
 

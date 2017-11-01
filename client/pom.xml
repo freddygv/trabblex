@@ -82,7 +82,20 @@
 
     </build>
 
+    <repositories>
+        <repository>
+            <id>data-local</id>
+            <name>data</name>
+            <url>file://${project.basedir}/repo</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>fcup</groupId>
+            <artifactId>ChunkSeeder</artifactId>
+            <version>1.35</version>
+        </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
