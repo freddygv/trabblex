@@ -19,6 +19,7 @@ ServerSeeder/target
 
 # Video files
 **/videos/*
+**/sources/*
 **/downloads/*
 
 # BlueJ files
