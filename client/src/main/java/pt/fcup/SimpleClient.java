@@ -34,9 +34,6 @@ public class SimpleClient {
 
     //JSONArray localChunks = new JSONArray();
 
-    // max number of concurrent downloads
-    private int maxDownloads = 3;
-
     // could be used later for multi-server management
     //private final String seeder_identifier = "file_hash";
 
@@ -71,7 +68,12 @@ public class SimpleClient {
                                 break;
 
                             case "search":
-                                break;
+                            if(parts.length < 3)
+                                displayHelp();
+                            else{
+                                searchFromKeyword(parts[2]);
+                            }
+                            break;
                         }
                     }
                     break;
@@ -94,9 +96,29 @@ public class SimpleClient {
                     break;
 
                 case "info":
+                    if(parts.length < 2)
+                        displayHelp();
+                    else
+                    {
+                        // if file has spaces...
+                        String filename = parts[1];
+                        for(int i = 2; i < parts.length; i++)
+                            filename = filename + " " + parts[i];
+                        fileInfo(filename);
+                    }
                     break;
 
                 case "play":
+                if(parts.length < 2)
+                        displayHelp();
+                    else
+                    {
+                        // if file has spaces...
+                        String filename = parts[1];
+                        for(int i = 2; i < parts.length; i++)
+                            filename = filename + " " + parts[i];
+                        playFile(filename);
+                    }
                     break;
 
                 case "verbose":
@@ -108,12 +130,6 @@ public class SimpleClient {
                     displayHelp();
                     break;
 
-                case "setmaxdownloads":
-                    if(parts.length < 2)
-                        displayHelp();
-                    else
-                        maxDownloads = Integer.parseInt(parts[1]);
-                    break;
 
             }
         } while(input != "quit");
@@ -130,50 +146,94 @@ public class SimpleClient {
         System.out.println("list files");
         System.out.println("info file");
         System.out.println("play name");
-        System.out.println("setmaxdownloads x");
         System.out.println("===========================");
     }
 
    
+    private void searchFromKeyword(String keyword)
+    {
+        String result = client.query("listfromkeyword", keyword);
+
+        if(result == null)
+        {
+            System.err.println("Error querying the server");
+        }
+        else
+        {         
+            JSONArray localSeederInfo = new JSONArray(result);
+
+            /*
+                Display result info nicely
+            */
+            for (int i = 0 ; i < localSeederInfo.length(); i++) 
+            {
+                JSONObject obj = localSeederInfo.getJSONObject(i);
+                System.out.println(obj.getString("file_name")
+                    + ": " + obj.getString("file_size") + "Kb"
+                    + " (" + obj.getString("video_size_x") + "x"
+                    + obj.getString("video_size_y") + " @ "
+                    + obj.getString("bitrate") + "b/s" + ")"
+                    );
+
+                if(verbose)
+                {
+                    System.out.println(">> file_hash: " + obj.getString("file_hash"));
+                    System.out.println(">> protocol: " + obj.getString("protocol"));
+                    System.out.println(">> port: " + obj.getString("port"));
+                }
+            }
+        }
+
+    }
 
     /**
     *   @return a list of the seeder on the remote server
     **/
-    private JSONArray listSeeders()
+    private void listSeeders()
     {
         String result = client.query("list", null);
 
         if(result == null)
         {
             System.err.println("Error querying the server for the seeds");
-            return null;
         }
+        else{
 
-        localSeederInfo = new JSONArray(result);
+            localSeederInfo = new JSONArray(result);
 
 
-        /*
-            Display seeder info nicely
-        */
-        for (int i = 0 ; i < localSeederInfo.length(); i++) 
-        {
-            JSONObject obj = localSeederInfo.getJSONObject(i);
-            System.out.println(obj.getString("file_name")
-                + ": " + obj.getString("file_size") + "Kb"
-                + " (" + obj.getString("video_size_x") + "x"
-                + obj.getString("video_size_y") + " @ "
-                + obj.getString("bitrate") + "b/s" + ")"
-                );
-
-            if(verbose)
+            /*
+                Display seeder info nicely
+            */
+            for (int i = 0 ; i < localSeederInfo.length(); i++) 
             {
-                System.out.println(">> file_hash: " + obj.getString("file_hash"));
-                System.out.println(">> protocol: " + obj.getString("protocol"));
-                System.out.println(">> port: " + obj.getString("port"));
+                JSONObject obj = localSeederInfo.getJSONObject(i);
+                System.out.println(obj.getString("file_name")
+                    + ": " + obj.getString("file_size") + "Kb"
+                    + " (" + obj.getString("video_size_x") + "x"
+                    + obj.getString("video_size_y") + " @ "
+                    + obj.getString("bitrate") + "b/s" + ")"
+                    );
+
+                if(verbose)
+                {
+                    System.out.println(">> file_hash: " + obj.getString("file_hash"));
+                    System.out.println(">> protocol: " + obj.getString("protocol"));
+                    System.out.println(">> port: " + obj.getString("port"));
+                }
             }
         }
 
-        return null;
+    }
+
+    private void playFile(String file)
+    {
+        try{
+            Runtime.getRuntime().exec("ffplay downloads/" + file);
+        }
+        catch(Exception e){
+            System.err.println("Error could not read file!");
+        }
     }
 
 
@@ -181,11 +241,29 @@ public class SimpleClient {
     * Get file info
     * if completely downloaded, full path, size; if
     * being downloaded: file size and neighbor list
-    * @return file info in a json array
     **/
-    public JSONArray fileInfo(String fileName)
+    public void fileInfo(String fileName)
     {
-        return null;
+        // get number of file
+        for(int i = 0; i < files.size(); i++)
+        {
+            FileDownloader f = files.get(i);
+            if(f.getFileName().equals(fileName)){
+                System.out.println("File info " + f.getFileName());
+
+                if(f.getnbChunksNotDownloaded() <= 1)
+                    System.out.println("Downloading Finished");
+                else 
+                    System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
+
+                System.out.println("Full path = " + "downloads/" + fileName);
+                File fa =new File("downloads/" + fileName);
+                System.out.println("File size = " + fa.length()/(1024*1024) + "MB");
+
+                // neighbor list
+
+            }
+        }
     }
 
 
@@ -249,20 +327,14 @@ public class SimpleClient {
             FileDownloader f = files.get(i);
             System.out.println("=================");
             System.out.println(f.getFileName());
-            if(f.getnbChunksNotDownloaded() <= 0)
+            // TODO why stuck at one ? Resolve...
+            if(f.getnbChunksNotDownloaded() <= 1)
                 System.out.println("Downloading Finished");
             else 
                 System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
 
 
         }
-    }
-
-    private boolean informClientUnjoinable(String ip, int port)
-    {
-        // Inform client manager that a client is not joinable
-        // eg disconnected from the network
-        return false;
     }
 
     public static void main(String[] args)

@@ -79,25 +79,6 @@ public class ClientManagerResource{
     }
 
     /**
-    * TODO: replace query by call to seeder manager
-    * Upon getting a list of keywords from the client,
-    * returns all the seeders that match that list
-    * @return the seeders that match the list, in json format
-    **/
-    @GET
-    @Path("getfromkeywords/{kwds}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getSeedersfromKeyword(@PathParam("kwds") String keywords)
-    {
-        
-        String query =  "SELECT file_hash, chunk_hash, owner_ip, is_active FROM chunk_owners " +
-                    "WHERE file_hash = 'file-hash-1';";
-
-        return runQuery(query).toString();
-
-    }
-
-    /**
     * Get a list of all the seeders:
     * file_name, file_size, video_size_x, video_size_y, bitrate
     * does NOT include ip adress and port for security purposes
@@ -140,9 +121,16 @@ public class ClientManagerResource{
     * Searches all the seeders for the keywords
     * @return a json of the specific seeders
     **/
-    public JSONArray getSeedersfromKeyword(ArrayList<String> keywords) 
+    @GET
+    @Path("listfromkeyword/{keyword}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getSeedersfromKeyword(@PathParam("keyword") String keyword) 
     {
-        return new JSONArray();
+        JSONArray result = null;
+
+        String query =  "SELECT * FROM videos WHERE file_name LIKE '%" + keyword +"%';";
+
+        return runQuery(query).toString();
     }
 
 
