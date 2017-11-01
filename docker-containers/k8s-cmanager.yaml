@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cmanager
+  labels:
+    app: cmanager
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: cmanager
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cmanager
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cmanager
+    spec:
+      containers:
+      - name: clientmanager
+        image: eu.gcr.io/groupj-179216/fq-cmanager:rc1
+        ports:
+        - containerPort: 80
