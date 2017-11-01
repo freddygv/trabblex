@@ -94,7 +94,7 @@
         <dependency>
             <groupId>fcup</groupId>
             <artifactId>ChunkSeeder</artifactId>
-            <version>1.32</version>
+            <version>1.34</version>
         </dependency>
 
         <dependency>

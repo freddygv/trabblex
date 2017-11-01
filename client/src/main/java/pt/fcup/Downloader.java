@@ -73,6 +73,8 @@ class Downloader extends Thread
 				fos.write(contents, 0, bytesRead);
 			}
 
+			System.out.println("Finished reading bytes");
+
 			fos.flush();
 			fos.close();
 			dis.close();

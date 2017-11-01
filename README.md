@@ -136,6 +136,11 @@ Note: no longer deleting local chunk files, to be able to seed them...
 So the client isn't selfish: as long as he is running, he can seed ANY chunk of 
 the file he already has, even if the file has finished downloading
 
+Note: if local file for seeding was not available, 
+TCP connection was not closed properly, and the client would stall...
+    -->> long term = need better exception management, 
+        and exception scenario management
+
 # Documentation
 
 | Software | Link |
