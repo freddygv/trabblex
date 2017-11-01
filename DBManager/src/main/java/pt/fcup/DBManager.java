@@ -3,21 +3,50 @@ package pt.fcup;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.*;
 import java.io.FileInputStream;
 import java.util.Properties;
 
 public class DBManager {
 
-    private final String HOST = "127.0.0.1:5432";
-    private final String DB_NAME = "prod";
-    private final String DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
     private final String DB_PROPS_LOCATION = "db.properties";
+    private final String DB_NAME = "prod";
+    private final String HOST;
+    private String DB_URL;
 
     private Properties DB_PROPS;
     private Connection conn;
 
+    public DBManager(boolean isInCointainer) throws IOException, ClassNotFoundException {
+        InetAddress address = InetAddress.getByName("postgres-server");
+        HOST = address.getHostAddress();
+        DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+        System.out.println(DB_URL);
+
+        try {
+            Class.forName("org.postgresql.Driver");
+
+        } catch (ClassNotFoundException e) {
+            System.err.println("Postgres Driver not found.");
+            throw e;
+
+        }
+
+        try {
+            loadDBProperties(DB_PROPS_LOCATION);
+
+        } catch (IOException e) {
+            System.err.println("Error loading properties file.");
+            throw e;
+
+        }
+    }
+
     public DBManager() throws IOException, ClassNotFoundException {
+        HOST = "127.0.0.1:5432";
+        DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
+
         try {
             Class.forName("org.postgresql.Driver");
 
