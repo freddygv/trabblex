@@ -1,8 +1,3 @@
-ice/target/
-!ice/target/classes/META-INF/
-ServerSeeder/target
-!ServerSeever/target/classes/META-INF/
-
 # Idea
 **/.idea/workspace.xml
 **/.idea/tasks.xml
