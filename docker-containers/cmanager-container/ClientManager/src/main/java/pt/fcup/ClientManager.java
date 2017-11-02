@@ -17,7 +17,7 @@ class ClientManager extends ResourceConfig{
     private DBManager db;
 
     // Base URI the Grizzly server will listen on
-    public static final String BASE_URI = "http://localhost:8080/trabblex/";
+    public static final String BASE_URI = "http://0.0.0.0:8080/trabblex/";
 
     public static void main(String[] args)
     {

@@ -6,8 +6,9 @@ metadata:
     app: cmanager
 spec:
   type: LoadBalancer
+  loadBalancerIP: "35.195.218.215"
   ports:
-  - port: 80
+  - port: 8080
   selector:
     app: cmanager
 ---
@@ -24,6 +25,9 @@ spec:
     spec:
       containers:
       - name: clientmanager
-        image: eu.gcr.io/groupj-179216/fq-cmanager:rc1
+        image: eu.gcr.io/groupj-179216/fq-cmanager:rc2
+        env:
+        - name: CMANAGER_IP
+          value: "35.195.218.215"
         ports:
-        - containerPort: 80
+        - containerPort: 8080

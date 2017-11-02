@@ -26,7 +26,7 @@ public class Seeder {
     private final String fullPath;
     private final String videoName;
     private final int port;
-    private final String ip;
+    private String ip;
 
     private final String iceHost;
 
@@ -43,8 +43,10 @@ public class Seeder {
 
         this.iceHost = iceHost;
 
-        // TODO: Get IP from environment variable, will be the same for all seeders
-        ip = "localhost";
+        ip = System.getenv("SEEDBOX_IP");
+
+        if(ip == null)  ip = "localhost";
+
         this.port = port;
         System.out.println("Seeder IP:PORT for " + filepath + " is " + ip + ":" + port);
 

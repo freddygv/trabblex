@@ -6,6 +6,7 @@ metadata:
     app: seedbox
 spec:
   type: LoadBalancer
+  loadBalancerIP: "35.187.185.209"
   ports:
   - port: 29200
     name: sockets
@@ -27,7 +28,10 @@ spec:
     spec:
       containers:
       - name: seedbox
-        image: eu.gcr.io/groupj-179216/fq-seedbox:rc1
+        image: eu.gcr.io/groupj-179216/fq-seedbox:rc2
+        env:
+        - name: SEEDBOX_IP
+          value: "35.187.185.209"
         ports:
           - containerPort: 29200
             name: sockets
