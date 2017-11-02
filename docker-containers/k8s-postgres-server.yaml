@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: postgres-server
-        image: eu.gcr.io/groupj-179216/fq-db:rc1
+        image: eu.gcr.io/groupj-179216/fq-db:rc2
         env:
         - name: POSTGRES_USER
           value: "driver"
@@ -34,3 +34,11 @@ spec:
           value: "prod"
         ports:
           - containerPort: 5432
+        volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgres
+      volumes:
+        - name: postgres-persistent-storage
+          gcePersistentDisk:
+            pdName: postgres-disk
+            fsType: ext4

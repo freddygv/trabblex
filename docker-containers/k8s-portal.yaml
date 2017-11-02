@@ -24,6 +24,6 @@ spec:
     spec:
       containers:
       - name: portal
-        image: eu.gcr.io/groupj-179216/fq-portal:rc1
+        image: eu.gcr.io/groupj-179216/fq-portal:rc2
         ports:
           - containerPort: 8081
