@@ -42,7 +42,7 @@ public class SimpleClient {
 
     public SimpleClient(String[] args)
     {
-        client = new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/");
+        client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
     }
 
     private void run()
