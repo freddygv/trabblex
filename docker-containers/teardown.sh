@@ -2,7 +2,7 @@
 
 kubectl delete service cmanager; kubectl delete service seedbox
 
-sleep 2m
+sleep 4m
 
 gcloud compute forwarding-rules list
 
