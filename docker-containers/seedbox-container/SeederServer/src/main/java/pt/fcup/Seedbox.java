@@ -3,7 +3,6 @@ package pt.fcup;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pt.fcup.exception.*;
-import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -51,12 +50,14 @@ public class Seedbox {
     }
 
     private void run() throws JSONParsingException, IOException {
+        // TODO: Remove
+        queryTables();
+
         String portalAddress = InetAddress.getByName("portal").getHostAddress();
         iceHost = String.format("%s -p 8081", portalAddress);
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
-        writeVideosToDB();
 
         // Set up ICE adapter to accept incoming messages
         IceServer rpc = new IceServer();
@@ -125,59 +126,6 @@ public class Seedbox {
             throw new JSONParsingException("Error reading file metadata.", e);
 
         }
-
-    }
-
-    private void writeVideosToDB() {
-        // TODO: Remove
-        System.out.println("Pre query");
-        queryTables();
-
-        String fileHash;
-        String filepath;
-        int fileSize;
-        int videoSizeX;
-        int videoSizeY;
-        int bitrate;
-
-        JSONObject currentItem;
-        Iterator<?> keys = fileMetadata.keys();
-        String currentKey;
-
-        System.out.println("Initializing videos table...");
-
-        boolean regResult = false;
-        while(keys.hasNext()) {
-
-            currentKey = (String)keys.next();
-            currentItem = fileMetadata.getJSONObject(currentKey);
-
-            fileHash = currentItem.getString("fileHash");
-            filepath = currentItem.getString("filepath");
-            fileSize = currentItem.getInt("fileSize");
-            videoSizeX = currentItem.getInt("videoSizeX");
-            videoSizeY = currentItem.getInt("videoSizeY");
-            bitrate = currentItem.getInt("bitrate");
-
-            System.out.println(String.format("Current video: '%s' '%s'", currentKey, fileHash));
-
-            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
-
-                regResult = deregister.initializeDB(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate);
-            }
-
-            if (regResult == false) {
-                System.err.println("Video db initialization failed for: " + currentKey);
-                fileMetadata.remove(currentKey);
-
-            }
-
-        }
-
-        // TODO: Remove
-        System.out.println("Post query");
-        queryTables();
 
     }
 

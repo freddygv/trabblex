@@ -15,6 +15,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
      */
     public boolean registerSeeder(String fileHash, com.zeroc.Ice.Current current) {
         try {
+            System.out.println(String.format("Seeding Seeder for: %s as active", fileHash));
             String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
 
             dbUpdate(String.format(updateQuery, fileHash));
@@ -64,6 +65,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
                 updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');",
                         fileHash, chunkHashes[i], chunkIDs[i], seederIP, seederPort);
 
+                System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHashes[i], chunkIDs[i]));
                 dbUpdate(updateQuery);
 
             }

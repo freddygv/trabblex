@@ -51,8 +51,10 @@ public class SimpleClient {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Client started");
+        displayHelp();
 
         do{
+
             System.out.print("> ");
             input = sc.nextLine();
             String[] parts = input.split(" ");

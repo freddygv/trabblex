@@ -1,8 +1,9 @@
 #!/bin/bash
 
-kubectl delete service cmanager; kubectl delete service seedbox
+kubectl delete service cmanager
+kubectl delete service seedbox
 
-sleep 4m
+sleep 240
 
 gcloud compute forwarding-rules list
 

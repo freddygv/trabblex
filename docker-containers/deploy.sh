@@ -10,4 +10,18 @@ kubectl create -f k8s-portal.yaml
 kubectl create -f k8s-seedbox.yaml
 kubectl create -f k8s-cmanager.yaml
 
+COUNT=$(kubectl get pods | grep 'ContainerCreating' | wc -l)
+while [ $COUNT -gt 0 ]; do
+  ERROR=$(kubectl get pods | grep -E 'Error|CrashLoopBackOff' | wc -l)
+  if [ $ERROR -gt 0 ]; then
+  	echo "Errors present"
+    kubectl get pods | grep 'Error'
+    break
+  fi
+  
+  COUNT=$(kubectl get pods | grep 'ContainerCreating' | wc -l)
+	echo Number of containers pending creation: $COUNT
+  sleep 30
+done
+
 kubectl get pods
