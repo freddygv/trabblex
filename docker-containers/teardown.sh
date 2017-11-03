@@ -6,5 +6,5 @@ sleep 4m
 
 gcloud compute forwarding-rules list
 
-gcloud container clusters delete trabblex
-gcloud compute disks delete postgres-disk
+yes | gcloud container clusters delete trabblex
+yes | gcloud compute disks delete postgres-disk
