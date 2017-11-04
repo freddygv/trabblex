@@ -44,7 +44,6 @@ public class Seeder {
         this.iceHost = iceHost;
 
         ip = System.getenv("SEEDBOX_IP");
-
         if(ip == null)  ip = "localhost";
 
         this.port = port;

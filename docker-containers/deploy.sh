@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gcloud container clusters create trabblex --machine-type=g1-small --num-nodes=4 --disk-size=30
+gcloud container clusters create trabblex --machine-type=f1-micro --num-nodes=4 --disk-size=30
 gcloud compute disks create postgres-disk --size 200GB
 
 gcloud container clusters get-credentials "trabblex"
@@ -18,7 +18,7 @@ while [ $COUNT -gt 0 ]; do
     kubectl get pods | grep 'Error'
     break
   fi
-  
+
   COUNT=$(kubectl get pods | grep 'ContainerCreating' | wc -l)
 	echo Number of containers pending creation: $COUNT
   sleep 30

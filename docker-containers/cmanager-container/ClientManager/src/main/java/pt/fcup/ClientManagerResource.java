@@ -7,6 +7,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import java.io.IOException;
@@ -34,15 +35,35 @@ public class ClientManagerResource{
 
     public ClientManagerResource()
     {
+        boolean cluster = true;
+
         try
         {
-            db = new DBManager(true);
             seedboxAddress = InetAddress.getByName("seedbox").getHostAddress();
-            host = String.format("%s -p 8082", seedboxAddress);
+
         }
-        catch (ClassNotFoundException | IOException e) {
+        catch (UnknownHostException e) {
+            cluster = false;
+            seedboxAddress = "localhost";
+
+        }
+
+        host = String.format("%s -p 8082", seedboxAddress);
+
+        try {
+            if(cluster) {
+                db = new DBManager(cluster);
+
+            } else {
+                db = new DBManager();
+
+            }
+
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
+
         }
+
     }
 
     private JSONArray runQuery( String query )

@@ -6,6 +6,7 @@ import pt.fcup.exception.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -50,10 +51,21 @@ public class Seedbox {
     }
 
     private void run() throws JSONParsingException, IOException {
-        // TODO: Remove
-        queryTables();
+        String portalAddress;
 
-        String portalAddress = InetAddress.getByName("portal").getHostAddress();
+        try {
+             portalAddress = InetAddress.getByName("portal").getHostAddress();
+
+        } catch (UnknownHostException e) {
+            System.out.println("Running in local mode.");
+            portalAddress = "localhost";
+
+            // TODO: Remove
+            queryTables("local");
+
+        }
+
+        System.out.println(portalAddress);
         iceHost = String.format("%s -p 8081", portalAddress);
 
         // Parsing metadata for each video from a local JSON file
@@ -132,9 +144,18 @@ public class Seedbox {
     /**
      * For debugging only, queries entire seeders and chunk_owners tables to check if all files were added.
      */
-    private void queryTables() {
+    private void queryTables(String mode) {
         try {
-            DBManager testDB = new DBManager(true);
+            DBManager testDB;
+
+            if (mode == "local") {
+                testDB = new DBManager(true);
+
+            } else {
+                testDB = new DBManager();
+
+            }
+
             System.out.println("Querying videos table:");
             System.out.println(testDB.queryTable("SELECT file_hash, file_name FROM videos;").toString());
 

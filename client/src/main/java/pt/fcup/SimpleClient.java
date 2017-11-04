@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 
 
 public class SimpleClient {
+    private final String MODE = "local";
 
     private boolean verbose = false;
     private final int chunkSize = 1024*10; // bytes
@@ -42,7 +43,12 @@ public class SimpleClient {
 
     public SimpleClient(String[] args)
     {
-        client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
+        if(MODE == "local") {
+            client = new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/");
+        } else {
+            client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
+        }
+
     }
 
     private void run()
