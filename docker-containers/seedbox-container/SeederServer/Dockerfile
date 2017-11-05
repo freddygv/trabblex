@@ -20,6 +20,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY src                /usr/src/app/src
+COPY videos             /usr/src/app/videos
 COPY pom.xml            /usr/src/app
 COPY db.properties      /usr/src/app
 COPY file-metadata.json /usr/src/app

@@ -227,7 +227,6 @@ public class SimpleClient {
                 {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
-                    System.out.println(">> port: " + obj.getString("port"));
                 }
             }
         }
