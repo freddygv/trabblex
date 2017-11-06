@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 
 
 public class SimpleClient {
+    private final String MODE = "local";
 
     private boolean verbose = false;
     private final int chunkSize = 1024*10; // bytes
@@ -42,7 +43,12 @@ public class SimpleClient {
 
     public SimpleClient(String[] args)
     {
-        client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
+        if(MODE == "local") {
+            client = new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/");
+        } else {
+            client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
+        }
+
     }
 
     private void run()
@@ -51,8 +57,10 @@ public class SimpleClient {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Client started");
+        displayHelp();
 
         do{
+
             System.out.print("> ");
             input = sc.nextLine();
             String[] parts = input.split(" ");
@@ -219,7 +227,6 @@ public class SimpleClient {
                 {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
-                    System.out.println(">> port: " + obj.getString("port"));
                 }
             }
         }

@@ -15,6 +15,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
      */
     public boolean registerSeeder(String fileHash, com.zeroc.Ice.Current current) {
         try {
+            System.out.println(String.format("Seeding Seeder for: %s as active", fileHash));
             String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
 
             dbUpdate(String.format(updateQuery, fileHash));
@@ -64,6 +65,7 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
                 updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');",
                         fileHash, chunkHashes[i], chunkIDs[i], seederIP, seederPort);
 
+                System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHashes[i], chunkIDs[i]));
                 dbUpdate(updateQuery);
 
             }
@@ -72,22 +74,6 @@ public class RegistrableI implements pt.fcup.generated.RegistrableI {
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Neighborhood update: DB insert failed.");
-            return false;
-
-        }
-    }
-
-    public boolean initializeDB(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate, Current current) {
-        try {
-            String initQuery = "INSERT INTO videos(file_hash, file_name, file_size, protocol, video_size_x, video_size_y, bitrate, seeder_is_active) " +
-                    "VALUES ('%s', '%s', '%d', 'TCP', '%d', '%d', '%d', 'f');";
-
-            dbUpdate(String.format(initQuery, fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate));
-            return true;
-
-        } catch (ClassNotFoundException | IOException | SQLException ec) {
-            System.err.println("Video initialization: DB update failed.");
-            ec.printStackTrace();
             return false;
 
         }

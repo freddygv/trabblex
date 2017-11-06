@@ -125,44 +125,6 @@ public interface RegistrableIPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default boolean initializeDB(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate)
-    {
-        return initializeDB(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate, com.zeroc.Ice.ObjectPrx.noExplicitContext);
-    }
-
-    default boolean initializeDB(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate, java.util.Map<String, String> context)
-    {
-        return _iceI_initializeDBAsync(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate, context, true).waitForResponse();
-    }
-
-    default java.util.concurrent.CompletableFuture<Boolean> initializeDBAsync(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate)
-    {
-        return _iceI_initializeDBAsync(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
-    }
-
-    default java.util.concurrent.CompletableFuture<Boolean> initializeDBAsync(String fileHash, String filepath, int fileSize, int videoSizeX, int videoSizeY, int bitrate, java.util.Map<String, String> context)
-    {
-        return _iceI_initializeDBAsync(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate, context, false);
-    }
-
-    default com.zeroc.IceInternal.OutgoingAsync<Boolean> _iceI_initializeDBAsync(String iceP_fileHash, String iceP_filepath, int iceP_fileSize, int iceP_videoSizeX, int iceP_videoSizeY, int iceP_bitrate, java.util.Map<String, String> context, boolean sync)
-    {
-        com.zeroc.IceInternal.OutgoingAsync<Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "initializeDB", null, sync, null);
-        f.invoke(true, context, null, ostr -> {
-                     ostr.writeString(iceP_fileHash);
-                     ostr.writeString(iceP_filepath);
-                     ostr.writeInt(iceP_fileSize);
-                     ostr.writeInt(iceP_videoSizeX);
-                     ostr.writeInt(iceP_videoSizeY);
-                     ostr.writeInt(iceP_bitrate);
-                 }, istr -> {
-                     boolean ret;
-                     ret = istr.readBool();
-                     return ret;
-                 });
-        return f;
-    }
-
     /**
      * Contacts the remote server to verify that the object implements this type.
      * Raises a local exception if a communication error occurs.

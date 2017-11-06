@@ -1,5 +1,3 @@
-UPDATE IP
-
 gcloud container clusters create trabblex --machine-type=f1-micro --num-nodes=4 --disk-size=30
 gcloud container clusters create trabblex --machine-type=g1-small --num-nodes=4 --disk-size=30
 
@@ -8,10 +6,13 @@ gcloud container clusters describe trabblex
 
 gcloud container clusters get-credentials "trabblex"
 gcloud compute disks create postgres-disk --size 200GB
+gcloud compute disks create seedbox-disk --size 200GB
 
 kubectl create -f k8s-postgres-server.yaml; kubectl create -f k8s-portal.yaml; kubectl create -f k8s-seedbox.yaml; kubectl create -f k8s-cmanager.yaml
 
 kubectl get pods
+
+kubectl set image deployment/portal portal=eu.gcr.io/groupj-179216/fq-portal:rc2
 
 kubectl delete deployment postgres-server; kubectl delete service postgres-server
 kubectl delete deployment portal; kubectl delete service portal

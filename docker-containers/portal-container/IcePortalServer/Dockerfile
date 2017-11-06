@@ -29,5 +29,6 @@ COPY portal-init.sh  /usr/src/app
 
 RUN chmod +x wait-for-it.sh
 RUN chmod +x portal-init.sh
+RUN mvn -U clean install -DskipTests
 
 CMD ["./portal-init.sh"]

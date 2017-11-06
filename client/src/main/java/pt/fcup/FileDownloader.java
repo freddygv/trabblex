@@ -412,7 +412,6 @@ public class FileDownloader extends Thread
      * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
      * @param file
      * @return hex string hash
-     * @throws FileHashException
      * Copied from Seeder.java, dirty...
      */
     //

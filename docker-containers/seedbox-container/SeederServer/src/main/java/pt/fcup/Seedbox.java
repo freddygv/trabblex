@@ -3,10 +3,10 @@ package pt.fcup;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pt.fcup.exception.*;
-import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -51,12 +51,25 @@ public class Seedbox {
     }
 
     private void run() throws JSONParsingException, IOException {
-        String portalAddress = InetAddress.getByName("portal").getHostAddress();
+        String portalAddress;
+
+        try {
+             portalAddress = InetAddress.getByName("portal").getHostAddress();
+
+        } catch (UnknownHostException e) {
+            System.out.println("Running in local mode.");
+            portalAddress = "localhost";
+
+            // TODO: Remove
+            queryTables("local");
+
+        }
+
+        System.out.println(portalAddress);
         iceHost = String.format("%s -p 8081", portalAddress);
 
         // Parsing metadata for each video from a local JSON file
         parseMetadata();
-        writeVideosToDB();
 
         // Set up ICE adapter to accept incoming messages
         IceServer rpc = new IceServer();
@@ -128,65 +141,21 @@ public class Seedbox {
 
     }
 
-    private void writeVideosToDB() {
-        // TODO: Remove
-        System.out.println("Pre query");
-        queryTables();
-
-        String fileHash;
-        String filepath;
-        int fileSize;
-        int videoSizeX;
-        int videoSizeY;
-        int bitrate;
-
-        JSONObject currentItem;
-        Iterator<?> keys = fileMetadata.keys();
-        String currentKey;
-
-        System.out.println("Initializing videos table...");
-
-        boolean regResult = false;
-        while(keys.hasNext()) {
-
-            currentKey = (String)keys.next();
-            currentItem = fileMetadata.getJSONObject(currentKey);
-
-            fileHash = currentItem.getString("fileHash");
-            filepath = currentItem.getString("filepath");
-            fileSize = currentItem.getInt("fileSize");
-            videoSizeX = currentItem.getInt("videoSizeX");
-            videoSizeY = currentItem.getInt("videoSizeY");
-            bitrate = currentItem.getInt("bitrate");
-
-            System.out.println(String.format("Current video: '%s' '%s'", currentKey, fileHash));
-
-            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx deregister = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
-
-                regResult = deregister.initializeDB(fileHash, filepath, fileSize, videoSizeX, videoSizeY, bitrate);
-            }
-
-            if (regResult == false) {
-                System.err.println("Video db initialization failed for: " + currentKey);
-                fileMetadata.remove(currentKey);
-
-            }
-
-        }
-
-        // TODO: Remove
-        System.out.println("Post query");
-        queryTables();
-
-    }
-
     /**
      * For debugging only, queries entire seeders and chunk_owners tables to check if all files were added.
      */
-    private void queryTables() {
+    private void queryTables(String mode) {
         try {
-            DBManager testDB = new DBManager(true);
+            DBManager testDB;
+
+            if (mode == "local") {
+                testDB = new DBManager(true);
+
+            } else {
+                testDB = new DBManager();
+
+            }
+
             System.out.println("Querying videos table:");
             System.out.println(testDB.queryTable("SELECT file_hash, file_name FROM videos;").toString());
 

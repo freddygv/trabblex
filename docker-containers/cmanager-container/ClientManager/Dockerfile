@@ -29,5 +29,6 @@ COPY cmanager-init.sh  /usr/src/app
 
 RUN chmod +x wait-for-it.sh
 RUN chmod +x cmanager-init.sh
+RUN mvn -U clean install -DskipTests
 
 CMD ["./cmanager-init.sh"]
