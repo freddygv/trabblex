@@ -31,6 +31,11 @@ class Downloader extends Thread
 	@Override
 	public void run()
 	{ 
+		downloadChunk();
+	}
+
+	public void downloadChunk()
+	{
 		// dobug
 		//System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
 
@@ -84,7 +89,17 @@ class Downloader extends Thread
 		}
 		catch(java.io.FileNotFoundException e)
 		{
-			System.err.println("Couldn't create output file - check if downloads folder exists");
+			// debug
+			//System.err.println("Couldn't create output file - check if downloads folder exists");
+
+			// Create download folder
+			success = (new File("downloads")).mkdir();
+			if (!success) {
+				System.err.printlf"Couldn't create local directory downloads, please try creating it manually");
+			}
+
+			// if download folder created, try again downloading the chunk
+			return downloadChunk();
 		}
 		catch(java.net.ConnectException e)
 		{
@@ -101,7 +116,6 @@ class Downloader extends Thread
         }
 
         return;
-
 	}
 
 	public int getNbChunks()
