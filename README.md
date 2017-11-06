@@ -141,6 +141,9 @@ TCP connection was not closed properly, and the client would stall...
     -->> long term = need better exception management, 
         and exception scenario management
 
+Note: since the client downloads chunks by rarity, it NEEDS to download the whole file
+before being able to play it - streaming is not possible.
+
 # Documentation
 
 | Software | Link |
