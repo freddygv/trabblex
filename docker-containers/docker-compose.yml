@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   postgres-server:
-    image: eu.gcr.io/${PROJECT_ID}/fq-db:rc2
+    image: eu.gcr.io/groupj-179216/fq-db:rc2
     build: ./database-container
     networks:
       - mybridge
@@ -12,7 +12,7 @@ services:
      - POSTGRES_DB=prod
 
   portal:
-    image: eu.gcr.io/${PROJECT_ID}/fq-portal:rc2
+    image: eu.gcr.io/groupj-179216/fq-portal:rc2
     build: ./portal-container/IcePortalServer
     networks:
       - mybridge
@@ -20,7 +20,7 @@ services:
       - postgres-server
 
   seedbox:
-    image: eu.gcr.io/${PROJECT_ID}/fq-seedbox:rc2
+    image: eu.gcr.io/groupj-179216/fq-seedbox:rc2
     build: ./seedbox-container/SeederServer
     networks:
       - mybridge
@@ -30,7 +30,7 @@ services:
       - portal
 
   clientmanager:
-    image: eu.gcr.io/${PROJECT_ID}/fq-cmanager:rc2
+    image: eu.gcr.io/groupj-179216/fq-cmanager:rc2
     build: ./cmanager-container/ClientManager
     networks:
       - mybridge
