@@ -34,14 +34,14 @@ class Downloader extends Thread
 		downloadChunk();
 	}
 
-	public void downloadChunk()
+	public int downloadChunk()
 	{
 		// dobug
 		//System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
 
 		if (protocol != "TCP") {
 			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
-			return;
+			return 0;
 		}
 
 		try (
@@ -93,9 +93,9 @@ class Downloader extends Thread
 			//System.err.println("Couldn't create output file - check if downloads folder exists");
 
 			// Create download folder
-			success = (new File("downloads")).mkdir();
+			boolean success = (new File("downloads")).mkdir();
 			if (!success) {
-				System.err.printlf"Couldn't create local directory downloads, please try creating it manually");
+				System.err.println("Couldn't create local directory downloads, please try creating it manually");
 			}
 
 			// if download folder created, try again downloading the chunk
@@ -105,17 +105,17 @@ class Downloader extends Thread
 		{
 			// debug
         	//System.out.println("Couldn't connect to " + ip + ":" + port);
-        	return;
+        	return 0;
 		}
 		catch(Exception e)
         {
         	// debug
         	//System.out.println("Couldn't connect to " + ip + ":" + port);
            	e.printStackTrace();
-        	return;
+        	return 0;
         }
 
-        return;
+        return 1;
 	}
 
 	public int getNbChunks()

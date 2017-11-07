@@ -35,7 +35,7 @@ public class FileDownloader extends Thread
     private int nbChunksNotDownloaded;
 
     private final int localPort = 26000;
-    private final String localIP = InetAddress.getLocalHost();
+    private String localIP;
 
     // TODO pass the hashing algorithm through the header...
     private final String HASHING_ALGORITHM = "SHA-256";
@@ -47,6 +47,15 @@ public class FileDownloader extends Thread
 
         // client reference passed by the parent client
         this.client = client;
+
+        try{
+            localIP = InetAddress.getLocalHost().getHostAddress();
+        }
+        catch(UnknownHostException e)
+        {
+            System.err.println("Couldn't get local IP adress !");
+            // do something
+        }
     }
 
     public String getFileName()
