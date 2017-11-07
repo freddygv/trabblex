@@ -35,7 +35,7 @@ public class FileDownloader extends Thread
     private int nbChunksNotDownloaded;
 
     private final int localPort = 26000;
-    private final String localIP = "localhost";
+    private final String localIP = InetAddress.getLocalHost();
 
     // TODO pass the hashing algorithm through the header...
     private final String HASHING_ALGORITHM = "SHA-256";
