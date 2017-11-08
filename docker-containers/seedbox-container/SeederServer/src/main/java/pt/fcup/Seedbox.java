@@ -61,7 +61,7 @@ public class Seedbox {
             portalAddress = "localhost";
 
             // TODO: Remove
-            queryTables("local");
+            //queryTables("local");
 
         }
 
