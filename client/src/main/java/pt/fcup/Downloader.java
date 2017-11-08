@@ -26,6 +26,8 @@ class Downloader extends Thread
 		this.file = file;
 		this.chunkNumber = chunkNumber;
 		this.hash = hash;
+
+		System.out.println("Started downloader");
 	}
 
 	@Override
@@ -37,7 +39,7 @@ class Downloader extends Thread
 	public int downloadChunk()
 	{
 		// dobug
-		//System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
+		System.out.println("Connecting to " + ip + ":" + port + " to get file hash " + hash);
 
 		if (protocol != "TCP") {
 			System.out.println("Sorry, protocol " + protocol + " is not yet supported!");
@@ -59,18 +61,18 @@ class Downloader extends Thread
 		) {
 
 			// debug
-        	//System.out.println("Connection successfull to " + ip + ":" + port);
-			//System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
+        	System.out.println("Connection successfull to " + ip + ":" + port);
+			System.out.println(String.format("Requesting chunk id #%s for file: %s", chunkNumber, file));
 			out.println(chunkNumber);
 			out.println(file);
 
 			// debug
-        	//System.out.println("Sent chunk number and file name");
+        	System.out.println("Sent chunk number and file name");
 
 			nbChunks = Integer.parseInt(in.readLine());
 
 			// debug
-        	//System.out.println("Got number of chunks = " + nbChunks);
+        	System.out.println("Got number of chunks = " + nbChunks);
 
 			byte[] contents = new byte[1024*1024];
 			int bytesRead = 0;
@@ -84,7 +86,7 @@ class Downloader extends Thread
 			fos.close();
 			dis.close();
 			// debug
-			//System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
+			System.out.println(String.format("Downloaded chunk %s of '%s' successfully", chunkNumber, file));
 
 		}
 		catch(java.io.FileNotFoundException e)

@@ -159,7 +159,7 @@ public class FileDownloader extends Thread
         {
 
             // debug
-            //System.out.println("This is try " + tries + "/" + remoteChunkOwners.length());
+            System.out.println("This is try " + tries + "/" + remoteChunkOwners.length());
 
             if(remoteChunkOwners.length() <= tries)
             {
@@ -167,7 +167,22 @@ public class FileDownloader extends Thread
                 return false;
             }
 
-            JSONObject obj = remoteChunkOwners.getJSONObject(tries);
+            // TODO cleanup this mess
+            // get first owner that isn't a seeder from the server
+            JSONObject obj;
+
+          /*  int xab= 1;
+            for(int i = 0; i < remoteChunkOwners.length(); i ++){
+                obj = remoteChunkOwners.getJSONObject(tries);
+                System.out.println("Owner : " + obj.getString("owner_ip"));
+                if(!obj.getString("owner_ip").equals("35.187.185.209:29200")){
+                    xab = i;
+                    System.err.println("Found non-seeder source : " + xab);
+                }
+            }
+            obj = remoteChunkOwners.getJSONObject(xab);*/
+            obj = remoteChunkOwners.getJSONObject(tries);
+
 
             // if we have tested all sedeers, then file unavailable :(
             if(obj == null)
