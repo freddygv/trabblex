@@ -102,6 +102,9 @@ public class FileDownloader extends Thread
             System.err.println("Couldn't get the chunk owners of the file!");
         }
 
+        System.out.println("ChunkOwners = " + chunkOwners);
+        System.out.println("Filehash = " + fileHash);
+
         return chunkOwners;
     }
 
@@ -167,22 +170,38 @@ public class FileDownloader extends Thread
             Thread.currentThread().interrupt();
 
         do{
-            //System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + " chunks");
+            System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + " chunks");
+            System.out.println("nbChunksInFile " + nbChunksInFile + "");
             
             // determine next chunk to download
             Chunk nextChunkToDownload = chm.getRarestChunk();
 
-            //System.out.println("Downloading chunk " + nextChunkToDownload.chunkNumber);
 
             if(nextChunkToDownload == null)
             {
-              //  System.err.println("Error couldn't get a source for the next chunk !\n"
-                //                    + "Note: this shouldn't be happening");
+                System.err.println("Requesting a new seeder...\n");
+
+                String newSeeder = client.query("createseeder", name);
+                if(newSeeder == null)
+                {
+                    System.err.println("Error requesting the creation of a new seeder: " + newSeeder);
+                    return false;
+                }
+                
+                // get to next loop
                 continue;
             }
 
+            System.out.println("Downloading chunk " + nextChunkToDownload.chunkNumber);
+
             // get a source for this chunk
             Owner chunkSource = nextChunkToDownload.getSource();
+
+            // if no sources available, request a seeder
+          /*  if(chunkSource == null)
+            {
+                
+            }*/
 
             // start downloader
             Downloader dwl = new Downloader(
@@ -229,7 +248,7 @@ public class FileDownloader extends Thread
             }
 
 
-        } while(chm.numberOfChunksNotDownloaded() > 0);
+        } while(chm.numberOfChunksNotDownloaded() > 0 || nbChunksInFile == 0);
 
 
         // assemble files bla bla bla
@@ -245,7 +264,7 @@ public class FileDownloader extends Thread
             System.out.print("File " + name + " successfully downloaded\n> ");
         }
         else{
-            System.err.print("File " + name + " chunk is not valid :(\n> ");
+            System.err.print("File " + name + " hash is not valid :(\n> ");
         }
 
         return true;

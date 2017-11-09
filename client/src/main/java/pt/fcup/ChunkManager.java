@@ -29,14 +29,15 @@ class ChunkManager
     // TODO calculate unique number of chunks (based on numbers)
 	public ChunkManager(JSONArray remoteChunkOwners)
 	{
+		System.out.println("Saving remote chunks..");
 
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
         {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
             // debug
-        	//System.out.print("Chunk manager saving chunk " + obj.getString("chunk_id")
-        	//	+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
+        	System.out.print("Chunk manager saving chunk " + obj.getString("chunk_id")
+        		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
 
             String hash = obj.getString("chunk_hash");
             if(!chunks.containsKey(hash))
@@ -55,7 +56,7 @@ class ChunkManager
             else
             {
             	// debug
-            	//System.out.println("Already available chunk, new source !");
+            	System.out.println("Already available chunk, new source !");
             	// update chunk info to add new source
             	chunks.get(hash).addSource(obj);
             }
@@ -96,7 +97,7 @@ class ChunkManager
 		}
 
 		// debug
-		//System.out.println("Rarest chunk is number "+ ch.chunkNumber);
+		System.out.println("Rarest chunk is number "+ ch.chunkNumber);
     	
 
 		return ch;
