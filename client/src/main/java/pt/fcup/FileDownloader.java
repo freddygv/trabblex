@@ -2,6 +2,7 @@ package pt.fcup;
 
 import java.util.Properties;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 import javax.ws.rs.GET;
@@ -52,12 +53,21 @@ public class FileDownloader extends Thread
 
         try{
             localIP = InetAddress.getLocalHost().getHostAddress();
+
+            if(localIP.equals("127.0.1.1"))
+            {
+                Scanner sc = new Scanner(System.in);
+                System.out.println("Please enter your IP adress: ");
+                localIP = sc.nextLine();
+
+            }
         }
         catch(UnknownHostException e)
         {
             System.err.println("Couldn't get local IP adress !");
             // do something
         }
+        System.err.println("Local IP adress is " + localIP);
     }
 
     public String getFileName()
@@ -147,10 +157,6 @@ public class FileDownloader extends Thread
 
     private boolean downloadFile() throws IOException
     {
-
-        // the owners of the chunk of the file (seeder + other clients)
-        JSONArray remoteChunkOwners = null;
-
         // the protocol that will be used - atm, fixed
         String protocol = "TCP";
 
@@ -159,7 +165,7 @@ public class FileDownloader extends Thread
 
         // Fetch all the chunk owners related to the client
         String chunkOwners = getChunkOwners();
-        remoteChunkOwners = new JSONArray(chunkOwners);
+        JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
         // have the chunkmanager point to a new instance
         // TODO does this work ?
         chm = new ChunkManager(remoteChunkOwners);
@@ -186,6 +192,12 @@ public class FileDownloader extends Thread
                 {
                     System.err.println("Error requesting the creation of a new seeder: " + newSeeder);
                     return false;
+                }
+                else // update chunkmanager
+                {
+                    String newChunkOwners = getChunkOwners();
+                    JSONArray newRemoteChunkOwners = new JSONArray(newChunkOwners);
+                    chm.addChunkOwners(newRemoteChunkOwners);
                 }
                 
                 // get to next loop

@@ -29,6 +29,11 @@ class ChunkManager
     // TODO calculate unique number of chunks (based on numbers)
 	public ChunkManager(JSONArray remoteChunkOwners)
 	{
+		addChunkOwners(remoteChunkOwners);
+	}
+
+	public void addChunkOwners(JSONArray remoteChunkOwners)
+	{
 		System.out.println("Saving remote chunks..");
 
         for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
