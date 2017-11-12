@@ -196,6 +196,7 @@ public class FileDownloader extends Thread
                     System.err.println("Error requesting the creation of a new seeder: " + newSeeder);
                     return false;
                 }
+                System.out.println("Result = " + newSeeder);
                 
                 // get to next loop
                 continue;
@@ -203,9 +204,9 @@ public class FileDownloader extends Thread
 
             // update chunkmanager to make sure we have all the sources
                 
-            String newChunkOwners = getChunkOwners();
+          /*  String newChunkOwners = getChunkOwners();
             JSONArray newRemoteChunkOwners = new JSONArray(newChunkOwners);
-            chm.addChunkOwners(newRemoteChunkOwners);
+            chm.addChunkOwners(newRemoteChunkOwners);*/
 
             System.out.println("Downloading chunk " + nextChunkToDownload.chunkNumber);
 
