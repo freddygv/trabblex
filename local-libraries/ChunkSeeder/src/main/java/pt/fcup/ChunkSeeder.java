@@ -36,7 +36,7 @@ class ChunkSeeder extends Thread {
             //System.out.println("Local seeder seeding file " + filepath);
             File file = new File("sources/" + filepath + "-" + chunkID);
 
-            //System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filepath));
+            System.out.println(String.format("User requested chunk id #%s for file: %s", chunkID, filepath));
 
             OutputStream os = socket.getOutputStream();
             PrintWriter out = new PrintWriter(os, true);
@@ -44,7 +44,7 @@ class ChunkSeeder extends Thread {
 
             if(!file.exists())
             {
-                //System.out.println("Error opening file " + "sources/" + filepath + "-" + chunkID);
+                System.out.println("Error opening file " + "sources/" + filepath + "-" + chunkID);
             }
             else
             {

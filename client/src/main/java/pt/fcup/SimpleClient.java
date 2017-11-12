@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 
 
 public class SimpleClient {
-    private final String MODE = "local";
+    private final String MODE = "remote";
 
     private boolean verbose = false;
     private final int chunkSize = 1024*10; // bytes
