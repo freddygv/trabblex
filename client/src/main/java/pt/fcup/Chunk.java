@@ -35,6 +35,9 @@ public class Chunk
 		ow.is_seeder = obj.getString("is_seeder").equalsIgnoreCase("t");
 		ow.hash = obj.getString("chunk_hash");
 
+		if(owners.contains(ow))
+			System.out.println("Owner already known !");
+
 		owners.add(ow);
 
 		// save chunk number

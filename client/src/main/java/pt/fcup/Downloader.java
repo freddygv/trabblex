@@ -50,8 +50,8 @@ class Downloader extends Thread
 		try{
 			Socket clientSocket = new Socket();
 			InetSocketAddress adr = new InetSocketAddress(ip, port);
-			clientSocket.connect(adr, 1000);
-			clientSocket.setSoTimeout(1000);
+			clientSocket.connect(adr, 5000);
+			clientSocket.setSoTimeout(10000);
 
 			PrintWriter out =
 					new PrintWriter(clientSocket.getOutputStream(), true);
@@ -109,13 +109,14 @@ class Downloader extends Thread
 		catch(java.net.ConnectException e)
 		{
 			// debug
-        	//System.out.println("Couldn't connect to " + ip + ":" + port);
+        	System.out.println("Couldn't connect to " + ip + ":" + port);
+        	e.printStackTrace();
         	return 0;
 		}
 		catch(Exception e)
         {
         	// debug
-        	//System.out.println("Couldn't connect to " + ip + ":" + port);
+        	System.out.println("Couldn't connect to " + ip + ":" + port);
            	e.printStackTrace();
         	return 0;
         }
