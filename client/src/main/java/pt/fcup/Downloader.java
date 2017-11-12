@@ -2,6 +2,7 @@ package pt.fcup;
 
 import java.io.FileOutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.io.*;
 
@@ -46,19 +47,21 @@ class Downloader extends Thread
 			return 0;
 		}
 
-		try (
-				Socket clientSocket = new Socket(InetAddress.getByName(ip), port);
+		try{
+			Socket clientSocket = new Socket();
+			InetSocketAddress adr = new InetSocketAddress(ip, port);
+			clientSocket.connect(adr, 1000);
+			clientSocket.setSoTimeout(1000);
 
-				PrintWriter out =
-						new PrintWriter(clientSocket.getOutputStream(), true);
-				BufferedReader in =
-						new BufferedReader(
-								new InputStreamReader(clientSocket.getInputStream()));
+			PrintWriter out =
+					new PrintWriter(clientSocket.getOutputStream(), true);
+			BufferedReader in =
+					new BufferedReader(
+							new InputStreamReader(clientSocket.getInputStream()));
 
-				DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+			DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
-				FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
-		) {
+			FileOutputStream fos = new FileOutputStream("downloads/" + file + "-" + chunkNumber);
 
 			// debug
         	System.out.println("Connection successfull to " + ip + ":" + port);
