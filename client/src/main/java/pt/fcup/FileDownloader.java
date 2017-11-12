@@ -170,6 +170,9 @@ public class FileDownloader extends Thread
         // TODO does this work ?
         chm = new ChunkManager(remoteChunkOwners);
 
+
+        UploadServer up = null;
+
         int nbChunksInFile = 0;
 
         if(chunkOwners == null)
@@ -251,6 +254,15 @@ public class FileDownloader extends Thread
                     // restart, only this time with all the seeders needed...
                     return downloadFile();
                 }
+
+                // if no uploadserver running, create one
+                if(up == null)
+                {
+                    up = new UploadServer(localPort, nbChunksInFile);
+                    Thread usThread = new Thread(up, "Client upload Thread");
+                    usThread.start();
+                }
+
 
             }
             catch(Exception e)

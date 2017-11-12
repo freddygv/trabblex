@@ -17,8 +17,8 @@ class ChunkSeeder extends Thread {
     }
 
     public void run() {
-        //System.out.println("Starting local chunk seeder");
-        //System.out.println("Path%" + System.getProperty("user.dir"));
+        System.out.println("Starting local chunk seeder");
+        System.out.println("Path%" + System.getProperty("user.dir"));
         transferChunk();
 
     }

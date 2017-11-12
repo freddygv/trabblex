@@ -8,13 +8,11 @@ import java.util.concurrent.Executors;
 public class UploadServer implements Runnable {
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
     private int BASE_PORT;
-    private String file;
     private int nbChunks;
 
-    public UploadServer(int BASE_PORT, int nbChunks, String file)
+    public UploadServer(int BASE_PORT, int nbChunks)
     {
         this.BASE_PORT = BASE_PORT;
-        this.file = file;
         this.nbChunks = nbChunks;
     }
 
