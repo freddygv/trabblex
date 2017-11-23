@@ -3,6 +3,7 @@
 kubectl delete service cmanager
 kubectl delete service seedbox
 
+# Wait for static IP to un-bind
 sleep 240
 
 gcloud compute forwarding-rules list

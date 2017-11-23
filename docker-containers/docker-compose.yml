@@ -11,14 +11,6 @@ services:
      - POSTGRES_PASSWORD=verylongandsecurerootpassword
      - POSTGRES_DB=prod
 
-  portal:
-    image: eu.gcr.io/groupj-179216/fq-portal:rc2
-    build: ./portal-container/IcePortalServer
-    networks:
-      - mybridge
-    depends_on:
-      - postgres-server
-
   seedbox:
     image: eu.gcr.io/groupj-179216/fq-seedbox:rc2
     build: ./seedbox-container/SeederServer
@@ -27,7 +19,7 @@ services:
     ports:
       - "29200:29200"
     depends_on:
-      - portal
+      - postgres-server
 
   clientmanager:
     image: eu.gcr.io/groupj-179216/fq-cmanager:rc2

@@ -37,11 +37,3 @@ spec:
             name: sockets
           - containerPort: 8082
             name: ice
-        volumeMounts:
-            - name: seedbox-persistent-storage
-              mountPath: /var/lib/seedbox
-      volumes:
-        - name: seedbox-persistent-storage
-          gcePersistentDisk:
-            pdName: seedbox-disk
-            fsType: ext4
