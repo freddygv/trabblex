@@ -10,9 +10,9 @@ public class IceServer implements Runnable {
         try {
             ic = com.zeroc.Ice.Util.initialize();
 
-            // Creates ICE adapter and binds RequestableI interface
-            com.zeroc.Ice.ObjectAdapter adapter =
-                    ic.createObjectAdapterWithEndpoints("SeederRequestAdapter", "default -p 8082");
+            com.zeroc.Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("SeederRequestAdapter",
+                                                                                      "default -p 8082");
+
             adapter.add(new RequestableI(), com.zeroc.Ice.Util.stringToIdentity("SeederRequest"));
             adapter.activate();
             ic.waitForShutdown();
@@ -35,6 +35,7 @@ public class IceServer implements Runnable {
                 status = 1;
             }
         }
+
         System.exit(status);
     }
 }

@@ -1,7 +1,6 @@
 package pt.fcup;
 
 import pt.fcup.exception.FileHashException;
-import pt.fcup.generated.RegistrableIPrx;
 
 import java.io.*;
 import org.json.JSONObject;
@@ -13,49 +12,40 @@ import java.security.NoSuchAlgorithmException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Seeder {
-    private final int MAX_RETRIES = 4;
+    private DBManager db;
+
+    private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
     private final String HASHING_ALGORITHM = "SHA-256";
     private final String BASE_PATH = "videos/";
 
-    private final String filepath;
     private final String fullPath;
     private final String videoName;
     private final int port;
     private String ip;
 
-    private final String iceHost;
-
     private String fileHash;
     private int numberOfChunks;
-    private int maxChunkSizeInBytes;
 
     private List<String> chunkHashes;
     private List<String> chunkIDs;
 
-    public Seeder(String filepath, int port, String iceHost, JSONObject fileMetadata, int chunkSize) throws UnknownHostException {
-        this.filepath = filepath;
+    public Seeder(String filepath, int port, JSONObject fileMetadata) throws UnknownHostException {
+
         fullPath = BASE_PATH + filepath;
 
-        this.iceHost = iceHost;
-
         ip = System.getenv("SEEDBOX_IP");
-        if(ip == null)  ip = "localhost";
+        if (ip == null) ip = "localhost";
 
         this.port = port;
-        System.out.println("Seeder IP:PORT for " + filepath + " is " + ip + ":" + port);
 
         videoName = fileMetadata.get("videoName").toString();
-        maxChunkSizeInBytes = chunkSize; // 10 Mb
 
-    }
-
-    public String getFilepath() {
-        return filepath;
     }
 
     public String getFullPath() {
@@ -73,57 +63,106 @@ public class Seeder {
     /**
      * Registers Seeder/file with the portal and sends chunk hashes to update swarm/neighborhood
      *
-     * TODO: Send arguments instead, and build query in the portal
      * @return true if file and neighborhood registrations are successful
      */
     public boolean registerSeeder() {
-
-        boolean regResult = false;
-        boolean neighborhoodResult = false;
-
-        String[] hashStringArray = chunkHashes.toArray(new String[chunkHashes.size()]);
-        String[] idStringArray = chunkIDs.toArray(new String[chunkIDs.size()]);
-
         System.out.println("Registering seeder for " + videoName + " at port " + port);
+        boolean videoRegResult = registerInVideos();
+        boolean chunkRegResult = registerInChunkOwners();
 
-        // Retry policy
-        for (int retries = 0; retries < MAX_RETRIES; retries++) {
-            try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RegistrableIPrx register = RegistrableIPrx.checkedCast(communicator.stringToProxy("SeederRegistration:default -h " + iceHost));
+        if(videoRegResult && chunkRegResult) {
+            return true;
 
-                regResult = register.registerSeeder(fileHash);
+        } else {
+            // TODO: Handle de-reg failure
+            deregisterSeeder();
+            return false;
 
-                neighborhoodResult = register.sendHashes(hashStringArray, idStringArray, fileHash, ip, port);
-
-            }
-
-            if (regResult && neighborhoodResult) {
-                break;
-            }
         }
+    }
 
-        return regResult && neighborhoodResult;
+    /**
+     * Update the videos table to indicate there's an active seeder
+     * @return true if registration was completed without exceptions
+     */
+    private boolean registerInVideos() {
+        try {
+            System.out.println(String.format("Seeding Seeder for: %s as active", fileHash));
+            String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
+
+            dbUpdate(String.format(updateQuery, fileHash));
+            return true;
+
+        } catch (ClassNotFoundException | IOException | SQLException ec) {
+            System.err.println("Seeder registration: DB update failed.");
+            ec.printStackTrace();
+            return false;
+
+        }
 
     }
 
     /**
-     * Generate hash for file, chunk file, then hash chunks
+     * Update the chunk_owners table to populate seeder IP for each chunk
+     * @return true if registration was completed without exceptions
+     */
+    private boolean registerInChunkOwners() {
+        String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) ";
+        String updateQuery;
+        try {
+            for (int i = 0; i < chunkHashes.size(); i++) {
+                updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');", fileHash,
+                                                                                                            chunkHashes.get(i),
+                                                                                                            chunkIDs.get(i),
+                                                                                                            ip,
+                                                                                                            port);
+
+                System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHashes.get(i),
+                                                                                            chunkIDs.get(i)));
+                dbUpdate(updateQuery);
+
+            }
+
+            return true;
+
+        } catch (ClassNotFoundException | IOException | SQLException ec) {
+            System.err.println("Neighborhood update: DB insert failed.");
+            return false;
+
+        }
+    }
+
+    /**
+     * Deletes from videos table, removing de-registered seeder
+     * @return true if records successfully deleted
+     */
+    private boolean deregisterSeeder(){
+        String seederDeletionQuery = "UPDATE videos SET seeder_is_active = 'f' WHERE file_hash = '%s';";
+        String neighborDeletionQuery = "DELETE FROM chunk_owners WHERE file_hash = '%s';";
+
+        try {
+            dbUpdate(String.format(seederDeletionQuery, fileHash));
+            dbUpdate(String.format(neighborDeletionQuery, fileHash));
+            return true;
+
+        } catch (ClassNotFoundException | IOException | SQLException ec) {
+            System.err.println("Seeder de-registration: DB delete failed.");
+            ec.printStackTrace();
+            return false;
+
+        }
+    }
+
+    /**
+     * Generate SHA-256 hash for file, chunk file, then hash chunks.
+     * Hashes used for file verification on the client-side.
      * @return true if video processed successfully
      */
     public boolean processVideo() throws FileHashException, IOException {
         try {
             fileHash = hashFile(new File(fullPath));
             System.out.println("SHA-256 Hash: " + fileHash);
-
-        } catch (FileHashException e) {
-            System.err.println("Error generating file hash.");
-            throw e;
-
-        }
-
-        try {
             chunkAndHash();
-            System.out.println("Number of chunks: " + numberOfChunks);
 
         } catch (IOException | FileHashException e) {
             System.err.println("Error chunking file and hashing chunks.");
@@ -185,7 +224,7 @@ public class Seeder {
      * @throws FileHashException
      */
     private void chunkAndHash() throws IOException, FileHashException {
-        byte[] chunkBuffer = new byte[maxChunkSizeInBytes];
+        byte[] chunkBuffer = new byte[CHUNK_SIZE];
         String chunkName;
         String chunkHash;
         int chunkIndex = 0;
@@ -196,8 +235,7 @@ public class Seeder {
             chunkHashes = new ArrayList<>();
             chunkIDs = new ArrayList<>();
 
-            int bytesRead = 0;
-
+            int bytesRead;
             while((bytesRead = bi.read(chunkBuffer)) > 0) {
                 chunkName = fullPath + "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
@@ -210,8 +248,6 @@ public class Seeder {
                     chunkHashes.add(chunkHash);
                     chunkIDs.add(Integer.toString(chunkIndex));
 
-                    System.out.println(String.format("Chunk index: %d, Chunk hash: %s", chunkIndex, chunkHash));
-
                     chunkIndex++;
                 }
             }
@@ -222,4 +258,16 @@ public class Seeder {
 
     }
 
+    /**
+     * TODO: Implement DB connection pool
+     * @param query DB insert/update/delete to execute
+     */
+    private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
+        db = (ip == "localhost") ? new DBManager(true)
+                                 : new DBManager();
+
+        db.singleUpdate(query);
+        db = null;
+
+    }
 }

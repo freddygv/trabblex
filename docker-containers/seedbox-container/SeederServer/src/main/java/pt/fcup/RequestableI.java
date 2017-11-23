@@ -34,11 +34,11 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
             numChunks = newSeed.getNumberOfChunks();
 
         } catch (IOException | FileHashException e) {
-            // TODO: Handle seeder creation failure in ClientManager, if 0 is returned, consider failure
             System.err.println("Error generating seeder.");
 
 
         } finally {
+            // If 0 is returned, ClientManager handles failure
             return numChunks;
 
         }

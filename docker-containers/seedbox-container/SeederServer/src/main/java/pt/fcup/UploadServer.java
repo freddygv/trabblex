@@ -12,14 +12,11 @@ public class UploadServer implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(String.format("Starting Upload ThreadPool with %s threads", MAX_THREADS));
-
         ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
 
         boolean listening = true;
         try (ServerSocket serverSocket = new ServerSocket(BASE_PORT)) {
             while (listening) {
-                System.out.println("Listening for new connections...");
                 ServerChunkSeeder cs = new ServerChunkSeeder(serverSocket.accept());
                 executor.execute(cs);
 
