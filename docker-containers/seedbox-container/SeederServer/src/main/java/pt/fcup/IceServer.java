@@ -1,15 +1,17 @@
 package pt.fcup;
 
+/**
+ * Server threads accepting incoming connections from Client Manager.
+ * Requests come as RPC calls using ZeroC's ICE.
+ */
 public class IceServer implements Runnable {
     @Override
     public void run() {
 
-        int status = 0;
         com.zeroc.Ice.Communicator ic = null;
 
         try {
             ic = com.zeroc.Ice.Util.initialize();
-
             com.zeroc.Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("SeederRequestAdapter",
                                                                                       "default -p 8082");
 
@@ -19,11 +21,9 @@ public class IceServer implements Runnable {
 
         } catch (com.zeroc.Ice.LocalException e) {
             e.printStackTrace();
-            status = 1;
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
-            status = 1;
 
         }
 
@@ -32,10 +32,7 @@ public class IceServer implements Runnable {
                 ic.destroy();
             } catch (Exception e) {
                 System.err.println(e.getMessage());
-                status = 1;
             }
         }
-
-        System.exit(status);
     }
 }
