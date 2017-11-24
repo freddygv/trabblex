@@ -12,8 +12,7 @@ class DBManagerTest {
     private String resultString;
     private String expectedString;
 
-    // TODO restore once working
-  /*  @BeforeEach
+    @BeforeEach
     void setUp() throws Exception {
         testDB = new DBManager();
     }
@@ -70,5 +69,4 @@ class DBManagerTest {
         assertEquals(expectedString, resultString);
 
     }
-*/
 }

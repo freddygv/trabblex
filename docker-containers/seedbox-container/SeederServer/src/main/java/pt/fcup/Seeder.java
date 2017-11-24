@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Seeder {
+class Seeder {
     private DBManager db;
 
     private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -35,7 +35,7 @@ public class Seeder {
     private List<String> chunkHashes;
     private List<String> chunkIDs;
 
-    public Seeder(String filepath, int port, JSONObject fileMetadata) throws UnknownHostException {
+    Seeder(String filepath, int port, JSONObject fileMetadata) throws UnknownHostException {
 
         fullPath = BASE_PATH + filepath;
 
@@ -48,15 +48,15 @@ public class Seeder {
 
     }
 
-    public String getFullPath() {
+    String getFullPath() {
         return fullPath;
     }
 
-    public int getNumberOfChunks() {
+    int getNumberOfChunks() {
         return numberOfChunks;
     }
 
-    public String getVideoName() {
+    String getVideoName() {
         return videoName;
     }
 
@@ -65,38 +65,35 @@ public class Seeder {
      *
      * @return true if file and neighborhood registrations are successful
      */
-    public boolean registerSeeder() {
-        System.out.println("Registering seeder for " + videoName + " at port " + port);
-        boolean videoRegResult = registerInVideos();
-        boolean chunkRegResult = registerInChunkOwners();
+    void registerSeeder() throws ClassNotFoundException, IOException, SQLException {
+     try {
+            System.out.println("Registering seeder for " + videoName + " at port " + port);
+            registerInVideos();
+            registerInChunkOwners();
 
-        if(videoRegResult && chunkRegResult) {
-            return true;
-
-        } else {
-            // TODO: Handle de-reg failure
+        } catch (Exception e) {
             deregisterSeeder();
-            return false;
+            throw e;
 
         }
+
     }
 
     /**
      * Update the videos table to indicate there's an active seeder
      * @return true if registration was completed without exceptions
      */
-    private boolean registerInVideos() {
+    private void registerInVideos() throws ClassNotFoundException, IOException, SQLException {
         try {
             System.out.println(String.format("Seeding Seeder for: %s as active", fileHash));
-            String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
 
+            String updateQuery = "UPDATE videos SET seeder_is_active = 't' WHERE file_hash = '%s';";
             dbUpdate(String.format(updateQuery, fileHash));
-            return true;
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Seeder registration: DB update failed.");
             ec.printStackTrace();
-            return false;
+            throw ec;
 
         }
 
@@ -106,7 +103,7 @@ public class Seeder {
      * Update the chunk_owners table to populate seeder IP for each chunk
      * @return true if registration was completed without exceptions
      */
-    private boolean registerInChunkOwners() {
+    private void registerInChunkOwners() throws ClassNotFoundException, IOException, SQLException {
         String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) ";
         String updateQuery;
         try {
@@ -123,11 +120,10 @@ public class Seeder {
 
             }
 
-            return true;
-
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Neighborhood update: DB insert failed.");
-            return false;
+            ec.printStackTrace();
+            throw ec;
 
         }
     }
@@ -136,19 +132,18 @@ public class Seeder {
      * Deletes from videos table, removing de-registered seeder
      * @return true if records successfully deleted
      */
-    private boolean deregisterSeeder(){
+    private void deregisterSeeder() throws ClassNotFoundException, IOException, SQLException {
         String seederDeletionQuery = "UPDATE videos SET seeder_is_active = 'f' WHERE file_hash = '%s';";
         String neighborDeletionQuery = "DELETE FROM chunk_owners WHERE file_hash = '%s';";
 
         try {
             dbUpdate(String.format(seederDeletionQuery, fileHash));
             dbUpdate(String.format(neighborDeletionQuery, fileHash));
-            return true;
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Seeder de-registration: DB delete failed.");
             ec.printStackTrace();
-            return false;
+            throw ec;
 
         }
     }
@@ -158,7 +153,7 @@ public class Seeder {
      * Hashes used for file verification on the client-side.
      * @return true if video processed successfully
      */
-    public boolean processVideo() throws FileHashException, IOException {
+    void processVideo() throws FileHashException, IOException {
         try {
             fileHash = hashFile(new File(fullPath));
             System.out.println("SHA-256 Hash: " + fileHash);
@@ -169,8 +164,6 @@ public class Seeder {
             throw e;
 
         }
-
-        return true;
     }
 
     /**
@@ -178,7 +171,7 @@ public class Seeder {
      * https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
      */
     private final char[] hexArray = "0123456789ABCDEF".toCharArray();
-    public String bytesToHex(byte[] bytes) {
+    String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
             int v = bytes[j] & 0xFF;

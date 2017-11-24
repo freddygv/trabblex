@@ -6,6 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * UploadServer creates a thread pool to handle incoming requests for file chunks.
+ */
 public class UploadServer implements Runnable {
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
     private final int BASE_PORT = 29200;

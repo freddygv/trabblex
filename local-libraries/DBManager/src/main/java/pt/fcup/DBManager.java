@@ -22,7 +22,6 @@ public class DBManager {
         InetAddress address = InetAddress.getByName("postgres-server");
         HOST = address.getHostAddress();
         DB_URL = "jdbc:postgresql://" + HOST + "/" + DB_NAME;
-        System.out.println(DB_URL);
 
         try {
             Class.forName("org.postgresql.Driver");

@@ -1,12 +1,16 @@
 package pt.fcup;
 
+import org.json.JSONObject;
 import pt.fcup.exception.FileHashException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class RequestableI implements pt.fcup.generated.RequestableI {
+    private final int BASE_PORT = 29200;
+
     /**
      * Implementation of RPC requests for Seeders from the ClientManager.
-     * If a client requests a seeder, provide existing, else create and register one.
+     * If a client requests a seeder, provide number of chunks, else create and register one.
      *
      * @param fileName of video
      * @param current Ice object
@@ -18,16 +22,15 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
         try {
 
             // Try to get an existing instance of a Seeder for a given file
-            Seedbox mySB = Seedbox.getSeedbox();
-            Seeder newSeed = mySB.seederHashMap.get(fileName);
+            Seedbox sb = Seedbox.getSeedbox();
+            Seeder newSeed = sb.seederHashMap.get(fileName);
 
             // If there is no instance, create one
+            // Files aren't chunked and hashed up front. Only once requested for the first time.
             if(newSeed == null) {
-                System.out.println("No seeder present, creating new seeder.");
-                newSeed = mySB.createSingleSeeder(fileName);
-
-            } else {
-                System.out.println("Seeder already exists.");
+                System.out.println("File hasn't been processed, doing so now.");
+                newSeed = createSingleSeeder(sb.fileMetadata.getJSONObject(fileName), fileName);
+                sb.seederHashMap.put(fileName, newSeed);
 
             }
 
@@ -43,5 +46,22 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
         }
 
+    }
+
+    /**
+     * Processes the video requested and registers the chunks in the portal.
+     * @param filename name of the file requested
+     */
+    private Seeder createSingleSeeder(JSONObject videoMetadata, String filename) throws IOException, FileHashException, ClassNotFoundException, SQLException {
+
+        Seeder newSeeder;
+
+        newSeeder = new Seeder(filename, BASE_PORT, videoMetadata);
+
+        // Hash file, chunk file, hash chunks, and register in DB, if either fails an exception is thrown
+        newSeeder.processVideo();
+        newSeeder.registerSeeder();
+
+        return newSeeder;
     }
 }

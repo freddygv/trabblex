@@ -10,14 +10,11 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Seedbox {
-
     private final String METADATA_LOCATION = "file-metadata.json";
-    private JSONObject fileMetadata;
+    JSONObject fileMetadata;
+    HashMap<String, Seeder> seederHashMap = new HashMap<>();
 
-    private final int BASE_PORT = 29200;
-    public HashMap<String, Seeder> seederHashMap = new HashMap<>();
-
-    private static Seedbox sb;
+    static Seedbox sb;
 
     public static void main(String[] args) {
         sb = new Seedbox();
@@ -37,7 +34,7 @@ public class Seedbox {
     /**
      * Provides RequestableI interface with access to the Seedbox object
      */
-    public static Seedbox getSeedbox() {
+    static Seedbox getSeedbox() {
         return sb;
 
     }
@@ -56,44 +53,6 @@ public class Seedbox {
         Thread usThread = new Thread(us, "Upload Thread");
         usThread.start();
 
-    }
-
-    /**
-     * Instantiates a seeder to provide file requested
-     * TODO: Handle unsuccessful registration
-     * TODO: Pull out into separate class
-     * @param filename name of the file requested
-     */
-    public Seeder createSingleSeeder(String filename) throws IOException, FileHashException {
-
-        Seeder newSeeder;
-
-        try{
-            newSeeder = new Seeder(filename, BASE_PORT, fileMetadata.getJSONObject(filename));
-        }
-        catch(JSONException e)
-        {
-            System.err.println("Couldn't retrieve " + filename + " from local json storage");
-            System.out.println(fileMetadata);
-            throw e;
-        }
-
-        // Hash file, chunk file, hash chunks, and register in DB
-        boolean videoProcSuccess = newSeeder.processVideo();
-        boolean regSuccess = newSeeder.registerSeeder();
-
-        // TODO: What if one fails
-        if (videoProcSuccess && regSuccess) {
-            System.out.println("Seeder registration success for: " + newSeeder.getVideoName());
-
-        } else {
-            System.out.println("Seeder registration UNSUCCESSFUL for: " + newSeeder.getVideoName());
-
-        }
-
-        seederHashMap.put(filename, newSeeder);
-
-        return newSeeder;
     }
 
     /**
