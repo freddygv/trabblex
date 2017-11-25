@@ -22,7 +22,7 @@ package pt.fcup.generated;
 
 public interface RequestableI extends com.zeroc.Ice.Object
 {
-    int requestSeeder(String fileName, com.zeroc.Ice.Current current);
+    boolean requestSeeder(String fileName, com.zeroc.Ice.Current current);
 
     static final String[] _iceIds =
     {
@@ -54,9 +54,9 @@ public interface RequestableI extends com.zeroc.Ice.Object
         String iceP_fileName;
         iceP_fileName = istr.readString();
         inS.endReadParams();
-        int ret = obj.requestSeeder(iceP_fileName, current);
+        boolean ret = obj.requestSeeder(iceP_fileName, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
-        ostr.writeInt(ret);
+        ostr.writeBool(ret);
         inS.endWriteParams(ostr);
         return inS.setResult(ostr);
     }

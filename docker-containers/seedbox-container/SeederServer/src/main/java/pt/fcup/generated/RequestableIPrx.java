@@ -22,34 +22,34 @@ package pt.fcup.generated;
 
 public interface RequestableIPrx extends com.zeroc.Ice.ObjectPrx
 {
-    default int requestSeeder(String fileName)
+    default boolean requestSeeder(String fileName)
     {
         return requestSeeder(fileName, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default int requestSeeder(String fileName, java.util.Map<String, String> context)
+    default boolean requestSeeder(String fileName, java.util.Map<String, String> context)
     {
         return _iceI_requestSeederAsync(fileName, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Integer> requestSeederAsync(String fileName)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> requestSeederAsync(String fileName)
     {
         return _iceI_requestSeederAsync(fileName, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Integer> requestSeederAsync(String fileName, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<java.lang.Boolean> requestSeederAsync(String fileName, java.util.Map<String, String> context)
     {
         return _iceI_requestSeederAsync(fileName, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Integer> _iceI_requestSeederAsync(String iceP_fileName, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> _iceI_requestSeederAsync(String iceP_fileName, java.util.Map<String, String> context, boolean sync)
     {
-        com.zeroc.IceInternal.OutgoingAsync<Integer> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "requestSeeder", null, sync, null);
+        com.zeroc.IceInternal.OutgoingAsync<java.lang.Boolean> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "requestSeeder", null, sync, null);
         f.invoke(true, context, null, ostr -> {
                      ostr.writeString(iceP_fileName);
                  }, istr -> {
-                     int ret;
-                     ret = istr.readInt();
+                     boolean ret;
+                     ret = istr.readBool();
                      return ret;
                  });
         return f;

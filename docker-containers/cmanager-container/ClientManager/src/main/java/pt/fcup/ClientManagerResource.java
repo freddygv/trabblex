@@ -1,108 +1,100 @@
 package pt.fcup;
 import org.json.JSONArray;
+import pt.fcup.generated.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-
-import java.io.IOException;
-import pt.fcup.generated.*;
-import java.sql.SQLException;
-
-import org.json.JSONObject;
-import org.json.JSONArray;
-
 import javax.ws.rs.QueryParam;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
- * Gives the client a bunch of functionalities
- * Used as a resource by the client manager
+ * Used as a resource by the ClientManager to expose functionality to clients
  **/
 @Path("clientmanager")
-public class ClientManagerResource{
+public class ClientManagerResource {
 
-    DBManager db = null;
     private final int MAX_RETRIES = 6;
-    private int numberOfChunks;
 
-    private String seedboxAddress;
     private String host;
+    private boolean cluster = false;
 
-    public ClientManagerResource()
-    {
-        boolean cluster = true;
+    private DBManager db = null;
 
-        try
-        {
+    public ClientManagerResource() {
+        setSeedboxHostAddr();
+        createDBManager();
+
+    }
+
+    /**
+     * Sets address for the Seedbox to enable seeder requests from clients.
+     * If seedbox address is not resolved by DNS, then the server is running locally.
+     */
+    private void setSeedboxHostAddr() {
+        String seedboxAddress = "localhost";
+
+        try {
             seedboxAddress = InetAddress.getByName("seedbox").getHostAddress();
+            cluster = true;
 
-        }
-        catch (UnknownHostException e) {
-            cluster = false;
-            seedboxAddress = "localhost";
+        } catch (UnknownHostException e) {
+            // Do nothing, just checking if we are running locally
 
         }
 
         host = String.format("%s -p 8082", seedboxAddress);
 
+    }
+
+    private void createDBManager() {
         try {
-            if(cluster) {
-                db = new DBManager(cluster);
+            db = (cluster) ? new DBManager(cluster)
+                           : new DBManager();
 
-            } else {
-                db = new DBManager();
-
-            }
 
         } catch (ClassNotFoundException | IOException e) {
+            // TODO: Handle failure
             e.printStackTrace();
 
         }
-
     }
 
-    private JSONArray runQuery( String query )
-    {
+    private JSONArray runQuery( String query ) {
         JSONArray res = null;
 
         try{
-            //System.out.println("Executing query " + query);
             res = db.queryTable(query);
-            //System.out.println("Result = " + res.toString());
 
-        }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-            System.err.println("While running query \n>>>>>>>>>>>>>>>>\n" + query);
-            System.err.println(">>>>>>>>>>>>>>>>");
+        } catch(Exception e) {
+            queryError(query);
 
         }
 
         return res;
     }
 
-    private void runUpdate( String query )
-    {
-
+    private void runUpdate( String query ) {
         try{
-            //System.out.println("Executing query " + query);
             db.singleUpdate(query);
-            //System.out.println("Result = " + res.toString());
+
+        } catch(SQLException e) {
+            queryError(query);
 
         }
-        catch(Exception e)
-        {
-            System.err.println("Connection to DB Failed (" + e + ")");
-            System.err.println("While running query \n>>>>>>>>>>>>>>>>\n" + query);
-            System.err.println(">>>>>>>>>>>>>>>>");
+    }
 
-        }
+    private void queryError(String query) {
+        System.err.println("DB Update/Query failed while running query:");
+        System.err.println(query);
+
     }
 
     /**
@@ -115,12 +107,9 @@ public class ClientManagerResource{
     @GET
     @Path("list")
     @Produces(MediaType.TEXT_PLAIN)
-    public String listSeeders()
-    {
-        JSONArray result = null;
+    public String listSeeders() {
 
         String query =  "SELECT * FROM videos;";
-
         return runQuery(query).toString();
 
     }
@@ -133,33 +122,12 @@ public class ClientManagerResource{
     @GET
     @Path("getowners/{hash}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getChunkOwners(@PathParam("hash") String filehash)
-    {
+    public String getChunkOwners(@PathParam("hash") String filehash) {
 
-        String query =  "SELECT * FROM chunk_owners WHERE file_hash='"
-                + filehash
-                + "';";
-
+        String query = String.format("SELECT * FROM chunk_owners WHERE file_hash='%s';", filehash);
         return runQuery(query).toString();
 
     }
-
-    /**
-     * Searches all the seeders for the keywords
-     * @return a json of the specific seeders
-     **/
-    @GET
-    @Path("listfromkeyword/{keyword}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getSeedersfromKeyword(@PathParam("keyword") String keyword)
-    {
-        JSONArray result = null;
-
-        String query =  "SELECT * FROM videos WHERE file_name LIKE '%" + keyword +"%';";
-
-        return runQuery(query).toString();
-    }
-
 
     /**
      * Creates a seeder for the designated file
@@ -168,27 +136,31 @@ public class ClientManagerResource{
     @GET
     @Path("createseeder/{filename}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String createSeeder(@PathParam("filename") String filename)
-    {
-        boolean reqResult = false;
+    public String createSeeder(@PathParam("filename") String filename) {
+        boolean creationSuccess = false;
 
-        for (int retries = 0; retries < MAX_RETRIES; retries++) {
+        // Retry policy for RPC communications
+        int retries = 0;
+        while (true) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
                 RequestableIPrx create = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h " + host));
-                numberOfChunks = create.requestSeeder(filename);
-                System.out.println("Number of chunks: " + numberOfChunks);
-                reqResult = true;
+                creationSuccess = create.requestSeeder(filename);
+                break;
+
+            } catch (Exception e) {
+                // TODO: Client - If RPC error is received, suggest trying again later
+                if (++retries == MAX_RETRIES) return "Error: RPC.";
+
             }
 
-            if (reqResult) {
-                break;
-            }
+            retries++;
         }
 
-        // TODO: Make a real JSONArray, if needed
-        if (reqResult)
-            return "success";
-        return null;
+        // TODO: Client - if seeder creation error, tell user and re-query videos.
+        return (creationSuccess) ? "Creation success."
+                                 : "Error: Seeder creation.";
+
+
     }
 
     /**
@@ -200,46 +172,27 @@ public class ClientManagerResource{
                                        @QueryParam("chunk_hash") String chunk_hash,
                                        @QueryParam("chunk_id") String chunk_id,
                                        @QueryParam("ip") String ip,
-                                       @QueryParam("port") String port)
-    {
+                                       @QueryParam("port") String port) {
 
-        String query =  "INSERT INTO chunk_owners(file_hash,chunk_hash,chunk_id,owner_ip,owner_port,is_seeder)"
-                +" VALUES('" + file_hash + "',"
-                + "'" + chunk_hash + "',"
-                + "'" + Integer.parseInt(chunk_id) + "',"
-                + "'" + ip + "',"
-                + "'" + Integer.parseInt(port) + "',"
-                + "'f'"
-                + ");";
+        String query =  "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder)"
+                      + "VALUES('%s', '%s', %s, '%s', %s, 'f');".format(file_hash, chunk_hash, chunk_id, ip, port);
 
         runUpdate(query);
-
         return null;
     }
 
     /**
      * De-registers the client as chunk seeder
      */
-    /**
-     * Registers a client as chunk seeder
-     */
     @Path("unregisterclientseeder")
     @Produces(MediaType.TEXT_PLAIN)
-    public String unRegisterClientSeeder(@QueryParam("file_hash") String file_hash,
+    public String deregisterClientSeeder(@QueryParam("file_hash") String file_hash,
                                          @QueryParam("chunk_hash") String chunk_hash,
                                          @QueryParam("chunk_id") String chunk_id,
                                          @QueryParam("ip") String ip,
-                                         @QueryParam("port") String port)
-    {
+                                         @QueryParam("port") String port) {
 
-        String query =  "DELETE FROM chunk_owners WHERE "
-                +"file_hash='" + file_hash + "' AND "
-                + "chunk_hash='" + chunk_hash + "' AND "
-                + "chunk_id='" + Integer.parseInt(chunk_id) + "' AND "
-                + "owner_ip='" + ip + "' AND "
-                + "owner_port='" + Integer.parseInt(port) + "'"
-                + ";";
-
+        String query =  String.format("DELETE FROM chunk_owners WHERE owner_ip='%s' AND owner_port = %s;", ip, port);
         runUpdate(query);
 
         return null;

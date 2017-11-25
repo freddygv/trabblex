@@ -53,7 +53,7 @@ class ServerChunkSeeder implements Runnable {
     /**
      * Write from file over socket to client
      */
-    void sendFile( OutputStream os) {
+    void sendFile(OutputStream os) {
         File outgoingFile = new File(filepath + "-" + chunkID);
 
         try(FileInputStream fis = new FileInputStream(outgoingFile);

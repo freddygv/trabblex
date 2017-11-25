@@ -42,12 +42,11 @@ class ChunkSeeder extends Thread {
             PrintWriter out = new PrintWriter(os, true);
             out.println(numChunks);
 
-            if(!file.exists())
-            {
+            if(!file.exists()) {
                 System.out.println("Error opening file " + "sources/" + filepath + "-" + chunkID);
+
             }
-            else
-            {
+            else {
                 FileInputStream fis = new FileInputStream(file);
                 BufferedInputStream bis = new BufferedInputStream(fis);
 
@@ -72,4 +71,6 @@ class ChunkSeeder extends Thread {
 
         }
     }
+
+
 }

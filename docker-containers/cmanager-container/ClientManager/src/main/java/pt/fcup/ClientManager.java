@@ -9,57 +9,24 @@ import java.net.URI;
 import javax.ws.rs.core.Application;
 
 /**
- *   Creates a Grizzly HTTP server and exposes a
- *   bunch of resources for the client to use
+ *   Creates a Grizzly HTTP server and exposes JAX-RS resources for the client
  **/
-class ClientManager extends ResourceConfig{
+class ClientManager extends ResourceConfig {
+    private final String BASE_URI = "http://0.0.0.0:8080/trabblex/";
 
-    private DBManager db;
-
-    // Base URI the Grizzly server will listen on
-    public static final String BASE_URI = "http://0.0.0.0:8080/trabblex/";
-
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         ClientManager cm = new ClientManager();
+        cm.run();
 
-        // TODO: Remove at the end, using for debugging
-//        ClientManagerResource cr = new ClientManagerResource();
-//        cr.createSeeder("tl_512kb.mp4");
     }
 
-    /**
-     * Start Grizzly HTTP server exposing JAX-RS resources
-     */
-    public static HttpServer startServer() {
+    private void run() {
         // create a resource config that scans for JAX-RS resources and providers
-        final ResourceConfig rc = new ResourceConfig().packages("pt.fcup");
+        ResourceConfig rc = new ResourceConfig().packages("pt.fcup");
 
         // create and start a new instance of grizzly http server
         // expose the Jersey application at BASE_URI
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-
-    }
-
-    /**
-     * Create server and everything else necessary
-     */
-    public ClientManager ()
-    {
-
-        // start server
-        try
-        {
-            final HttpServer server = startServer();
-            System.out.println("Created server");
-
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-
-        }
-
+        GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
 }
