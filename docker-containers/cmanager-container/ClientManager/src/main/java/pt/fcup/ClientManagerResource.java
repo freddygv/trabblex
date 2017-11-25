@@ -98,10 +98,8 @@ public class ClientManagerResource {
     }
 
     /**
-     * Get a list of all the seeders:
+     * Get a list of files on the server:
      * file_name, file_size, video_size_x, video_size_y, bitrate
-     * does NOT include ip adress and port for security purposes
-     * (the chunk_owners database contains info about the seeders AND peers)
      * @return all the seeders
      **/
     @GET
@@ -115,8 +113,7 @@ public class ClientManagerResource {
     }
 
     /**
-     * Upon getting the name of a file from the client,
-     * returns all the seeders and clients that have that files
+     * Returns the neighborhood of peers for a given file
      * @return the seeders and clients that match the file, in json format
      **/
     @GET
@@ -130,7 +127,7 @@ public class ClientManagerResource {
     }
 
     /**
-     * Creates a seeder for the designated file
+     * Requests a seeder for the designated file
      * @return seeder info
      **/
     @GET
@@ -164,7 +161,7 @@ public class ClientManagerResource {
     }
 
     /**
-     * Registers a client as chunk seeder
+     * When a client has a chunk, it registers as a seeder
      */
     @Path("registerclientseeder")
     @Produces(MediaType.TEXT_PLAIN)
@@ -182,7 +179,7 @@ public class ClientManagerResource {
     }
 
     /**
-     * De-registers the client as chunk seeder
+     * De-registers the client from the list of seeders
      */
     @Path("unregisterclientseeder")
     @Produces(MediaType.TEXT_PLAIN)
