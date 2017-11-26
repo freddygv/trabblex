@@ -15,13 +15,12 @@ class ServerChunkSeeder implements Runnable {
     }
 
     public void run() {
-        try(OutputStream os = socket.getOutputStream();
-            PrintWriter out = new PrintWriter(os, true);
+        try(BufferedReader in = new BufferedReader(
+                                new InputStreamReader(socket.getInputStream()));
 
-            BufferedReader in = new BufferedReader(
-                                new InputStreamReader(socket.getInputStream()))
-        )
-        {
+            OutputStream os = socket.getOutputStream();
+            PrintWriter out = new PrintWriter(os, true)) {
+
             clientHandshake(in, out);
             sendFile(os);
 
@@ -36,7 +35,7 @@ class ServerChunkSeeder implements Runnable {
      *   1. Client sends chunk id and filename requested
      *   2. Seeder replies with the number of chunks in the file
      */
-    void clientHandshake(BufferedReader in, PrintWriter out) throws IOException {
+    private void clientHandshake(BufferedReader in, PrintWriter out) throws IOException {
         // In from client
         chunkID = Integer.parseInt(in.readLine());
         String filename = in.readLine();
@@ -53,7 +52,7 @@ class ServerChunkSeeder implements Runnable {
     /**
      * Write from file over socket to client
      */
-    void sendFile(OutputStream os) {
+    private void sendFile(OutputStream os) {
         File outgoingFile = new File(filepath + "-" + chunkID);
 
         try(FileInputStream fis = new FileInputStream(outgoingFile);
@@ -63,8 +62,10 @@ class ServerChunkSeeder implements Runnable {
 
             int bytesRead;
             byte[] contents = new byte[(int)fileLength]; // 1MB
+
             while((bytesRead = bis.read(contents)) > 0){
                 os.write(contents, 0, bytesRead);
+
             }
 
             os.flush();

@@ -20,7 +20,6 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
         boolean success = false;
 
         try {
-
             // Try to get an existing instance of a Seeder for a given file
             Seedbox sb = Seedbox.getSeedbox();
             Seeder newSeed = sb.seederHashMap.get(fileName);

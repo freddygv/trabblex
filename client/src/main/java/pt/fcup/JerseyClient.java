@@ -1,9 +1,7 @@
 package pt.fcup;
 
 import java.util.*;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import javax.ws.rs.client.*;
@@ -21,75 +19,58 @@ import java.util.Scanner;
 
 public class JerseyClient {
 
-	protected String HOST;
-	protected String URL;
+	protected String host;
+	protected String url;
 	private Client client;
 
-	public JerseyClient(String HOST, String URL)
-	{
+	public JerseyClient(String host, String url) {
 		client = ClientBuilder.newClient();
-		this.HOST = HOST;
-		this.URL = HOST + URL;
+		this.host = host;
+		this.url = host + url;
+
 	}
 
-    public String query(String path)
-    {
+    public String query(String path) {
         return query(path, null, null);
     }
 
-    public String query(String path, String param)
-    {
+    public String query(String path, String param) {
         return query(path, param, null);
+
     }
 
-	public String query(String path, String param, Map<String,String> queryParams)
-   	{
+	public String query(String path, String param, Map<String,String> queryParams) {
         String result = null;
 
-        try
-        {
-            if(param != null)
-            {
+        try {
+            if(param != null) {
                 path = path + "/";
-            }
-            else{
+
+            } else {
                 param = "";
+
             }
 
-            // Query client manager
-            WebTarget resourceWebTarget = client.target(URL).path(path + param);
+            WebTarget resourceWebTarget = client.target(url).path(path + param);
 
-            // add query params
-            if(queryParams != null)
-            {
-                Iterator it = queryParams.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry)it.next();
-                    resourceWebTarget = resourceWebTarget.queryParam(pair.getKey().toString(), pair.getValue());
-                }
+            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                resourceWebTarget = resourceWebTarget.queryParam(entry.getKey().toString(),
+                                                                 entry.getValue());
+
             }
-                
+
             result = resourceWebTarget.request(MediaType.TEXT_PLAIN).get(String.class);
-        }
-        catch(javax.ws.rs.ProcessingException e)
-        {
-            System.err.println("Cannot connect to server " + HOST);
 
-        }
-        catch(javax.ws.rs.NotFoundException e)
-        {
-            // debug
-            //System.err.println("Resource not found: " + URL);
+        } catch(ProcessingException e) {
+            System.err.println("Cannot connect to server " + host);
 
-        }
-        catch(javax.ws.rs.InternalServerErrorException e)
-        {
+        } catch(NotFoundException e) {
+            System.err.println("Resource not found: " + url);
+
+        } catch(InternalServerErrorException e) {
             System.err.println("Could not connect to database");
+
         }
-        catch(Exception e )
-        {
-            e.printStackTrace();
-        }  
 
         return result;
     }

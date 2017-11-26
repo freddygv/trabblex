@@ -23,8 +23,7 @@ public class Chunk
 	/*
 		Update local info about owners
 	*/
-	public void addSource(JSONObject obj)
-	{
+	public void addSource(JSONObject obj) {
 
 		Owner ow = new Owner();
 		ow.ip = obj.getString("owner_ip");
@@ -51,13 +50,11 @@ public class Chunk
 		If a source doesn't have the chunk we asked for,
 		or the hash is bad, then remove that source
 	*/
-	public void removeOwner(String ip, int port, String hash)
-	{
-		for(int i = 0; i < owners.size(); i++)
-		{
+	public void removeOwner(String ip, int port, String hash) {
+		for(int i = 0; i < owners.size(); i++) {
 			if(owners.get(i).ip == ip
 				&& owners.get(i).hash == hash
-				&& owners.get(i).port == port){
+				&& owners.get(i).port == port) {
 				// debug
 				//System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
 				owners.remove(i);
@@ -66,30 +63,30 @@ public class Chunk
 	}
 
 
-	public Owner getSource()
-	{
+	public Owner getSource() {
 		int sourceFromSeeder = -1;
 
 		// Get the first owner that isn't a seeder preferably
-		if(owners.size() == 0)
-		{
+		if(owners.size() == 0) {
 			System.out.println("No source found!");
 			return null;
+
 		}
 
-		for(int i = 0; i < owners.size(); i++)
-		{
-			if(owners.get(i).is_seeder == false)
-			{
+		for(int i = 0; i < owners.size(); i++) {
+			if(owners.get(i).is_seeder == false) {
 				System.out.println("Got source from client for chunk " + chunkNumber);
 				return owners.get(i);
+
+			} else {
+			    sourceFromSeeder = i;
+
 			}
-			else
-				sourceFromSeeder = i;
 		}
 
 		System.out.println("Got source from seeder for chunk " + chunkNumber);
 		return owners.get(sourceFromSeeder);
+
 	}
 
 	public int getNumberOfSources()

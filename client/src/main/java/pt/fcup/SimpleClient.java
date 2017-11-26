@@ -1,58 +1,33 @@
 package pt.fcup;
 
-import java.util.Properties;
 import java.util.ArrayList;
-
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
-
-
-/*import org.glassfish.jersey.client.*;*/
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.MediaType;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.util.Scanner;
-
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 
 public class SimpleClient {
     private final String MODE = "remote";
 
     private boolean verbose = false;
-    private final int chunkSize = 1024*10; // bytes
 
     JSONArray localSeederInfo= new JSONArray();
     JerseyClient client;
 
-    //JSONArray localChunks = new JSONArray();
-
-    // could be used later for multi-server management
-    //private final String seeder_identifier = "file_hash";
-
     ArrayList<FileDownloader> files = new ArrayList<FileDownloader>();
 
 
-    public SimpleClient(String[] args)
-    {
-        if(MODE == "local") {
-            client = new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/");
-        } else {
-            client = new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
-        }
+    public SimpleClient(String[] args) {
+        client = (MODE == "local") ? new JerseyClient("http://127.0.0.1:8080", "/trabblex/clientmanager/")
+                                   : new JerseyClient("http://35.195.218.215:8080", "/trabblex/clientmanager/");
+
 
     }
 
-    private void run()
-    {
+    private void run() {
         String input;
         Scanner sc = new Scanner(System.in);
 
@@ -143,8 +118,7 @@ public class SimpleClient {
         } while(input != "quit");
     }
 
-    private void displayHelp()
-    {
+    private void displayHelp() {
         System.out.println("===========================");
         System.out.println("Simple client coded by Freddy and Quentin");
         System.out.println("=== Available commands===");
@@ -158,23 +132,19 @@ public class SimpleClient {
     }
 
    
-    private void searchFromKeyword(String keyword)
-    {
+    private void searchFromKeyword(String keyword) {
         String result = client.query("listfromkeyword", keyword);
 
-        if(result == null)
-        {
+        if(result == null) {
             System.err.println("Error querying the server");
-        }
-        else
-        {         
+
+        } else {
             JSONArray localSeederInfo = new JSONArray(result);
 
             /*
                 Display result info nicely
             */
-            for (int i = 0 ; i < localSeederInfo.length(); i++) 
-            {
+            for (int i = 0 ; i < localSeederInfo.length(); i++) {
                 JSONObject obj = localSeederInfo.getJSONObject(i);
                 System.out.println(obj.getString("file_name")
                     + ": " + obj.getString("file_size") + "Kb"
@@ -183,29 +153,25 @@ public class SimpleClient {
                     + obj.getString("bitrate") + "b/s" + ")"
                     );
 
-                if(verbose)
-                {
+                if(verbose) {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
                     System.out.println(">> port: " + obj.getString("port"));
                 }
             }
         }
-
     }
 
     /**
     *   @return a list of the seeder on the remote server
     **/
-    private void listSeeders()
-    {
+    private void listSeeders() {
         String result = client.query("list", null);
 
-        if(result == null)
-        {
+        if(result == null) {
             System.err.println("Error querying the server for the seeds");
-        }
-        else{
+
+        } else{
 
             localSeederInfo = new JSONArray(result);
 
@@ -213,8 +179,7 @@ public class SimpleClient {
             /*
                 Display seeder info nicely
             */
-            for (int i = 0 ; i < localSeederInfo.length(); i++) 
-            {
+            for (int i = 0 ; i < localSeederInfo.length(); i++) {
                 JSONObject obj = localSeederInfo.getJSONObject(i);
                 System.out.println(obj.getString("file_name")
                     + ": " + obj.getString("file_size") + "Kb"
@@ -223,23 +188,24 @@ public class SimpleClient {
                     + obj.getString("bitrate") + "b/s" + ")"
                     );
 
-                if(verbose)
-                {
+                if(verbose) {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
                 }
             }
         }
-
     }
 
-    private void playFile(String file)
-    {
-        try{
+    /**
+     * Play downloaded video
+     */
+    private void playFile(String file) {
+        try {
             Runtime.getRuntime().exec("ffplay downloads/" + file);
-        }
-        catch(Exception e){
-            System.err.println("Error could not read file!");
+
+        } catch(IOException e){
+            System.err.println("Error: could not read file!");
+
         }
     }
 
@@ -249,13 +215,11 @@ public class SimpleClient {
     * if completely downloaded, full path, size; if
     * being downloaded: file size and neighbor list
     **/
-    public void fileInfo(String fileName)
-    {
+    public void fileInfo(String fileName) {
         // get number of file
-        for(int i = 0; i < files.size(); i++)
-        {
+        for(int i = 0; i < files.size(); i++) {
             FileDownloader f = files.get(i);
-            if(f.getFileName().equals(fileName)){
+            if(f.getFileName().equals(fileName)) {
                 System.out.println("File info " + f.getFileName());
 
                 if(f.getnbChunksNotDownloaded() <= 1)
@@ -281,33 +245,21 @@ public class SimpleClient {
         Also, ensures consistency if file name on server changes meanwhile
         TODO later create a seeder class to alleviate work ?
     */
-    private String getHashFromName( String name )
-    {
-      
+    private String getHashFromName( String name ) {
         String hashToGet = null;
 
-        if(verbose)
-            System.out.println("Searching for " + name);
+        if(verbose) System.out.println("Searching for " + name);
 
-        for (int i = 0; i < localSeederInfo.length(); i++)
-        {
-            if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name))
-            {
+        for (int i = 0; i < localSeederInfo.length(); i++) {
+            if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name)) {
                 hashToGet = localSeederInfo.getJSONObject(i).getString("file_hash");
 
             }
         }
 
-        if(hashToGet == null)
-        {
-            System.out.println("File not found: " + name);
+        if(hashToGet == null) System.out.println("File not found: " + name);
 
-        }
-        else
-        {
-            if(verbose)
-                System.out.println("Found, hash= " + hashToGet);
-        }
+        else if(verbose) System.out.println("Found, hash= " + hashToGet);
 
         return hashToGet;
     }
@@ -317,8 +269,7 @@ public class SimpleClient {
     * Starts the download of a file
     * TODO manage join ?
     **/
-    private void downloadFile(String name)
-    {
+    private void downloadFile(String name) {
         FileDownloader f = new FileDownloader(name, getHashFromName(name), client);
         f.start();
         files.add(f);
@@ -327,10 +278,8 @@ public class SimpleClient {
     /**
     * Get info from all local files
     **/
-    private void listFiles()
-    {
-        for(int i = 0; i < files.size(); i++)
-        {
+    private void listFiles() {
+        for(int i = 0; i < files.size(); i++) {
             FileDownloader f = files.get(i);
             System.out.println("=================");
             System.out.println(f.getFileName());
@@ -340,14 +289,13 @@ public class SimpleClient {
             else 
                 System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
 
-
         }
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         SimpleClient sc = new SimpleClient(args);
         sc.run();
+
     }
 
     

@@ -1,21 +1,7 @@
 package pt.fcup;
 
-import java.util.Properties;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Scanner;
-
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
-
-
-/*import org.glassfish.jersey.client.*;*/
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.MediaType;
-
-import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.util.*;
@@ -28,11 +14,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-
-public class FileDownloader extends Thread
-{
-    private String name, fileHash;
-    private JerseyClient client;
+public class FileDownloader extends Thread {
+    private final String name;
+    private final String fileHash;
+    private final JerseyClient client;
     private int nbChunksNotDownloaded;
 
     private final int localPort = 26000;
@@ -40,34 +25,21 @@ public class FileDownloader extends Thread
 
     private ChunkManager chm;
 
-    // TODO pass the hashing algorithm through the header...
     private final String HASHING_ALGORITHM = "SHA-256";
 
-    public FileDownloader(String name, String hash, JerseyClient client)
-    {
+    public FileDownloader(String name, String hash, JerseyClient client) {
         this.name = name;
         this.fileHash = hash;
-
-        // client reference passed by the parent client
         this.client = client;
 
         try{
             localIP = InetAddress.getLocalHost().getHostAddress();
 
-            if(localIP.equals("127.0.1.1"))
-            {
-                Scanner sc = new Scanner(System.in);
-                System.out.println("Please enter your IP adress: ");
-                localIP = sc.nextLine();
-
-            }
-        }
-        catch(UnknownHostException e)
-        {
+        } catch(UnknownHostException e) {
             System.err.println("Couldn't get local IP adress !");
             // do something
+
         }
-        System.err.println("Local IP adress is " + localIP);
     }
 
     public String getFileName()
@@ -85,31 +57,29 @@ public class FileDownloader extends Thread
     * Via a TCP connection
     **/
     @Override
-    public void run()
-    {
-        try{
+    public void run() {
+        try {
             downloadFile();
-        }
-        catch(Exception e)
-        {
+
+        } catch(Exception e) {
             e.printStackTrace();
+
         }
     }
 
-    private String getChunkOwners()
-    {
-        if(fileHash == null)
-        {
+    private String getChunkOwners() {
+        if(fileHash == null) {
             System.err.println("Couldn't solve hash from filename!");
             System.err.println("Error downloading file " + name);
             return null;
+
         }
 
         String chunkOwners = client.query("getowners", fileHash);
 
-        if(chunkOwners == null)
-        {
+        if(chunkOwners == null) {
             System.err.println("Couldn't get the chunk owners of the file!");
+
         }
 
         System.out.println("ChunkOwners = " + chunkOwners);
@@ -118,8 +88,7 @@ public class FileDownloader extends Thread
         return chunkOwners;
     }
 
-    private void checkDownload(Chunk nextChunkToDownload, Owner chunkSource) throws Exception
-    {
+    private void checkDownload(Chunk nextChunkToDownload, Owner chunkSource) throws Exception {
         Map<String,String> queryParams = new HashMap<String,String>();
         queryParams.put("file_hash", fileHash);
         queryParams.put("chunk_hash", chunkSource.hash);
@@ -127,8 +96,7 @@ public class FileDownloader extends Thread
         queryParams.put("ip", localIP);
         queryParams.put("port", Integer.toString(localPort));
 
-        if(checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true)
-        {
+        if(checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true) {
             // mark chunk as downloaded
             chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
 
@@ -139,8 +107,8 @@ public class FileDownloader extends Thread
             File f = new File("downloads/" + name + "-" + nextChunkToDownload.chunkNumber);
             File f2 = new File("sources/" + name + "-" + nextChunkToDownload.chunkNumber);
             f.renameTo(f2);
-        }
-        else{
+
+        } else{
             nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port, chunkSource.hash);
             // inform database to remove chunk owner
             client.query("unregisterclientseeder", null, queryParams);
@@ -155,11 +123,7 @@ public class FileDownloader extends Thread
 
     }
 
-    private boolean downloadFile() throws IOException
-    {
-        // the protocol that will be used - atm, fixed
-        String protocol = "TCP";
-
+    private boolean downloadFile() throws IOException {
         // storing the file
         ArrayList<Byte> file = new ArrayList<Byte>();
 
@@ -178,7 +142,7 @@ public class FileDownloader extends Thread
         if(chunkOwners == null)
             Thread.currentThread().interrupt();
 
-        do{
+        do {
             System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + " chunks");
             System.out.println("nbChunksInFile " + nbChunksInFile + "");
             
@@ -186,8 +150,7 @@ public class FileDownloader extends Thread
             Chunk nextChunkToDownload = chm.getRarestChunk();
 
 
-            if(nextChunkToDownload == null)
-            {
+            if(nextChunkToDownload == null) {
                 System.err.println("Requesting a new seeder...\n");
 
                 String newSeeder = client.query("createseeder", name);
@@ -220,17 +183,14 @@ public class FileDownloader extends Thread
             }*/
 
             // start downloader
-            Downloader dwl = new Downloader(
-                name,
-                nextChunkToDownload.chunkNumber,
-                chunkSource.ip,
-                chunkSource.port,
-                chunkSource.protocol,
-                chunkSource.hash
+            Downloader dwl = new Downloader(name,
+                                            nextChunkToDownload.chunkNumber,
+                                            chunkSource.ip,
+                                            chunkSource.port
             );
 
             // the thread will automatically save the file locally
-            dwl.start();
+            dwl.run();
 
             // wait for it to finish
             try{
@@ -241,15 +201,15 @@ public class FileDownloader extends Thread
 
                 // Assess if all chunks are available 
                 // If no, create a seeder, and start all over again
-                if(chm.getNbChunksAvailable() < nbChunksInFile)
-                {
+                if(chm.getNbChunksAvailable() < nbChunksInFile) {
                     // debug
                     //System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
                     String newSeeder = client.query("createseeder", name);
-                    if(newSeeder == null)
-                    {
+
+                    if(newSeeder == null) {
                         System.err.println("Error requesting the creation of a new seeder");
                         return false;
+
                     }
                     
                     // restart, only this time with all the seeders needed...
@@ -257,19 +217,18 @@ public class FileDownloader extends Thread
                 }
 
                 // if no uploadserver running, create one
-                if(up == null)
-                {
+                if(up == null) {
                     up = new UploadServer(localPort, nbChunksInFile);
                     Thread usThread = new Thread(up, "Client upload Thread");
                     usThread.start();
+
                 }
 
 
-            }
-            catch(Exception e)
-            {
+            } catch(Exception e) {
                 e.printStackTrace();
                 return false;
+
             }
 
 
@@ -277,19 +236,19 @@ public class FileDownloader extends Thread
 
 
         // assemble files bla bla bla
-        if(assembleFile(name, nbChunksInFile) == false)
-        {
+        if(assembleFile(name, nbChunksInFile) == false) {
             System.err.println("Error assembling file " + name);
             return false;
+
         }
 
         // check file hash
-        if(checkHash("downloads/" + name, fileHash) == true)
-        {
+        if(checkHash("downloads/" + name, fileHash) == true) {
             System.out.print("File " + name + " successfully downloaded\n> ");
-        }
-        else{
+
+        } else {
             System.err.print("File " + name + " hash is not valid :(\n> ");
+
         }
 
         return true;
@@ -297,20 +256,16 @@ public class FileDownloader extends Thread
 
     }
 
-    private boolean assembleFile(String name, int nbChunks)
-    {
+    private boolean assembleFile(String name, int nbChunks) {
         try (FileOutputStream fos = new FileOutputStream("downloads/" + name);
             BufferedOutputStream mergingStream = new BufferedOutputStream(fos)) {
-            for (int i = 0; i < nbChunks; i++) 
-            {
-                java.nio.file.Path localFile = Paths.get("sources/" + name + "-" + i);
+            for (int i = 0; i < nbChunks; i++) {
+                Path localFile = Paths.get("sources/" + name + "-" + i);
                 Files.copy(localFile, mergingStream);
-                //Files.delete(localFile);
+
             }
-        }   
-        catch(IOException e)
-        {
-            System.err.println("Error re-assembling the file\n");
+        } catch(IOException e) {
+            System.err.println("Error re-assembling the file");
             e.printStackTrace();
             return false;
         }
@@ -321,28 +276,19 @@ public class FileDownloader extends Thread
     /**
     *   Makes sure a file or chunk hash is correct
     */
-    public boolean checkHash(String file, String hash)
-    {
+    public boolean checkHash(String file, String hash) {
         // check if file exists
         File f = new File(file);
-        if (f.isFile() && f.canRead()) {
-
-        }
-        else{
-            //System.err.println("Error opening file " + file + " to check hash");
+        if (!(f.isFile() && f.canRead())) {
             return false;
+
         }
 
         String realHash = hashFile(file);
-        if(!realHash.equals(hash))
-        {
-            // debug - now automatically managed
-            //System.err.println("Error comparing remote file hash=" + hash + 
-            //    " and local hash=" + realHash);
-            return false;
-        }
-        else
-            return true;
+
+        return (realHash.equals(hash)) ? true
+                                       : false;
+
     }
 
     /**
@@ -352,7 +298,6 @@ public class FileDownloader extends Thread
      * @return hex string hash
      * Copied from Seeder.java, dirty...
      */
-    //
     private String hashFile(String file){
         try (FileInputStream inputStream = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
