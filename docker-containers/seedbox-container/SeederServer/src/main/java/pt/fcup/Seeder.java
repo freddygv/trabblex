@@ -105,14 +105,14 @@ class Seeder {
      */
     private void registerInChunkOwners() throws ClassNotFoundException, IOException, SQLException {
         String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) ";
-        String updateQuery;
+
         try {
             for (int i = 0; i < chunkHashes.size(); i++) {
-                updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');", fileHash,
-                                                                                                            chunkHashes.get(i),
-                                                                                                            chunkIDs.get(i),
-                                                                                                            ip,
-                                                                                                            port);
+                String updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');", fileHash,
+                                                                                                                   chunkHashes.get(i),
+                                                                                                                   chunkIDs.get(i),
+                                                                                                                   ip,
+                                                                                                                   port);
 
                 System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHashes.get(i),
                                                                                             chunkIDs.get(i)));

@@ -32,12 +32,10 @@ class ChunkManager
 		addChunkOwners(remoteChunkOwners);
 	}
 
-	public void addChunkOwners(JSONArray remoteChunkOwners)
-	{
+	public void addChunkOwners(JSONArray remoteChunkOwners) {
 		System.out.println("Saving remote chunks..");
 
-        for (int i = 0 ; i < remoteChunkOwners.length(); i++) 
-        {
+        for (int i = 0 ; i < remoteChunkOwners.length(); i++) {
             JSONObject obj = remoteChunkOwners.getJSONObject(i);
 
             // debug
@@ -45,8 +43,7 @@ class ChunkManager
         		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
 
             String hash = obj.getString("chunk_hash");
-            if(!chunks.containsKey(hash))
-            {
+            if(!chunks.containsKey(hash)) {
             	// debug
             	//System.out.println("New chunk !");
                 chunks.put(hash, new Chunk(obj));
