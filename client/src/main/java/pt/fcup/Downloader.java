@@ -6,24 +6,24 @@ import java.io.*;
 
 class Downloader implements Runnable
 {
-	private final String ip;
-	private final String file;
-	private final int port;
-	private final int chunkNumber;
+    private final String ip;
+    private final String file;
+    private final int port;
+    private final int chunkNumber;
 
-	private int nbChunks;
+    private int nbChunks;
 
 
-	public Downloader(String file, int chunkNumber, String ip, int port) {
-		this.ip = ip;
-		this.port = port;
-		this.file = file;
-		this.chunkNumber = chunkNumber;
+    public Downloader(String file, int chunkNumber, String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+        this.file = file;
+        this.chunkNumber = chunkNumber;
 
-	}
+    }
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
         // debug
         System.out.println(String.format("Requesting chunk %s of '%s' from: %s", chunkNumber, file, ip));
 
@@ -54,12 +54,12 @@ class Downloader implements Runnable
 
         }
 
-	}
+    }
 
     /**
      * Download chunk to file
      */
-	private void download(DataInputStream dis, FileOutputStream fos) throws IOException {
+    private void download(DataInputStream dis, FileOutputStream fos) throws IOException {
         byte[] contents = new byte[1024*1024];
         int bytesRead;
 
@@ -82,8 +82,8 @@ class Downloader implements Runnable
 
     }
 
-	public int getNbChunks()
-	{
-		return nbChunks;
-	}
+    public int getNbChunks()
+    {
+        return nbChunks;
+    }
 }

@@ -19,16 +19,16 @@ import java.util.Scanner;
 
 public class JerseyClient {
 
-	protected String host;
-	protected String url;
-	private Client client;
+    protected String host;
+    protected String url;
+    private Client client;
 
-	public JerseyClient(String host, String url) {
-		client = ClientBuilder.newClient();
-		this.host = host;
-		this.url = host + url;
+    public JerseyClient(String host, String url) {
+        client = ClientBuilder.newClient();
+        this.host = host;
+        this.url = host + url;
 
-	}
+    }
 
     public String query(String path) {
         return query(path, null, null);
@@ -39,7 +39,7 @@ public class JerseyClient {
 
     }
 
-	public String query(String path, String param, Map<String,String> queryParams) {
+    public String query(String path, String param, Map<String,String> queryParams) {
         String result = null;
 
         try {
