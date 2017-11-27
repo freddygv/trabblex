@@ -80,7 +80,7 @@ class ServerChunkSeeder implements Runnable {
             int bytesRead;
             ByteBuffer buffer = ByteBuffer.allocate((int)fileLength);
 
-            while((bytesRead = ch.read(buffer)) > 0){
+            while ((bytesRead = ch.read(buffer)) > 0){
                 os.write(buffer.array(), 0, bytesRead);
 
             }

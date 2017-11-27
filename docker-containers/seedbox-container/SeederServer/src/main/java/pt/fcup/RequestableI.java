@@ -26,7 +26,7 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
             // If there is no instance, create one
             // Files aren't chunked and hashed up front. Only once requested for the first time.
-            if(newSeed == null) {
+            if (newSeed == null) {
                 System.out.println("File hasn't been processed, doing so now.");
                 newSeed = createSingleSeeder(sb.fileMetadata.getJSONObject(fileName), fileName);
                 sb.seederHashMap.put(fileName, newSeed);

@@ -68,7 +68,7 @@ public class FileDownloader extends Thread {
     }
 
     private String getChunkOwners() {
-        if(fileHash == null) {
+        if (fileHash == null) {
             System.err.println("Couldn't solve hash from filename!");
             System.err.println("Error downloading file " + name);
             return null;
@@ -77,7 +77,7 @@ public class FileDownloader extends Thread {
 
         String chunkOwners = client.query("getowners", fileHash);
 
-        if(chunkOwners == null) {
+        if (chunkOwners == null) {
             System.err.println("Couldn't get the chunk owners of the file!");
 
         }
@@ -96,7 +96,7 @@ public class FileDownloader extends Thread {
         queryParams.put("ip", localIP);
         queryParams.put("port", Integer.toString(localPort));
 
-        if(checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true) {
+        if (checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true) {
             // mark chunk as downloaded
             chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
 
@@ -139,7 +139,7 @@ public class FileDownloader extends Thread {
 
         int nbChunksInFile = 0;
 
-        if(chunkOwners == null)
+        if (chunkOwners == null)
             Thread.currentThread().interrupt();
 
         do {
@@ -150,11 +150,11 @@ public class FileDownloader extends Thread {
             Chunk nextChunkToDownload = chm.getRarestChunk();
 
 
-            if(nextChunkToDownload == null) {
+            if (nextChunkToDownload == null) {
                 System.err.println("Requesting a new seeder...\n");
 
                 String newSeeder = client.query("createseeder", name);
-                if(newSeeder == null)
+                if (newSeeder == null)
                 {
                     System.err.println("Error requesting the creation of a new seeder: " + newSeeder);
                     return false;
@@ -177,7 +177,7 @@ public class FileDownloader extends Thread {
             Owner chunkSource = nextChunkToDownload.getSource();
 
             // if no sources available, request a seeder
-          /*  if(chunkSource == null)
+          /*  if (chunkSource == null)
             {
                 
             }*/
@@ -201,12 +201,12 @@ public class FileDownloader extends Thread {
 
                 // Assess if all chunks are available 
                 // If no, create a seeder, and start all over again
-                if(chm.getNbChunksAvailable() < nbChunksInFile) {
+                if (chm.getNbChunksAvailable() < nbChunksInFile) {
                     // debug
                     //System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
                     String newSeeder = client.query("createseeder", name);
 
-                    if(newSeeder == null) {
+                    if (newSeeder == null) {
                         System.err.println("Error requesting the creation of a new seeder");
                         return false;
 
@@ -217,7 +217,7 @@ public class FileDownloader extends Thread {
                 }
 
                 // if no uploadserver running, create one
-                if(up == null) {
+                if (up == null) {
                     up = new UploadServer(localPort, nbChunksInFile);
                     Thread usThread = new Thread(up, "Client upload Thread");
                     usThread.start();
@@ -232,18 +232,18 @@ public class FileDownloader extends Thread {
             }
 
 
-        } while(chm.numberOfChunksNotDownloaded() > 0 || nbChunksInFile == 0);
+        } while (chm.numberOfChunksNotDownloaded() > 0 || nbChunksInFile == 0);
 
 
         // assemble files bla bla bla
-        if(assembleFile(name, nbChunksInFile) == false) {
+        if (assembleFile(name, nbChunksInFile) == false) {
             System.err.println("Error assembling file " + name);
             return false;
 
         }
 
         // check file hash
-        if(checkHash("downloads/" + name, fileHash) == true) {
+        if (checkHash("downloads/" + name, fileHash) == true) {
             System.out.print("File " + name + " successfully downloaded\n> ");
 
         } else {

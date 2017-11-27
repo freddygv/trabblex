@@ -42,7 +42,7 @@ public class SimpleClient {
 
             switch(parts[0]){
                 case "seeder":
-                    if(parts.length < 2)
+                    if (parts.length < 2)
                         displayHelp();
                     else{
                         switch(parts[1]){
@@ -51,7 +51,7 @@ public class SimpleClient {
                                 break;
 
                             case "search":
-                            if(parts.length < 3)
+                            if (parts.length < 3)
                                 displayHelp();
                             else{
                                 searchFromKeyword(parts[2]);
@@ -62,13 +62,13 @@ public class SimpleClient {
                     break;
 
                 case "download":
-                    if(parts.length < 2)
+                    if (parts.length < 2)
                         displayHelp();
                     else
                     {
                         // if file has spaces...
                         String filename = parts[1];
-                        for(int i = 2; i < parts.length; i++)
+                        for (int i = 2; i < parts.length; i++)
                             filename = filename + " " + parts[i];
                         downloadFile(filename);
                     }
@@ -79,26 +79,26 @@ public class SimpleClient {
                     break;
 
                 case "info":
-                    if(parts.length < 2)
+                    if (parts.length < 2)
                         displayHelp();
                     else
                     {
                         // if file has spaces...
                         String filename = parts[1];
-                        for(int i = 2; i < parts.length; i++)
+                        for (int i = 2; i < parts.length; i++)
                             filename = filename + " " + parts[i];
                         fileInfo(filename);
                     }
                     break;
 
                 case "play":
-                if(parts.length < 2)
+                if (parts.length < 2)
                         displayHelp();
                     else
                     {
                         // if file has spaces...
                         String filename = parts[1];
-                        for(int i = 2; i < parts.length; i++)
+                        for (int i = 2; i < parts.length; i++)
                             filename = filename + " " + parts[i];
                         playFile(filename);
                     }
@@ -115,7 +115,7 @@ public class SimpleClient {
 
 
             }
-        } while(input != "quit");
+        } while (input != "quit");
     }
 
     private void displayHelp() {
@@ -135,7 +135,7 @@ public class SimpleClient {
     private void searchFromKeyword(String keyword) {
         String result = client.query("listfromkeyword", keyword);
 
-        if(result == null) {
+        if (result == null) {
             System.err.println("Error querying the server");
 
         } else {
@@ -153,7 +153,7 @@ public class SimpleClient {
                     + obj.getString("bitrate") + "b/s" + ")"
                     );
 
-                if(verbose) {
+                if (verbose) {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
                     System.out.println(">> port: " + obj.getString("port"));
@@ -168,7 +168,7 @@ public class SimpleClient {
     private void listSeeders() {
         String result = client.query("list", null);
 
-        if(result == null) {
+        if (result == null) {
             System.err.println("Error querying the server for the seeds");
 
         } else{
@@ -188,7 +188,7 @@ public class SimpleClient {
                     + obj.getString("bitrate") + "b/s" + ")"
                     );
 
-                if(verbose) {
+                if (verbose) {
                     System.out.println(">> file_hash: " + obj.getString("file_hash"));
                     System.out.println(">> protocol: " + obj.getString("protocol"));
                 }
@@ -217,12 +217,12 @@ public class SimpleClient {
     **/
     public void fileInfo(String fileName) {
         // get number of file
-        for(int i = 0; i < files.size(); i++) {
+        for (int i = 0; i < files.size(); i++) {
             FileDownloader f = files.get(i);
-            if(f.getFileName().equals(fileName)) {
+            if (f.getFileName().equals(fileName)) {
                 System.out.println("File info " + f.getFileName());
 
-                if(f.getnbChunksNotDownloaded() <= 1)
+                if (f.getnbChunksNotDownloaded() <= 1)
                     System.out.println("Downloading Finished");
                 else 
                     System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
@@ -248,7 +248,7 @@ public class SimpleClient {
     private String getHashFromName( String name ) {
         String hashToGet = null;
 
-        if(verbose) System.out.println("Searching for " + name);
+        if (verbose) System.out.println("Searching for " + name);
 
         for (int i = 0; i < localSeederInfo.length(); i++) {
             if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name)) {
@@ -257,9 +257,9 @@ public class SimpleClient {
             }
         }
 
-        if(hashToGet == null) System.out.println("File not found: " + name);
+        if (hashToGet == null) System.out.println("File not found: " + name);
 
-        else if(verbose) System.out.println("Found, hash= " + hashToGet);
+        else if (verbose) System.out.println("Found, hash= " + hashToGet);
 
         return hashToGet;
     }
@@ -279,12 +279,12 @@ public class SimpleClient {
     * Get info from all local files
     **/
     private void listFiles() {
-        for(int i = 0; i < files.size(); i++) {
+        for (int i = 0; i < files.size(); i++) {
             FileDownloader f = files.get(i);
             System.out.println("=================");
             System.out.println(f.getFileName());
             // TODO why stuck at one ? Resolve...
-            if(f.getnbChunksNotDownloaded() <= 1)
+            if (f.getnbChunksNotDownloaded() <= 1)
                 System.out.println("Downloading Finished");
             else 
                 System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");

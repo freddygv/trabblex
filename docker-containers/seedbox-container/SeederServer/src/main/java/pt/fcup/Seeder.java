@@ -221,7 +221,7 @@ class Seeder {
                                                               : filename;
 
             int bytesRead;
-            while((bytesRead = bi.read(chunkBuffer)) > 0) {
+            while ((bytesRead = bi.read(chunkBuffer)) > 0) {
                 chunkName = "chunks/" + strippedFile + "/" + filename +  "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
 

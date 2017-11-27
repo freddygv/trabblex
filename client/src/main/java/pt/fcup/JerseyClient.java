@@ -43,7 +43,7 @@ public class JerseyClient {
         String result = null;
 
         try {
-            if(param != null) {
+            if (param != null) {
                 path = path + "/";
 
             } else {

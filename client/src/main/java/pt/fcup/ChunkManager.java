@@ -43,13 +43,13 @@ class ChunkManager
         		+ " (" + obj.getString("owner_ip") + ":" + obj.getString("owner_port") + ")...");
 
             String hash = obj.getString("chunk_hash");
-            if(!chunks.containsKey(hash)) {
+            if (!chunks.containsKey(hash)) {
             	// debug
             	//System.out.println("New chunk !");
                 chunks.put(hash, new Chunk(obj));
 
                 // Check out if chunk number is already in list
-                if(!chunksNotYetDownloaded.contains(obj.getString("chunk_id"))){
+                if (!chunksNotYetDownloaded.contains(obj.getString("chunk_id"))){
                 	nbChunksNotDownloaded ++;
                 	chunksNotYetDownloaded.add(obj.getString("chunk_id"));
                 }
@@ -78,10 +78,10 @@ class ChunkManager
 
 			// quick and dirty fix: some chunks will be bad, eg bad file hash
 			// if they don't have any sources left, ignore them
-			if((minowners == -1 || value.getNumberOfSources() < minowners) 
+			if ((minowners == -1 || value.getNumberOfSources() < minowners)
 				&& value.getNumberOfSources() > 0)
 			{
-				if(value.isDownloaded == false)
+				if (value.isDownloaded == false)
 				{
 					ch = value;
 					minowners = ch.getNumberOfSources();
@@ -92,7 +92,7 @@ class ChunkManager
         	//iter.remove(); // avoids a ConcurrentModificationException
 		}
 
-		if(ch == null)
+		if (ch == null)
 		{
 		//	System.out.println("Couldn't get rarest chunk!");
 			return null;
@@ -112,7 +112,7 @@ class ChunkManager
 		{
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
-			if(value.chunkNumber == n)
+			if (value.chunkNumber == n)
 			{
 				return value;
 			}
@@ -136,7 +136,7 @@ class ChunkManager
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
 
-			if(value.chunkNumber == n)
+			if (value.chunkNumber == n)
 			{
 				value.markDownloaded();
 			}
