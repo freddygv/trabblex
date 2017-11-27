@@ -34,8 +34,10 @@ public class Chunk
         ow.is_seeder = obj.getString("is_seeder").equalsIgnoreCase("t");
         ow.hash = obj.getString("chunk_hash");
 
-        if (owners.contains(ow))
+        if (owners.contains(ow)) {
             System.out.println("Owner already known !");
+
+        }
 
         owners.add(ow);
 
@@ -58,6 +60,7 @@ public class Chunk
                 // debug
                 //System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
                 owners.remove(i);
+
             }
         }
     }
@@ -89,13 +92,13 @@ public class Chunk
 
     }
 
-    public int getNumberOfSources()
-    {
+    public int getNumberOfSources() {
         return owners.size();
+
     }
 
-    public void markDownloaded()
-    {
+    public void markDownloaded() {
         isDownloaded = true;
+
     }
 }

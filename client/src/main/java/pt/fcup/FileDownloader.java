@@ -108,7 +108,7 @@ public class FileDownloader extends Thread {
             File f2 = new File("sources/" + name + "-" + nextChunkToDownload.chunkNumber);
             f.renameTo(f2);
 
-        } else{
+        } else {
             nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port, chunkSource.hash);
             // inform database to remove chunk owner
             client.query("unregisterclientseeder", null, queryParams);
@@ -298,7 +298,7 @@ public class FileDownloader extends Thread {
      * @return hex string hash
      * Copied from Seeder.java, dirty...
      */
-    private String hashFile(String file){
+    private String hashFile(String file) {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
 

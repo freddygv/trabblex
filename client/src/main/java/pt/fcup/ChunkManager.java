@@ -49,14 +49,12 @@ class ChunkManager
                 chunks.put(hash, new Chunk(obj));
 
                 // Check out if chunk number is already in list
-                if (!chunksNotYetDownloaded.contains(obj.getString("chunk_id"))){
+                if (!chunksNotYetDownloaded.contains(obj.getString("chunk_id"))) {
                 	nbChunksNotDownloaded ++;
                 	chunksNotYetDownloaded.add(obj.getString("chunk_id"));
                 }
 
-            }
-            else
-            {
+            } else {
             	// debug
             	System.out.println("Already available chunk, new source !");
             	// update chunk info to add new source
@@ -71,18 +69,16 @@ class ChunkManager
 		int minowners = -1;
 
 		Iterator iter = chunks.entrySet().iterator();
-		while (iter.hasNext())
-		{
+		while (iter.hasNext()) {
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
 
 			// quick and dirty fix: some chunks will be bad, eg bad file hash
 			// if they don't have any sources left, ignore them
 			if ((minowners == -1 || value.getNumberOfSources() < minowners)
-				&& value.getNumberOfSources() > 0)
-			{
-				if (value.isDownloaded == false)
-				{
+				&& value.getNumberOfSources() > 0) {
+
+			    if (value.isDownloaded == false) {
 					ch = value;
 					minowners = ch.getNumberOfSources();
 					
@@ -92,8 +88,7 @@ class ChunkManager
         	//iter.remove(); // avoids a ConcurrentModificationException
 		}
 
-		if (ch == null)
-		{
+		if (ch == null) {
 		//	System.out.println("Couldn't get rarest chunk!");
 			return null;
 		}
@@ -105,48 +100,45 @@ class ChunkManager
 		return ch;
 	}
 
-	public Chunk getChunk(int n)
-	{
+	public Chunk getChunk(int n) {
 		Iterator iter = chunks.entrySet().iterator();
-		while (iter.hasNext())
-		{
-			Map.Entry pair = (Map.Entry)iter.next();
+
+		while (iter.hasNext()) {
+
+		    Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
-			if (value.chunkNumber == n)
-			{
+
+			if (value.chunkNumber == n) {
 				return value;
+
 			}
 		}
 		return null;
 	}
 
-	public int numberOfChunksNotDownloaded()
-	{
+	public int numberOfChunksNotDownloaded() {
 		return nbChunksNotDownloaded;
 	}
 
-	public void markChunkDownloaded(int n)
-	{
+	public void markChunkDownloaded(int n) {
 		// mark all chunks number n as downloaded
 		Chunk ch = null;
 
 		Iterator iter = chunks.entrySet().iterator();
-		while (iter.hasNext())
-		{
+		while (iter.hasNext()) {
 			Map.Entry pair = (Map.Entry)iter.next();
 			Chunk value = (Chunk)pair.getValue();
 
-			if (value.chunkNumber == n)
-			{
+			if (value.chunkNumber == n) {
 				value.markDownloaded();
-			}
 
+			}
 		}
+
 		nbChunksNotDownloaded --;
 	}
 
-	public int getNbChunksAvailable()
-	{
+	public int getNbChunksAvailable() {
 		return chunks.size();
 	}
 }

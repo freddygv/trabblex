@@ -29,7 +29,7 @@ class Downloader implements Runnable
 
         // Make local directory for downloads if it doesn't exist
         File downloadDirectory = new File("downloads");
-        if (!downloadDirectory.exists()) downloadDirectory.mkdir();
+        if (!downloadDirectory.exists()) { downloadDirectory.mkdir(); }
 
         try (Socket clientSocket = new Socket(ip, port);
 
@@ -82,8 +82,8 @@ class Downloader implements Runnable
 
     }
 
-    public int getNbChunks()
-    {
+    public int getNbChunks() {
         return nbChunks;
+
     }
 }

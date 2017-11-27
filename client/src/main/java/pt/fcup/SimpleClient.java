@@ -40,37 +40,39 @@ public class SimpleClient {
             input = sc.nextLine();
             String[] parts = input.split(" ");
 
-            switch(parts[0]){
+            switch(parts[0]) {
                 case "seeder":
-                    if (parts.length < 2)
+                    if (parts.length < 2) {
                         displayHelp();
-                    else{
-                        switch(parts[1]){
+
+                    } else {
+                        switch(parts[1]) {
                             case "list":
                                 listSeeders();
                                 break;
 
                             case "search":
-                            if (parts.length < 3)
-                                displayHelp();
-                            else{
-                                searchFromKeyword(parts[2]);
-                            }
+                                if (parts.length < 3) {
+                                    displayHelp();
+
+                                } else {
+                                    searchFromKeyword(parts[2]);
+                                }
                             break;
                         }
                     }
                     break;
 
                 case "download":
-                    if (parts.length < 2)
+                    if (parts.length < 2) {
                         displayHelp();
-                    else
-                    {
+                    } else {
                         // if file has spaces...
                         String filename = parts[1];
                         for (int i = 2; i < parts.length; i++)
                             filename = filename + " " + parts[i];
                         downloadFile(filename);
+
                     }
                     break;
 
@@ -79,29 +81,34 @@ public class SimpleClient {
                     break;
 
                 case "info":
-                    if (parts.length < 2)
+                    if (parts.length < 2) {
                         displayHelp();
-                    else
-                    {
+                    } else {
                         // if file has spaces...
                         String filename = parts[1];
-                        for (int i = 2; i < parts.length; i++)
+                        for (int i = 2; i < parts.length; i++) {
                             filename = filename + " " + parts[i];
+
+                        }
+
                         fileInfo(filename);
+
                     }
                     break;
 
                 case "play":
-                if (parts.length < 2)
+                    if (parts.length < 2) {
                         displayHelp();
-                    else
-                    {
+
+                    } else {
                         // if file has spaces...
                         String filename = parts[1];
                         for (int i = 2; i < parts.length; i++)
                             filename = filename + " " + parts[i];
                         playFile(filename);
+
                     }
+
                     break;
 
                 case "verbose":
@@ -113,8 +120,8 @@ public class SimpleClient {
                     displayHelp();
                     break;
 
-
             }
+
         } while (input != "quit");
     }
 
@@ -171,7 +178,7 @@ public class SimpleClient {
         if (result == null) {
             System.err.println("Error querying the server for the seeds");
 
-        } else{
+        } else {
 
             localSeederInfo = new JSONArray(result);
 
@@ -203,7 +210,7 @@ public class SimpleClient {
         try {
             Runtime.getRuntime().exec("ffplay downloads/" + file);
 
-        } catch(IOException e){
+        } catch(IOException e) {
             System.err.println("Error: could not read file!");
 
         }
@@ -222,10 +229,13 @@ public class SimpleClient {
             if (f.getFileName().equals(fileName)) {
                 System.out.println("File info " + f.getFileName());
 
-                if (f.getnbChunksNotDownloaded() <= 1)
+                if (f.getnbChunksNotDownloaded() <= 1) {
                     System.out.println("Downloading Finished");
-                else 
+
+                } else {
                     System.out.println("Downloading " + f.getnbChunksNotDownloaded() + " chunks");
+
+                }
 
                 System.out.println("Full path = " + "downloads/" + fileName);
                 File fa =new File("downloads/" + fileName);
@@ -248,7 +258,10 @@ public class SimpleClient {
     private String getHashFromName( String name ) {
         String hashToGet = null;
 
-        if (verbose) System.out.println("Searching for " + name);
+        if (verbose) {
+            System.out.println("Searching for " + name);
+
+        }
 
         for (int i = 0; i < localSeederInfo.length(); i++) {
             if (localSeederInfo.getJSONObject(i).getString("file_name").equals(name)) {
@@ -257,9 +270,13 @@ public class SimpleClient {
             }
         }
 
-        if (hashToGet == null) System.out.println("File not found: " + name);
+        if (hashToGet == null) {
+            System.out.println("File not found: " + name);
 
-        else if (verbose) System.out.println("Found, hash= " + hashToGet);
+        } else if (verbose) {
+            System.out.println("Found, hash= " + hashToGet);
+
+        }
 
         return hashToGet;
     }

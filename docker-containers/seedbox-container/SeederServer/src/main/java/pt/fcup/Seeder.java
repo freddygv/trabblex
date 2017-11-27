@@ -18,7 +18,7 @@ import java.util.List;
 
 
 class Seeder {
-    private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+    private final int CHUNK_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
     private final String HASHING_ALGORITHM = "SHA-256";
     private final String BASE_PATH = "videos/";
 
@@ -206,7 +206,7 @@ class Seeder {
      * @throws FileHashException
      */
     private void chunkAndHash() throws IOException, FileHashException {
-        byte[] chunkBuffer = new byte[CHUNK_SIZE];
+        byte[] chunkBuffer = new byte[CHUNK_SIZE_BYTES];
         String chunkName;
         String chunkHash;
         int chunkIndex = 0;
