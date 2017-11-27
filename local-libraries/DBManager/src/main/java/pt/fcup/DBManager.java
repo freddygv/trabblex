@@ -1,7 +1,10 @@
 package pt.fcup;
 
+import java.beans.PropertyVetoException;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.net.InetAddress;
@@ -17,9 +20,13 @@ public class DBManager {
 
     private Properties DB_PROPS;
 
-    public DBManager() throws IOException, ClassNotFoundException {
+    private ComboPooledDataSource cpds;
+
+    public DBManager() throws IOException, ClassNotFoundException, PropertyVetoException {
+        cpds = new ComboPooledDataSource();
+        cpds.setDriverClass("org.postgresql.Driver");
+
         setPostgresURL();
-        loadDriver();
         loadDBProperties(DB_PROPS_LOCATION);
 
     }
@@ -35,26 +42,13 @@ public class DBManager {
             host = InetAddress.getByName("postgres-server").getHostAddress();
 
         } catch (UnknownHostException e) {
-            host = "127.0.0.1:5432";
+            host = "localhost:5432";
 
         }
 
         DB_URL = "jdbc:postgresql://" + host + "/" + DB_NAME;
+        cpds.setJdbcUrl(DB_URL);
 
-    }
-
-    /**
-     * Load Postgres JDBC driver
-     */
-    private void loadDriver() throws ClassNotFoundException {
-        try {
-            Class.forName("org.postgresql.Driver");
-
-        } catch (ClassNotFoundException e) {
-            System.err.println("Postgres Driver not found.");
-            throw e;
-
-        }
     }
 
     /**
@@ -64,6 +58,9 @@ public class DBManager {
         try (FileInputStream input = new FileInputStream(filename)) {
             DB_PROPS = new Properties();
             DB_PROPS.load(input);
+
+            cpds.setUser(DB_PROPS.getProperty("user"));
+            cpds.setPassword(DB_PROPS.getProperty("password"));
 
         } catch (IOException e) {
             System.err.println("Error loading properties file.");
@@ -135,9 +132,8 @@ public class DBManager {
         }
     }
 
-
-    protected Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_PROPS);
+    private Connection getConnection() throws SQLException {
+        return cpds.getConnection();
 
     }
 

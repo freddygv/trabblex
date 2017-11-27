@@ -22,7 +22,7 @@
         </repository>
     </repositories>
 
-    <dependencyMaagement>
+    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
@@ -32,7 +32,7 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-    </dependencyMaagement>
+    </dependencyManagement>
 
     <dependencies>
          <dependency>

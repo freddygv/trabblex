@@ -21,7 +21,6 @@ WORKDIR /usr/src/app
 
 COPY src                /usr/src/app/src
 COPY pom.xml            /usr/src/app
-COPY db.properties      /usr/src/app
 COPY repo               /usr/src/app/repo
 
 COPY wait-for-it.sh   /usr/src/app

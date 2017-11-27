@@ -2,12 +2,17 @@ package pt.fcup;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 class ServerChunkSeeder implements Runnable {
     private final Socket socket;
 
-    private String filepath;
     private int chunkID;
+    private String filename;
+    private String directory;
 
     public ServerChunkSeeder(Socket socket) {
         this.socket = socket;
@@ -22,7 +27,7 @@ class ServerChunkSeeder implements Runnable {
             PrintWriter out = new PrintWriter(os, true)) {
 
             clientHandshake(in, out);
-            sendFile(os);
+            sendFile(os, filename);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,33 +43,45 @@ class ServerChunkSeeder implements Runnable {
     private void clientHandshake(BufferedReader in, PrintWriter out) throws IOException {
         // In from client
         chunkID = Integer.parseInt(in.readLine());
-        String filename = in.readLine();
+        filename = in.readLine();
 
-        Seedbox sb = Seedbox.getSeedbox();
-        Seeder seederRequested = sb.seederHashMap.get(filename);
-        filepath = seederRequested.getFullPath();
+        setDirectory(filename);
 
         // Out to client
-        int numChunks = seederRequested.getNumberOfChunks();
+        int numChunks = getNumChunks();
         out.println(numChunks);
+    }
+
+    private void setDirectory(String filename) {
+        // First check if there is an extension in the filename (would have been stripped when creating chunk dir)
+        directory = (filename.indexOf(".") > 0) ? filename.substring(0, filename.lastIndexOf("."))
+                                                : filename;
+    }
+
+    /**
+     * Counts number of files in the chunk directory for the requested video
+     */
+    private int getNumChunks() throws IOException {
+        return (int)Files.list(Paths.get("chunks/" + directory)).count();
     }
 
     /**
      * Write from file over socket to client
      */
-    private void sendFile(OutputStream os) {
-        File outgoingFile = new File(filepath + "-" + chunkID);
+    private void sendFile(OutputStream os, String filename) {
+        String filepath = "chunks/" + directory + "/" + filename + "-" + chunkID;
+        File outgoingFile = new File(filepath);
 
         try(FileInputStream fis = new FileInputStream(outgoingFile);
-            BufferedInputStream bis = new BufferedInputStream(fis)) {
+            FileChannel ch = fis.getChannel()) {
 
             long fileLength = outgoingFile.length();
 
             int bytesRead;
-            byte[] contents = new byte[(int)fileLength]; // 1MB
+            ByteBuffer buffer = ByteBuffer.allocate((int)fileLength);
 
-            while((bytesRead = bis.read(contents)) > 0){
-                os.write(contents, 0, bytesRead);
+            while((bytesRead = ch.read(buffer)) > 0){
+                os.write(buffer.array(), 0, bytesRead);
 
             }
 

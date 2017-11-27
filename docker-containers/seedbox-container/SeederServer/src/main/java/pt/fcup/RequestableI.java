@@ -17,7 +17,7 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
      * @return number of chunks that the video was split into
      */
     public boolean requestSeeder(String fileName, com.zeroc.Ice.Current current) {
-        boolean success = false;
+        boolean isSuccess = false;
 
         try {
             // Try to get an existing instance of a Seeder for a given file
@@ -33,16 +33,16 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
             }
 
-            success = true;
+            isSuccess = true;
 
         } catch (IOException | FileHashException e) {
             System.err.println("Error generating seeder.");
-            // TODO: Remove from videos
+            // TODO: Handle. Remove from videos list?
 
 
         } finally {
             // If false is returned, ClientManager handles failure
-            return success;
+            return isSuccess;
 
         }
 

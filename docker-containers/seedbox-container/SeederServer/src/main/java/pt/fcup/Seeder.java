@@ -18,26 +18,23 @@ import java.util.List;
 
 
 class Seeder {
-    private DBManager db;
-
     private final int CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
     private final String HASHING_ALGORITHM = "SHA-256";
     private final String BASE_PATH = "videos/";
 
-    private final String fullPath;
+    private final String filename;
     private final String videoName;
     private final int port;
     private String ip;
 
     private String fileHash;
-    private int numberOfChunks;
 
     private List<String> chunkHashes;
     private List<String> chunkIDs;
 
-    Seeder(String filepath, int port, JSONObject fileMetadata) throws UnknownHostException {
+    Seeder(String filename, int port, JSONObject fileMetadata) throws UnknownHostException {
 
-        fullPath = BASE_PATH + filepath;
+        this.filename = filename;
 
         ip = System.getenv("SEEDBOX_IP");
         if (ip == null) ip = "localhost";
@@ -46,14 +43,6 @@ class Seeder {
 
         videoName = fileMetadata.get("videoName").toString();
 
-    }
-
-    String getFullPath() {
-        return fullPath;
-    }
-
-    int getNumberOfChunks() {
-        return numberOfChunks;
     }
 
     String getVideoName() {
@@ -155,7 +144,7 @@ class Seeder {
      */
     void processVideo() throws FileHashException, IOException {
         try {
-            fileHash = hashFile(new File(fullPath));
+            fileHash = hashFile(new File(BASE_PATH + filename));
             System.out.println("SHA-256 Hash: " + fileHash);
             chunkAndHash();
 
@@ -222,15 +211,18 @@ class Seeder {
         String chunkHash;
         int chunkIndex = 0;
 
-        try (FileInputStream fi = new FileInputStream(new File(fullPath));
+        try (FileInputStream fi = new FileInputStream(new File(BASE_PATH + filename));
              BufferedInputStream bi = new BufferedInputStream(fi)) {
 
             chunkHashes = new ArrayList<>();
             chunkIDs = new ArrayList<>();
 
+            String strippedFile = (filename.indexOf(".") > 0) ? filename.substring(0, filename.lastIndexOf("."))
+                                                              : filename;
+
             int bytesRead;
             while((bytesRead = bi.read(chunkBuffer)) > 0) {
-                chunkName = fullPath + "-" +  Integer.toString(chunkIndex);
+                chunkName = "chunks/" + strippedFile + "/" + filename +  "-" +  Integer.toString(chunkIndex);
                 File currentChunk = new File(chunkName);
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
@@ -245,22 +237,15 @@ class Seeder {
                 }
             }
 
-            numberOfChunks = chunkIndex; // Number of chunks
-
         }
 
     }
 
     /**
-     * TODO: Implement DB connection pool
      * @param query DB insert/update/delete to execute
      */
     private void dbUpdate(String query) throws ClassNotFoundException, IOException, SQLException {
-        db = (ip == "localhost") ? new DBManager(true)
-                                 : new DBManager();
-
-        db.singleUpdate(query);
-        db = null;
+        Seedbox.db.singleUpdate(query);
 
     }
 }

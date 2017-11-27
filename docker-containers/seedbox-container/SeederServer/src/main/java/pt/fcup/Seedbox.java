@@ -14,16 +14,19 @@ public class Seedbox {
     JSONObject fileMetadata;
     HashMap<String, Seeder> seederHashMap = new HashMap<>();
 
+    static DBManager db;
     static Seedbox sb;
 
     public static void main(String[] args) {
         sb = new Seedbox();
 
         try {
+            db = new DBManager();
             sb.run();
 
-        } catch (JSONParsingException e) {
-            System.err.println("Fatal exception, no file metadata available. Exiting.");
+
+        } catch (JSONParsingException | IOException | ClassNotFoundException e) {
+            System.err.println("Fatal exception. Exiting.");
             e.printStackTrace();
             System.exit(1);
 
