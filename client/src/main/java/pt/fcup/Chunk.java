@@ -1,104 +1,95 @@
 package pt.fcup;
 
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.List;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 
-/*
-    Simple chunk structure info used by the chunk manager
-*/
-public class Chunk
-{
-    public boolean isDownloaded = false;
-    public int chunkNumber;
-    public ArrayList<Owner> owners = new ArrayList<Owner>();
 
-    public Chunk(JSONObject obj)
-    {
+/**
+ * Contains a list of peers and servers the contain a specific video chunk
+ */
+public class Chunk {
+    private final String PROTOCOL = "TCP";
+
+    private final int chunkNumber;
+
+    private Map<String, Owner> owners = new HashMap<>();
+
+    public Chunk(JSONObject obj) {
+        chunkNumber = obj.getInt("chunk_id");
         addSource(obj);
+
     }
 
-    /*
-        Update local info about owners
-    */
+    public int getChunkNumber() {
+        return chunkNumber;
+
+    }
+
+    /**
+     * Adds ip/port/seeder info for a given owner to the list of owners for this chunk
+     */
     public void addSource(JSONObject obj) {
 
-        Owner ow = new Owner();
-        ow.ip = obj.getString("owner_ip");
-        ow.port = obj.getInt("owner_port");
-        // quick and dirty fix :(
-        ow.protocol = "TCP";
-        // database returns t or f for true / false
-        ow.is_seeder = obj.getString("is_seeder").equalsIgnoreCase("t");
-        ow.hash = obj.getString("chunk_hash");
+        String ownerIP = obj.getString("owner_ip");
+        int ownerPort = obj.getInt("owner_port");
+        boolean isSeeder = obj.getString("is_seeder").equalsIgnoreCase("t");
+        String chunkHash = obj.getString("chunk_hash");
 
-        if (owners.contains(ow)) {
-            System.out.println("Owner already known !");
+        Owner ow = new Owner(ownerIP,
+                             ownerPort,
+                             PROTOCOL,
+                             isSeeder,
+                             chunkHash);
 
-        }
+        owners.put(ownerIP + ":" + ownerPort, ow);
 
-        owners.add(ow);
-
-        // save chunk number
-        chunkNumber = obj.getInt("chunk_id");
-
-        // debug
-        //System.out.println("Adding source, now has " + owners.size() + " sources");
     }
 
-    /*
-        If a source doesn't have the chunk we asked for,
-        or the hash is bad, then remove that source
-    */
-    public void removeOwner(String ip, int port, String hash) {
-        for (int i = 0; i < owners.size(); i++) {
-            if (owners.get(i).ip == ip
-                && owners.get(i).hash == hash
-                && owners.get(i).port == port) {
-                // debug
-                //System.out.println("Removing bad owner " + owners.get(i).ip + ":" + owners.get(i).port);
-                owners.remove(i);
+    /**
+     * If a source doesn't have the chunk we asked for,
+     * or the hash is bad, then remove that source
+     */
+    public void removeOwner(String ip, int port) {
+        owners.remove(ip + ":" + port);
 
-            }
-        }
     }
 
 
+    /**
+     * Peers preferred as sources.
+     * If no peers are available, download from the seeder servers.
+     */
     public Owner getSource() {
-        int sourceFromSeeder = -1;
-
-        // Get the first owner that isn't a seeder preferably
-        if (owners.size() == 0) {
-            System.out.println("No source found!");
+        if (owners.isEmpty()) {
+            System.out.println("No source available.");
             return null;
 
         }
 
-        for (int i = 0; i < owners.size(); i++) {
-            if (owners.get(i).is_seeder == false) {
-                System.out.println("Got source from client for chunk " + chunkNumber);
-                return owners.get(i);
+        Owner seeder = null;
+
+        for (Map.Entry<String, Owner> chunkPair : owners.entrySet()) {
+            Owner currentOwner = chunkPair.getValue();
+
+            if (currentOwner.is_seeder) {
+                seeder = currentOwner;
 
             } else {
-                sourceFromSeeder = i;
+                System.out.println("Got source from peer for chunk " + chunkNumber);
+                return currentOwner;
 
             }
         }
 
         System.out.println("Got source from seeder for chunk " + chunkNumber);
-        return owners.get(sourceFromSeeder);
+        return seeder;
 
     }
 
     public int getNumberOfSources() {
         return owners.size();
-
-    }
-
-    public void markDownloaded() {
-        isDownloaded = true;
 
     }
 }

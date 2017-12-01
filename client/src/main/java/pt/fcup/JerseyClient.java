@@ -13,9 +13,9 @@ import org.json.JSONArray;
 
 import java.util.Scanner;
 
-/*
-    Used to query the client manager
-*/
+/**
+ * Makes requests to the ClientManager
+ */
 
 public class JerseyClient {
 
@@ -32,6 +32,7 @@ public class JerseyClient {
 
     public String query(String path) {
         return query(path, null, null);
+
     }
 
     public String query(String path, String param) {
@@ -42,19 +43,19 @@ public class JerseyClient {
     public String query(String path, String param, Map<String,String> queryParams) {
         String result = null;
 
+        if (param != null) {
+            path = path + "/";
+
+        } else {
+            param = "";
+
+        }
+
         try {
-            if (param != null) {
-                path = path + "/";
-
-            } else {
-                param = "";
-
-            }
-
             WebTarget resourceWebTarget = client.target(url).path(path + param);
 
             for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                resourceWebTarget = resourceWebTarget.queryParam(entry.getKey().toString(),
+                resourceWebTarget = resourceWebTarget.queryParam(entry.getKey(),
                                                                  entry.getValue());
 
             }
@@ -63,12 +64,15 @@ public class JerseyClient {
 
         } catch(ProcessingException e) {
             System.err.println("Cannot connect to server " + host);
+            e.printStackTrace();
 
         } catch(NotFoundException e) {
             System.err.println("Resource not found: " + url);
+            e.printStackTrace();
 
         } catch(InternalServerErrorException e) {
             System.err.println("Could not connect to database");
+            e.printStackTrace();
 
         }
 

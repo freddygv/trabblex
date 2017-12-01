@@ -11,11 +11,11 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class UploadServer implements Runnable {
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
-    private int BASE_PORT;
+    private int port;
     private int nbChunks;
 
-    public UploadServer(int BASE_PORT, int nbChunks) {
-        this.BASE_PORT = BASE_PORT;
+    public UploadServer(int port, int nbChunks) {
+        this.port = port;
         this.nbChunks = nbChunks;
 
     }
@@ -26,7 +26,7 @@ public class UploadServer implements Runnable {
         ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
 
         boolean listening = true;
-        try (ServerSocket serverSocket = new ServerSocket(BASE_PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (listening) {
                 ChunkSeeder cs = new ChunkSeeder(nbChunks, serverSocket.accept());
                 executor.execute(cs);
@@ -37,6 +37,8 @@ public class UploadServer implements Runnable {
             // Do nothing, UploadServer is already running
 
         } catch (IOException e) {
+            // Issue creating socket
+            // TODO: Handle, try new port?
             e.printStackTrace();
 
         }

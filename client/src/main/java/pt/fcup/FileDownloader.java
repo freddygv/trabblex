@@ -1,7 +1,7 @@
 package pt.fcup;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+
 import org.json.JSONArray;
 
 import java.util.*;
@@ -14,16 +14,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class FileDownloader extends Thread {
+public class FileDownloader implements Runnable {
     private final String name;
     private final String fileHash;
     private final JerseyClient client;
-    private int nbChunksNotDownloaded;
 
     private final int localPort = 26000;
     private String localIP;
 
     private ChunkManager chm;
+    private int numChunks;
 
     private final String HASHING_ALGORITHM = "SHA-256";
 
@@ -36,20 +36,10 @@ public class FileDownloader extends Thread {
             localIP = InetAddress.getLocalHost().getHostAddress();
 
         } catch(UnknownHostException e) {
-            System.err.println("Couldn't get local IP adress !");
-            // do something
+            System.err.println("Couldn't get local IP address!");
+            // TODO: Handle failure
 
         }
-    }
-
-    public String getFileName()
-    {
-        return name;
-    } 
-
-    public int getnbChunksNotDownloaded()
-    {
-        return nbChunksNotDownloaded;
     }
 
     /**
@@ -58,236 +48,220 @@ public class FileDownloader extends Thread {
     **/
     @Override
     public void run() {
+        if (fileHash == null) { return; }
+
         try {
             downloadFile();
 
-        } catch(Exception e) {
+        } catch(IOException e) {
             e.printStackTrace();
 
         }
     }
 
-    private String getChunkOwners() {
-        if (fileHash == null) {
-            System.err.println("Couldn't solve hash from filename!");
-            System.err.println("Error downloading file " + name);
-            return null;
+    private void downloadFile() throws IOException {
+        // Fetch swarm for the file
+        JSONArray remoteChunkOwners = new JSONArray(getChunkOwners());
+        chm = new ChunkManager(remoteChunkOwners);
+
+        while(chm.numberOfChunksNotDownloaded() > 0) {
+            System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + " chunks");
+
+            // determine next chunk to download and get a source for it
+            Chunk nextChunkToDownload = getNextChunk();
+            Owner chunkSource = nextChunkToDownload.getSource();
+
+            // construct downloader and start thread
+            ChunkDownloader dwl = new ChunkDownloader(name,
+                                                      nextChunkToDownload.getChunkNumber(),
+                                                      chunkSource.ip,
+                                                      chunkSource.port);
+
+            Thread dwlThread = new Thread(dwl);
+            dwlThread.start();
+
+            try {
+                dwlThread.join();
+                numChunks = dwl.getNbChunks();
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+
+            }
+
+            checkDownload(nextChunkToDownload, chunkSource);
+            startUploading();
 
         }
 
+        assembleFile(name);
+
+    }
+
+    /**
+     * If there are sources available, get the rarest chunk
+     * Else, request a seeder server
+     */
+    private Chunk getNextChunk() {
+        Chunk rarest = chm.getRarestChunk();
+
+        // Wait for the seeder to come online
+        if (rarest == null) {
+            // If rarest is null, request a new seeder
+            String newSeeder = client.query("createseeder", name);
+            if (newSeeder == null) {
+                System.err.println("File no longer available. Please refresh the list of videos.");
+                Thread.currentThread().interrupt();
+            }
+
+            rarest = chm.getRarestChunk();
+        }
+
+        return rarest;
+
+    }
+
+    /**
+     * Query the ClientManager to get the swarm for this file
+     */
+    private String getChunkOwners() {
         String chunkOwners = client.query("getowners", fileHash);
 
         if (chunkOwners == null) {
             System.err.println("Couldn't get the chunk owners of the file!");
+            Thread.currentThread().interrupt();
 
         }
-
-        System.out.println("ChunkOwners = " + chunkOwners);
-        System.out.println("Filehash = " + fileHash);
 
         return chunkOwners;
     }
 
-    private void checkDownload(Chunk nextChunkToDownload, Owner chunkSource) throws Exception {
-        Map<String,String> queryParams = new HashMap<String,String>();
+    /**
+     * Validate the download, if not valid clean up the bad file
+     */
+    private void checkDownload(Chunk nextChunkToDownload, Owner chunkSource) {
+        int chunkID = nextChunkToDownload.getChunkNumber();
+
+        try {
+            checkHash("downloads/" + name + "-" + chunkID, chunkSource.hash);
+            chm.markChunkDownloaded(chunkID);
+
+            // move file to sources
+            File f = new File("downloads/" + name + "-" + chunkID);
+            File f2 = new File("sources/" + name + "-" + chunkID);
+            f.renameTo(f2);
+
+            // register with portal so other can download from this user
+            registerAsSeeder(chunkSource.hash, chunkID);
+
+        } catch (IOException e) {
+            try {
+                cleanUpBadChunk(nextChunkToDownload, chunkSource, chunkID);
+
+            } catch (IOException ex) {
+                System.err.println("Unable to cleanup bad chunk.");
+                ex.printStackTrace();
+
+            }
+        }
+    }
+
+    /**
+     * If the chunk validation fails, delete bad chunk and remove owner
+     * TODO: Blacklist owner instead of just removing
+     * that way you can requery and still keep the owner out
+     */
+    private void cleanUpBadChunk(Chunk nextChunkToDownload, Owner chunkSource, int chunkID) throws IOException {
+        nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port);
+
+        System.out.println("Bad chunk hash downloads/" + name + "-" + chunkID
+                         + "Will now try another source");
+
+        // delete local chunk, client will try again
+        Path localFile = Paths.get("downloads/" + name + "-" + chunkID);
+        Files.delete(localFile);
+
+    }
+
+    /**
+     * If the download is valid, register this client as a chunk owner in the DB
+     */
+    private void registerAsSeeder(String chunkHash, int id) {
+        Map<String,String> queryParams = new HashMap<>();
         queryParams.put("file_hash", fileHash);
-        queryParams.put("chunk_hash", chunkSource.hash);
-        queryParams.put("chunk_id", Integer.toString(nextChunkToDownload.chunkNumber));
+        queryParams.put("chunk_hash", chunkHash);
+        queryParams.put("chunk_id", Integer.toString(id));
         queryParams.put("ip", localIP);
         queryParams.put("port", Integer.toString(localPort));
 
-        if (checkHash("downloads/" + name + "-" + nextChunkToDownload.chunkNumber, chunkSource.hash) == true) {
-            // mark chunk as downloaded
-            chm.markChunkDownloaded(nextChunkToDownload.chunkNumber);
-
-            // update database
-            client.query("registerclientseeder", null, queryParams);
-
-            // move file to sources
-            File f = new File("downloads/" + name + "-" + nextChunkToDownload.chunkNumber);
-            File f2 = new File("sources/" + name + "-" + nextChunkToDownload.chunkNumber);
-            f.renameTo(f2);
-
-        } else {
-            nextChunkToDownload.removeOwner(chunkSource.ip, chunkSource.port, chunkSource.hash);
-            // inform database to remove chunk owner
-            client.query("unregisterclientseeder", null, queryParams);
-            System.out.println("Bad chunk hash " + "downloads/" + name + "-" + nextChunkToDownload.chunkNumber + "\n"
-                + hashFile("downloads/" + name + "-" + nextChunkToDownload.chunkNumber) + "\n"
-                + chunkSource.hash + "\n"
-                + "Will now try another source");
-            // delete local chunk and try again
-            java.nio.file.Path localFile = Paths.get("downloads/" + name + "-" + nextChunkToDownload.chunkNumber);
-            //Files.delete(localFile);
-        }
-
+        client.query("registerclientseeder", null, queryParams);
     }
 
-    private boolean downloadFile() throws IOException {
-        // storing the file
-        ArrayList<Byte> file = new ArrayList<Byte>();
+    /**
+     * TODO: Update
+     */
+    private void startUploading() {
+        if (SimpleClient.uploader == null) {
+            SimpleClient.uploader = new UploadServer(localPort, numChunks);
 
-        // Fetch all the chunk owners related to the client
-        String chunkOwners = getChunkOwners();
-        JSONArray remoteChunkOwners = new JSONArray(chunkOwners);
-        // have the chunkmanager point to a new instance
-        // TODO does this work ?
-        chm = new ChunkManager(remoteChunkOwners);
-
-
-        UploadServer up = null;
-
-        int nbChunksInFile = 0;
-
-        if (chunkOwners == null)
-            Thread.currentThread().interrupt();
-
-        do {
-            System.out.println("Still has to download " + chm.numberOfChunksNotDownloaded() + " chunks");
-            System.out.println("nbChunksInFile " + nbChunksInFile + "");
-            
-            // determine next chunk to download
-            Chunk nextChunkToDownload = chm.getRarestChunk();
-
-
-            if (nextChunkToDownload == null) {
-                System.err.println("Requesting a new seeder...\n");
-
-                String newSeeder = client.query("createseeder", name);
-                if (newSeeder == null)
-                {
-                    System.err.println("Error requesting the creation of a new seeder: " + newSeeder);
-                    return false;
-                }
-                System.out.println("Result = " + newSeeder);
-                
-                // get to next loop
-                continue;
-            }
-
-            // update chunkmanager to make sure we have all the sources
-                
-          /*  String newChunkOwners = getChunkOwners();
-            JSONArray newRemoteChunkOwners = new JSONArray(newChunkOwners);
-            chm.addChunkOwners(newRemoteChunkOwners);*/
-
-            System.out.println("Downloading chunk " + nextChunkToDownload.chunkNumber);
-
-            // get a source for this chunk
-            Owner chunkSource = nextChunkToDownload.getSource();
-
-            // if no sources available, request a seeder
-          /*  if (chunkSource == null)
-            {
-                
-            }*/
-
-            // start downloader
-            Downloader dwl = new Downloader(name,
-                                            nextChunkToDownload.chunkNumber,
-                                            chunkSource.ip,
-                                            chunkSource.port
-            );
-
-            // the thread will automatically save the file locally
-            dwl.run();
-
-            // wait for it to finish
-            try{
-                dwl.join(); 
-                // todo check if number of chunks has changed ?
-                nbChunksInFile = dwl.getNbChunks();
-                checkDownload(nextChunkToDownload, chunkSource);
-
-                // Assess if all chunks are available 
-                // If no, create a seeder, and start all over again
-                if (chm.getNbChunksAvailable() < nbChunksInFile) {
-                    // debug
-                    //System.out.println("Chunks available: " + chm.getNbChunksAvailable() + "/" + nbChunksInFile);
-                    String newSeeder = client.query("createseeder", name);
-
-                    if (newSeeder == null) {
-                        System.err.println("Error requesting the creation of a new seeder");
-                        return false;
-
-                    }
-                    
-                    // restart, only this time with all the seeders needed...
-                    return downloadFile();
-                }
-
-                // if no uploadserver running, create one
-                if (up == null) {
-                    up = new UploadServer(localPort, nbChunksInFile);
-                    Thread usThread = new Thread(up, "Client upload Thread");
-                    usThread.start();
-
-                }
-
-
-            } catch(Exception e) {
-                e.printStackTrace();
-                return false;
-
-            }
-
-
-        } while (chm.numberOfChunksNotDownloaded() > 0 || nbChunksInFile == 0);
-
-
-        // assemble files bla bla bla
-        if (assembleFile(name, nbChunksInFile) == false) {
-            System.err.println("Error assembling file " + name);
-            return false;
-
-        }
-
-        // check file hash
-        if (checkHash("downloads/" + name, fileHash) == true) {
-            System.out.print("File " + name + " successfully downloaded\n> ");
+            Thread upServer = new Thread(SimpleClient.uploader);
+            upServer.start();
 
         } else {
-            System.err.print("File " + name + " hash is not valid :(\n> ");
+            // Already have an upload server running, do nothing
 
         }
-
-        return true;
-
-
     }
 
-    private boolean assembleFile(String name, int nbChunks) {
+    /**
+     * Combine all chunks for the file in the sources directory and validate merged file
+     */
+    private void assembleFile(String name) {
         try (FileOutputStream fos = new FileOutputStream("downloads/" + name);
             BufferedOutputStream mergingStream = new BufferedOutputStream(fos)) {
-            for (int i = 0; i < nbChunks; i++) {
-                Path localFile = Paths.get("sources/" + name + "-" + i);
-                Files.copy(localFile, mergingStream);
 
+            File[] directoryFiles = new File("sources/").listFiles();
+            Arrays.sort(directoryFiles);
+
+            for (File videoChunk : directoryFiles) {
+                if (videoChunk.getName().startsWith(name)) {
+                    Files.copy(videoChunk.toPath(), mergingStream);
+
+                }
             }
+
+            checkHash("downloads/" + name, fileHash);
+
         } catch(IOException e) {
-            System.err.println("Error re-assembling the file");
-            e.printStackTrace();
-            return false;
+            System.err.println("Error re-assembling the file, please try again.");
+
+
+        } finally {
+            cleanUpAllChunks();
+
+        }
+    }
+
+    /**
+     * Removes all chunks downloaded for when a re-download is needed
+     */
+    private void cleanUpAllChunks() {
+        File directory = new File("downloads/");
+
+        for (File videoChunk : directory.listFiles()) {
+            if (videoChunk.getName().startsWith(name)) {
+                videoChunk.delete();
+            }
         }
 
-        return true;
     }
 
     /**
     *   Makes sure a file or chunk hash is correct
     */
-    public boolean checkHash(String file, String hash) {
-        // check if file exists
-        File f = new File(file);
-        if (!(f.isFile() && f.canRead())) {
-            return false;
-
-        }
-
+    public boolean checkHash(String file, String hash) throws IOException {
         String realHash = hashFile(file);
-
-        return (realHash.equals(hash)) ? true
-                                       : false;
+        return realHash.equals(hash);
 
     }
 
@@ -296,9 +270,9 @@ public class FileDownloader extends Thread {
      * http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
      * @param file
      * @return hex string hash
-     * Copied from Seeder.java, dirty...
+     * TODO: Make local jar, duplicating work
      */
-    private String hashFile(String file) {
+    private String hashFile(String file) throws IOException {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
 
@@ -313,18 +287,20 @@ public class FileDownloader extends Thread {
 
             return bytesToHex(hashedBytes);
 
-        } catch (NoSuchAlgorithmException | IOException e) {
-            // do something !
-            // running out of time...
+        } catch (NoSuchAlgorithmException e) {
+            // Unreachable unless SHA-256 is removed
+            return null;
+
+        } catch (IOException e) {
+            throw e;
 
         }
-        return null;
     }
 
     /**
      * Converts byte array to hex string
      * https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
-     * Copied from Seeder.java, dirty...
+     * TODO: Make local jar, duplicating work
     */
     private final char[] hexArray = "0123456789ABCDEF".toCharArray();
     public String bytesToHex(byte[] bytes) {

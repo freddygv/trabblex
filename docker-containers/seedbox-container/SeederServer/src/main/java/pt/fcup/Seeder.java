@@ -37,7 +37,7 @@ class Seeder {
         this.filename = filename;
 
         ip = System.getenv("SEEDBOX_IP");
-        if (ip == null) ip = "localhost";
+        if (ip == null) {ip = "localhost";}
 
         this.port = port;
 
@@ -93,18 +93,24 @@ class Seeder {
      * @return true if registration was completed without exceptions
      */
     private void registerInChunkOwners() throws ClassNotFoundException, IOException, SQLException {
-        String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder) ";
+        String baseUpdateQuery = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, "
+                                                        + "owner_ip, owner_port, is_seeder) ";
 
         try {
             for (int i = 0; i < chunkHashes.size(); i++) {
-                String updateQuery = baseUpdateQuery + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');", fileHash,
-                                                                                                                   chunkHashes.get(i),
-                                                                                                                   chunkIDs.get(i),
-                                                                                                                   ip,
-                                                                                                                   port);
+                String chunkHash = chunkHashes.get(i);
+                String chunkID = chunkIDs.get(i);
 
-                System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHashes.get(i),
-                                                                                            chunkIDs.get(i)));
+                String updateQuery = baseUpdateQuery
+                                     + String.format("VALUES('%s', '%s', '%s', '%s', '%d', 't');",
+                                                     fileHash,
+                                                     chunkHash,
+                                                     chunkID,
+                                                     ip,
+                                                     port);
+
+                System.out.println(String.format("Seeding chunkHash #%s for: %s as active", chunkHash,
+                                                                                            chunkID));
                 dbUpdate(updateQuery);
 
             }
@@ -122,12 +128,12 @@ class Seeder {
      * @return true if records successfully deleted
      */
     private void deregisterSeeder() throws ClassNotFoundException, IOException, SQLException {
-        String seederDeletionQuery = "UPDATE videos SET seeder_is_active = 'f' WHERE file_hash = '%s';";
-        String neighborDeletionQuery = "DELETE FROM chunk_owners WHERE file_hash = '%s';";
+        String seederDeletionQry = "UPDATE videos SET seeder_is_active = 'f' WHERE file_hash = '%s';";
+        String neighborDeletionQry = "DELETE FROM chunk_owners WHERE file_hash = '%s';";
 
         try {
-            dbUpdate(String.format(seederDeletionQuery, fileHash));
-            dbUpdate(String.format(neighborDeletionQuery, fileHash));
+            dbUpdate(String.format(seederDeletionQry, fileHash));
+            dbUpdate(String.format(neighborDeletionQry, fileHash));
 
         } catch (ClassNotFoundException | IOException | SQLException ec) {
             System.err.println("Seeder de-registration: DB delete failed.");
@@ -200,16 +206,14 @@ class Seeder {
     }
 
     /**
-     * Reads files with a buffer set to the max chunk size and writes them out to the original video directory
+     * Reads files with a buffer set to the max chunk size
+     * and writes them out to the original video directory
      * https://stackoverflow.com/questions/10864317/how-to-break-a-file-into-pieces-using-java
      * @throws IOException
      * @throws FileHashException
      */
     private void chunkAndHash() throws IOException, FileHashException {
         byte[] chunkBuffer = new byte[CHUNK_SIZE_BYTES];
-        String chunkName;
-        String chunkHash;
-        int chunkIndex = 0;
 
         try (FileInputStream fi = new FileInputStream(new File(BASE_PATH + filename));
              BufferedInputStream bi = new BufferedInputStream(fi)) {
@@ -217,18 +221,20 @@ class Seeder {
             chunkHashes = new ArrayList<>();
             chunkIDs = new ArrayList<>();
 
-            String strippedFile = (filename.indexOf(".") > 0) ? filename.substring(0, filename.lastIndexOf("."))
-                                                              : filename;
+            // Filename without extension
+            String strippedFile = filename.substring(0, filename.lastIndexOf("."));
+
+            int chunkIndex = 0;
 
             int bytesRead;
             while ((bytesRead = bi.read(chunkBuffer)) > 0) {
-                chunkName = "chunks/" + strippedFile + "/" + filename +  "-" +  Integer.toString(chunkIndex);
+                String chunkName = "chunks/" + strippedFile + "/" + filename +  "-" +  chunkIndex;
                 File currentChunk = new File(chunkName);
 
                 try (FileOutputStream fo = new FileOutputStream(currentChunk)) {
                     fo.write(chunkBuffer, 0, bytesRead);
                     fo.close();
-                    chunkHash = hashFile(currentChunk);
+                    String chunkHash = hashFile(currentChunk);
 
                     chunkHashes.add(chunkHash);
                     chunkIDs.add(Integer.toString(chunkIndex));
