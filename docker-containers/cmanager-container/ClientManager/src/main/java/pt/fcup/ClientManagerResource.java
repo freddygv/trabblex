@@ -140,22 +140,22 @@ public class ClientManagerResource {
         int retries = 0;
         while (true) {
             try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize()) {
-                RequestableIPrx create = RequestableIPrx.checkedCast(communicator.stringToProxy("SeederRequest:default -h " + host));
+                String iceHost = "SeederRequest:default -h " + host;
+                RequestableIPrx create = RequestableIPrx.checkedCast(communicator.stringToProxy(iceHost));
                 creationSuccess = create.requestSeeder(filename);
                 break;
 
             } catch (Exception e) {
-                // TODO: Client - If RPC error is received, suggest trying again later
-                if (++retries == MAX_RETRIES) return "Error: RPC.";
+                if (++retries == MAX_RETRIES) { return "Error: Try again later"; }
 
             }
 
             retries++;
         }
 
-        // TODO: Client - if seeder creation error, tell user and re-query videos.
+        // TODO: Deregister video on failure, means there's no server nor peer sources
         return (creationSuccess) ? "Creation success."
-                                 : "Error: Seeder creation.";
+                                 : null;
 
 
     }
@@ -171,8 +171,14 @@ public class ClientManagerResource {
                                        @QueryParam("ip") String ip,
                                        @QueryParam("port") String port) {
 
-        String query =  "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, owner_ip, owner_port, is_seeder)"
-                      + "VALUES('%s', '%s', %s, '%s', %s, 'f');".format(file_hash, chunk_hash, chunk_id, ip, port);
+        String query = "INSERT INTO chunk_owners(file_hash, chunk_hash, chunk_id, "
+                                              + "owner_ip, owner_port, is_seeder)"
+
+                     + "VALUES('%s', '%s', %s, '%s', %s, 'f');".format(file_hash,
+                                                                       chunk_hash,
+                                                                       chunk_id,
+                                                                       ip,
+                                                                       port);
 
         runUpdate(query);
         return null;
@@ -189,7 +195,8 @@ public class ClientManagerResource {
                                          @QueryParam("ip") String ip,
                                          @QueryParam("port") String port) {
 
-        String query =  String.format("DELETE FROM chunk_owners WHERE owner_ip='%s' AND owner_port = %s;", ip, port);
+        String query =  String.format("DELETE FROM chunk_owners "
+                                    + "WHERE owner_ip='%s' AND owner_port = %s;", ip, port);
         runUpdate(query);
 
         return null;

@@ -26,7 +26,7 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
             // If there is no instance, create one
             // Files aren't chunked and hashed up front. Only once requested for the first time.
-            if(newSeed == null) {
+            if (newSeed == null) {
                 System.out.println("File hasn't been processed, doing so now.");
                 newSeed = createSingleSeeder(sb.fileMetadata.getJSONObject(fileName), fileName);
                 sb.seederHashMap.put(fileName, newSeed);
@@ -52,13 +52,17 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
      * Processes the video requested and registers the chunks in the portal.
      * @param filename name of the file requested
      */
-    private Seeder createSingleSeeder(JSONObject videoMetadata, String filename) throws IOException, FileHashException, ClassNotFoundException, SQLException {
+    private Seeder createSingleSeeder(JSONObject videoMetadata,
+                                      String filename) throws IOException,
+                                                              FileHashException,
+                                                              ClassNotFoundException,
+                                                              SQLException {
 
         Seeder newSeeder;
 
         newSeeder = new Seeder(filename, BASE_PORT, videoMetadata);
 
-        // Hash file, chunk file, hash chunks, and register in DB, if either fails an exception is thrown
+        // Hash file, chunk file, hash chunks, and register in DB, exception thrown on failure
         newSeeder.processVideo();
         newSeeder.registerSeeder();
 

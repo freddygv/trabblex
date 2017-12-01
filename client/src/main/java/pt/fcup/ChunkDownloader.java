@@ -4,38 +4,39 @@ import java.io.FileOutputStream;
 import java.net.Socket;
 import java.io.*;
 
-class Downloader implements Runnable
-{
-	private final String ip;
-	private final String file;
-	private final int port;
-	private final int chunkNumber;
+/**
+ * Executes handshake with a chunk source and downloads the chunk
+ */
+class ChunkDownloader implements Runnable {
+    private final String ip;
+    private final String file;
+    private final int port;
+    private final int chunkNumber;
 
-	private int nbChunks;
+    private int nbChunks;
 
+    public ChunkDownloader(String file, int chunkNumber, String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+        this.file = file;
+        this.chunkNumber = chunkNumber;
 
-	public Downloader(String file, int chunkNumber, String ip, int port) {
-		this.ip = ip;
-		this.port = port;
-		this.file = file;
-		this.chunkNumber = chunkNumber;
+    }
 
-	}
-
-	@Override
-	public void run() {
+    @Override
+    public void run() {
         // debug
         System.out.println(String.format("Requesting chunk %s of '%s' from: %s", chunkNumber, file, ip));
 
         // Make local directory for downloads if it doesn't exist
         File downloadDirectory = new File("downloads");
-        if(!downloadDirectory.exists()) downloadDirectory.mkdir();
+        if (!downloadDirectory.exists()) { downloadDirectory.mkdir(); }
 
         try (Socket clientSocket = new Socket(ip, port);
 
-             PrintWriter out   = new PrintWriter(clientSocket.getOutputStream(), true);
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(
-                     new InputStreamReader(clientSocket.getInputStream()));
+                                 new InputStreamReader(clientSocket.getInputStream()));
 
              DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
              FileOutputStream fos = new FileOutputStream(downloadDirectory + "/" + file + "-" + chunkNumber)) {
@@ -54,13 +55,13 @@ class Downloader implements Runnable
 
         }
 
-	}
+    }
 
     /**
      * Download chunk to file
      */
-	private void download(DataInputStream dis, FileOutputStream fos) throws IOException {
-        byte[] contents = new byte[1024*1024];
+    private void download(DataInputStream dis, FileOutputStream fos) throws IOException {
+        byte[] contents = new byte[1024*1024]; // 1MB
         int bytesRead;
 
         while ((bytesRead = dis.read(contents)) > 0) {
@@ -82,8 +83,8 @@ class Downloader implements Runnable
 
     }
 
-	public int getNbChunks()
-	{
-		return nbChunks;
-	}
+    public int getNbChunks() {
+        return nbChunks;
+
+    }
 }

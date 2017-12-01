@@ -7,14 +7,18 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-class ServerChunkSeeder implements Runnable {
+/**
+ * Executes handshake with user requesting chunk and transfers it via TCP socket
+ * TODO: Pull out into jar and use as local dependency
+ */
+class ChunkSeeder implements Runnable {
     private final Socket socket;
 
     private int chunkID;
     private String filename;
     private String directory;
 
-    public ServerChunkSeeder(Socket socket) {
+    public ChunkSeeder(Socket socket) {
         this.socket = socket;
 
     }
@@ -53,7 +57,8 @@ class ServerChunkSeeder implements Runnable {
     }
 
     private void setDirectory(String filename) {
-        // First check if there is an extension in the filename (would have been stripped when creating chunk dir)
+        // First check if there is an extension in the filename
+        // (would have been stripped when creating chunk dir)
         directory = (filename.indexOf(".") > 0) ? filename.substring(0, filename.lastIndexOf("."))
                                                 : filename;
     }
@@ -80,7 +85,7 @@ class ServerChunkSeeder implements Runnable {
             int bytesRead;
             ByteBuffer buffer = ByteBuffer.allocate((int)fileLength);
 
-            while((bytesRead = ch.read(buffer)) > 0){
+            while ((bytesRead = ch.read(buffer)) > 0){
                 os.write(buffer.array(), 0, bytesRead);
 
             }
