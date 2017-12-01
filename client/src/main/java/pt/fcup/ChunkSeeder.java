@@ -2,21 +2,21 @@ package pt.fcup;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Executes handshake with user requesting chunk and transfers it via TCP socket
- * TODO: Pull out Server version into jar and use as local dependency
+ * TODO: Pull this out into a local dependency jar
  */
 class ChunkSeeder implements Runnable {
-    private final int numChunks;
     private final Socket socket;
 
     private int chunkID;
     private String filepath;
 
-    public ChunkSeeder(int numChunks, Socket socket) {
+    public ChunkSeeder(Socket socket) {
         this.socket = socket;
-        this.numChunks = numChunks;
 
     }
 
@@ -48,37 +48,35 @@ class ChunkSeeder implements Runnable {
         filepath = in.readLine();
 
         // Out to peer
-        out.println(numChunks);
+        out.println(SimpleClient.chunkCounts.get(filepath));
     }
 
     /**
      * Write from file over socket to client
+     *
+     * Using FileChannel for thread safety
      */
     private void sendFile(OutputStream os) {
-        File file = new File("sources/" + filepath + "-" + chunkID);
+        File outgoingFile = new File("sources/" + filepath + "-" + chunkID);
 
-        System.out.println(String.format("Peer requested chunk id #%s for file: %s",
-                                         chunkID,
-                                         filepath));
+        try(FileInputStream fis = new FileInputStream(outgoingFile);
+            FileChannel ch = fis.getChannel()) {
 
-        try(FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis)) {
-
-            long fileLength = file.length();
-            byte[] contents = new byte[(int)fileLength]; // 1MB
+            long fileLength = outgoingFile.length();
 
             int bytesRead;
-            while ((bytesRead = bis.read(contents)) > 0) {
-                os.write(contents, 0, bytesRead);
-                System.out.println("Writing bytes " + contents);
+            ByteBuffer buffer = ByteBuffer.allocate((int)fileLength);
+
+            while ((bytesRead = ch.read(buffer)) > 0){
+                os.write(buffer.array(), 0, bytesRead);
 
             }
 
-        } catch (FileNotFoundException e) {
-            // TODO: Handle failure, deregister client
+            os.flush();
 
         } catch (IOException e) {
             e.printStackTrace();
+            // TODO: Handle failure, deregister this user
 
         }
     }

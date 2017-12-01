@@ -10,40 +10,37 @@ import java.util.concurrent.ThreadPoolExecutor;
  * UploadServer creates a thread pool to handle incoming requests for file chunks.
  */
 public class UploadServer implements Runnable {
-    private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
+    private final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
+    private final int MAX_RETRIES = 6;
     private int port;
-    private int nbChunks;
 
-    public UploadServer(int port, int nbChunks) {
+    public UploadServer(int port) {
         this.port = port;
-        this.nbChunks = nbChunks;
 
     }
-
 
     @Override
     public void run() {
         ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
 
-        boolean listening = true;
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            while (listening) {
-                ChunkSeeder cs = new ChunkSeeder(nbChunks, serverSocket.accept());
-                executor.execute(cs);
+        int counter = 0;
+        while (counter++ < MAX_RETRIES) {
+            try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+                // ServerSocket created, listen for incoming connections
+                while (true) {
+                    ChunkSeeder cs = new ChunkSeeder(serverSocket.accept());
+                    executor.execute(cs);
+
+                }
+
+            } catch (IOException e) {
+                // Try a new port
+                port++;
 
             }
-
-        } catch(java.net.BindException e) {
-            // Do nothing, UploadServer is already running
-
-        } catch (IOException e) {
-            // Issue creating socket
-            // TODO: Handle, try new port?
-            e.printStackTrace();
-
         }
 
         executor.shutdown();
-
     }
 }

@@ -41,8 +41,9 @@ class ChunkManager {
 
     /**
      * Loops over all remaining chunks and return the one with the fewest sources
+     * (that isn't actively being downloaded)
      */
-	public Chunk getRarestChunk() {
+	public Chunk getRarestChunk(Set<Integer> activeDownloads) {
 		Chunk rarest = null;
 		int minowners = Integer.MAX_VALUE;
 
@@ -50,7 +51,10 @@ class ChunkManager {
             Chunk currentChunk = chunks.get(id);
             int numSources = currentChunk.getNumberOfSources();
 
-            if (currentChunk.getNumberOfSources() < minowners && numSources > 0) {
+            if (currentChunk.getNumberOfSources() < minowners
+                    && numSources > 0
+                    && !activeDownloads.contains(Integer.parseInt(id))) {
+
                 rarest = currentChunk;
                 minowners = numSources;
 
@@ -61,7 +65,7 @@ class ChunkManager {
         return rarest;
 	}
 
-	public void markChunkDownloaded(int n) {
+	public synchronized void markChunkDownloaded(int n) {
         chunksPending.remove(Integer.toString(n));
 
 	}

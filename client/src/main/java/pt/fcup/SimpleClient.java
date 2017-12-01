@@ -2,26 +2,43 @@ package pt.fcup;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 
 public class SimpleClient {
-    private final String MODE = "remote";
+    static final String MODE = "remote";
+    static final int LOCAL_PORT = 26000;
+    static final String localIP = getLocalIP();
 
+    static Map<String, Integer> chunkCounts = new ConcurrentHashMap<>();
     private Map<String, String> hashes = new HashMap<>();
+
     private JerseyClient client;
     static UploadServer uploader;
 
     public SimpleClient() {
-        client = (MODE == "local") ? new JerseyClient("http://127.0.0.1:8080",
-                "/trabblex/clientmanager/")
-                : new JerseyClient("http://35.195.218.215:8080",
-                "/trabblex/clientmanager/");
+        client = new JerseyClient();
 
+    }
+
+    private static String getLocalIP() {
+        try{
+            return InetAddress.getLocalHost().getHostAddress();
+
+        } catch(UnknownHostException e) {
+            System.err.println("Couldn't get local IP address, exiting!");
+            System.exit(1);
+            return null;
+
+        }
     }
 
     public static void main(String[] args) {
@@ -142,7 +159,7 @@ public class SimpleClient {
     * Starts the download of a file
     **/
     private void downloadFile(String name) {
-        FileDownloader f = new FileDownloader(name, hashes.get(name), client);
+        FileDownloader f = new FileDownloader(name, hashes.get(name));
         Thread fdThread = new Thread(f);
         fdThread.start();
 
@@ -156,6 +173,22 @@ public class SimpleClient {
 
         for (File video : directory.listFiles()) {
             System.out.println("> " + video.getName() + " (" + video.length()/(1024*1024) + " MB)");
+
+        }
+    }
+
+    /**
+     * Spin up ServerSockets to accept requests for downloaded chunks
+     */
+    static void startUploadServer() {
+        if (uploader == null) {
+            uploader = new UploadServer(LOCAL_PORT);
+
+            Thread upServer = new Thread(uploader);
+            upServer.start();
+
+        } else {
+            // Do nothing, already running
 
         }
     }
