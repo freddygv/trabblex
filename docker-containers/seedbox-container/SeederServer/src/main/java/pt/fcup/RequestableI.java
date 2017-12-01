@@ -37,8 +37,7 @@ public class RequestableI implements pt.fcup.generated.RequestableI {
 
         } catch (IOException | FileHashException e) {
             System.err.println("Error generating seeder.");
-            // TODO: Handle. Remove from videos list?
-
+            // TODO: Remove from videos table in DB
 
         } finally {
             // If false is returned, ClientManager handles failure

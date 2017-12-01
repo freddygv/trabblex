@@ -3,6 +3,8 @@ package pt.fcup;
 /**
  * Server threads accepting incoming connections from Client Manager.
  * Requests come as RPC calls using ZeroC's ICE.
+ *
+ * By default, ICE's threadpool size is 1, so synchronization of Seeder methods is unnecessary
  */
 public class IceServer implements Runnable {
     @Override

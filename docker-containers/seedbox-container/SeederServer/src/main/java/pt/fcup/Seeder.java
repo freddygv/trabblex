@@ -242,9 +242,7 @@ class Seeder {
                     chunkIndex++;
                 }
             }
-
         }
-
     }
 
     /**

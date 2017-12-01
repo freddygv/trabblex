@@ -72,6 +72,8 @@ class ChunkSeeder implements Runnable {
 
     /**
      * Write from file over socket to client
+     *
+     * Using FileChannel for thread safety
      */
     private void sendFile(OutputStream os, String filename) {
         String filepath = "chunks/" + directory + "/" + filename + "-" + chunkID;
