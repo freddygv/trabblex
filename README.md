@@ -10,6 +10,9 @@ Trabblex is a streaming service that is a blend between Bittorrent and tradition
 *   **[PostgresDB](docker-containers/database-container):** Maintains global state of files available and users who can seed them.
 *   **[Client](client):** Client for users to access the service.
 
+### Deployment
+The SeederServer, ClientManager, and Postgres DB are all containerized services deployed to Google Container Clusters with Kubernetes. Deployment scripts and configuration files can be found: [here](docker-containers). 
+
 ### Contributors
 * @lebastaq
 * @freddygv
