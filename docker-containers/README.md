@@ -13,6 +13,6 @@ Run docker containers locally with: `docker-compose up`
 
 Push docker containers to GCR with `docker-compose push`
 
-Deploy to Google Container Clusters with `/.deploy.sh`
+Deploy to Google Container Clusters with `./deploy.sh`
 
-Bring down services with `/.teardown.sh`
+Bring down services with `./teardown.sh`
